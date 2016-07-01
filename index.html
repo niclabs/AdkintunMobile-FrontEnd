@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <title>Circulo alrededor de Antenas</title>
+  <script src="initial-data-antennas.js"></script>
+  <style>
+    html, body {
+      height: 90%;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="markerclusterer.js"></script>
+<script>
+
+  function initMap() {
+    var myLatLng = {lat: 	-33.447487, lng: -70.673676};
+
+    var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 8,
+      center: myLatLng
+    });
+    var size = data.antennas.length;
+    var markers = [];
+    for (var i = 0; i < 5000; i++) {
+      var marker = new google.maps.Marker({
+        position: {lat: data.antennas[i].lat, lng: data.antennas[i].lon},
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 20,
+          fillOpacity: 0.5,
+          strokeOpacity: 0.5
+        }
+      });
+      markers.push(marker);
+    }
+    var options = {
+        imagePath: 'images/m'
+      };
+    var markerCluster = new MarkerClusterer(map, markers, options);
+  }
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6Ot4ODflFdqkPttmKo1d2D-uWzATR_mA&signed_in=true&callback=initMap"></script>
+  </body>
+</html>
