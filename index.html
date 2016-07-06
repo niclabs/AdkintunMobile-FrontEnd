@@ -1,112 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Circulo alrededor de Antenas</title>
-  <script src="initial-data-antennas.js"></script>
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="js/markerclusterer.js"></script>
+  <script src="js/antennas.js"></script>
+  <script src="js/carriers.js"></script>
+  <script src="js/map.js"></script>
   <style>
     html, body {
       height: 90%;
       margin: 0;
       padding: 0;
     }
-    #map {
-      height: 100%;
+      #map {
+      height: 600px;
     }
   </style>
-  <script src="jquery.min.js"></script>
 </head>
 <body>
-<div id="map"></div>
-<script src="markerclusterer.js"></script>
-<script>
- var clusterMarkers = [];
-  function initMap() {
-    var myLatLng = {lat: 	-33.447487, lng: -70.673676};
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a href="#">Mapa interactivo</a></li>
+    <li role="presentation"><a href="graficos.html">Gráficos</a></li>
+  </ul>
+  <div class="form-group">
+    <label for="sel1">Seleccione operador</label>
+    <select class="form-control" id="sel1">
+      <option value=-1>Todos los operadores</option>;
+    </select>
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-8" id="map"></div>
+      <div class="col-md-4">
+          <p>Información</p>
+      </div>
+    </div>
+  </div>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6Ot4ODflFdqkPttmKo1d2D-uWzATR_mA&signed_in=true&callback=initMap">
+</script>
 
-    map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 8,
-      center: myLatLng,
-    });
-    size = data.antennas.length;
-    markers = [];
-    for (var i = 0; i < size; i++) {
-      var marker = new google.maps.Marker({
-        position: {lat: data.antennas[i].lat, lng: data.antennas[i].lon},
-      });
-      marker.addListener('click', function() {
-        document.write(marker.getPosition());
-      });
-      markers.push(marker);
+  <script>
+  //populate carriers
+    var data = data_carriers.carriers;
+    var size = data.length;
+    var option = '';
+    for( var i = 0;i<size;i++)
+    {
+      option += '<option value="'+i+ '">' + data[i].name + '</option>';
     }
-    markers.sort(function(a,b){
-      return a.position.lat() > b.position.lat() ? 1:-1;
-    })
-    options = {
-        imagePath: 'images/m'
-      };
-
-      mc = new MarkerClusterer(map,clusterMarkers,options);
-    $.getJSON("comunas.json",function(data){
-      var geoJsonObject = topojson.feature(data, data.objects.comunas)
-      map.data.addGeoJson(geoJsonObject);
-    });
-    google.maps.event.addListener(map, 'idle', showMarkers);
-  }
-  function lowerBound(lat){
-    var min = 0;
-    var max = size-1;
-    var mid = (min+max)>>1;
-    var ans = 0;
-    while(min<=max){
-      mid = (min+max)>>1;
-      if(markers[mid].position.lat()<=lat){
-        ans = mid;
-        min = mid+1;
-      }
-      else{
-        max = mid-1;
-      }
-    }
-    return ans;
-  }
-  function upperBound(lat){
-    var min = 0;
-    var max = size-1;
-    var mid = (min+max)>>1;
-    var ans = 0;
-    while(min<=max){
-      mid = (min+max)>>1;
-      if(markers[mid].position.lat()>=lat){
-        ans = mid;
-        max = mid-1;
-      }
-      else{
-        min = mid+1;
-      }
-    }
-    return ans;
-  }
-  function showMarkers() {
-    clusterMarkers = [];
-    mc.clearMarkers();
-    var bounds = map.getBounds();
-    var ne = bounds.getNorthEast();
-    var so = bounds.getSouthWest();
-    var inicio = upperBound(so.lat());
-    var final = lowerBound(ne.lat());
-    for (var i = inicio; i <= final; i++) {
-      clusterMarkers.push(markers[i]);
-    }
-    mc = new MarkerClusterer(map,clusterMarkers,options);
-  }
-
-
+    $('#sel1').append(option);
+  </script>
 
 </script>
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6Ot4ODflFdqkPttmKo1d2D-uWzATR_mA&signed_in=true&callback=initMap"></script>
   </body>
 </html>
