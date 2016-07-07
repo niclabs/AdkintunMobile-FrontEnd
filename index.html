@@ -40,8 +40,9 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-8" id="map"></div>
-      <div class="col-md-4">
-          <p>Información</p>
+      <div class="col-md-4" id="info">
+          <h1>Información de la antena</h1>
+          <i>No hay antena seleccionada</i>
       </div>
     </div>
   </div>
@@ -56,9 +57,13 @@
     var option = '';
     for( var i = 0;i<size;i++)
     {
-      option += '<option value="'+i+ '">' + data[i].name + '</option>';
+      option += '<option value="'+data[i].mnc +'">' + data[i].name + '</option>';
     }
     $('#sel1').append(option);
+
+    $('#sel1').on('change', '', function (e) {
+      showMarkers();
+    });
   </script>
 
 </script>
