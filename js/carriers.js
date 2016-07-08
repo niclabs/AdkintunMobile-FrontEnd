@@ -1,4 +1,4 @@
-data_carriers = 
+data_carriers =
 {
     "carriers":[
         {
@@ -86,4 +86,10 @@ data_carriers =
             "id": 73099
         }
     ]
+}
+
+var size_carriers = data_carriers.carriers.length;
+var mncToName = {};
+for(var i=0;i<size_carriers;i++){
+  mncToName[data_carriers.carriers[i].mnc]=data_carriers.carriers[i].name;
 }

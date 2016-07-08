@@ -17,47 +17,76 @@
   <script src="js/carriers.js"></script>
 </head>
 <body>
-  <ul class="nav nav-tabs">
-    <li role="presentation"><a href="index.html">Mapa interactivo</a></li>
+  <ul class="nav nav-pills">
+    <li role="presentation"><a href="index.html">Mapa de antenas</a></li>
     <li role="presentation"><a href="graficos.html">Gráficos</a></li>
     <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
   </ul>
-  <div class="form-group">
-    <div class='input-group date' id='datetimepicker1'>
-        <input type='text' class="form-control" />
-        <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
-        </span>
+  <div class="container">
+    <div class="form-group">
+      <div class='input-group date' id='datetimepicker1' onSelect=>
+          <input type='text' class="form-control" />
+          <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+      </div>
     </div>
   </div>
-  <div class="table-responsive">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="container" id="reports" style="display: none;">
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+      <div class="panel-heading">Dispositivos</div>
+      <div class="table-responsive">
+        <table class="table" id="devices">
+          <thead>
+            <tr>
+              <th>Operador</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Mediciones</div>
+      <table class="table" id="gsm">
+        <thead>
+          <tr>
+            <th>Operador</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Sims</div>
+      <table class="table" id="sims">
+        <thead>
+          <tr>
+            <th>Operador</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
   </div>
+  <div class="container">
+    <h3><span class="label label-danger" id="error"></span></h3>
+  </div>
+
+
 </body>
 <script type="text/javascript">
     var server = "http://172.30.65.50:9000/";
@@ -65,7 +94,8 @@
     //datetimepicker format
     $(function () {
         $('#datetimepicker1').datetimepicker({
-          format: 'MM-YYYY'
+          format: 'MM-YYYY',
+          useCurrent: false
         });
     });
     function getUrl(year,month){
@@ -80,10 +110,39 @@
       var jqxhr = $.getJSON(url, function() {
       })
       .done(function(data) {
-        console.log(data);
+        var add, mnc;
+        $("#error").html("");
+        $("#reports").show();
+
+        //populate devices
+        add = "";
+        $.each(data.total_device_carrier, function( k, v ) {
+          mnc = k.substring(3);
+          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+        });
+        add += "<tr><td>Total</td><td>"+data.total_devices+"</td></tr>"
+        $("#devices tbody").html(add);
+        //populate gsm
+        add = "";
+        $.each(data.total_gsm_carrier, function( k, v ) {
+          mnc = k.substring(3);
+          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+        });
+        add += "<tr><td>Total</td><td>"+data.total_gsm+"</td></tr>"
+        $("#gsm tbody").html(add);
+        //populate sims
+        add = "";
+        $.each(data.total_sims_carrier, function( k, v ) {
+          mnc = k.substring(3);
+          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+        });
+        add += "<tr><td>Total</td><td>"+data.total_sims+"</td></tr>"
+        $("#sims tbody").html(add);
+
       })
       .fail(function() {
-        console.log( "error" );
+          $("#error").html("<i>No hay información disponible para esta fecha</i>");
+          $("#reports").hide();
       });
 });
 
