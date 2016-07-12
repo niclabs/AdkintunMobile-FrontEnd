@@ -1,1 +1,0 @@
-# AdkintunMobile-FrontEnd
