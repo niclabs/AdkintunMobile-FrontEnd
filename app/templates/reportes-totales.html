@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Circulo alrededor de Antenas</title>
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="js/moment.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="js/antennas.js"></script>
+  <script src="js/carriers.js"></script>
+</head>
+<body>
+  <ul class="nav nav-pills">
+    <li role="presentation"><a href="index.html">Mapa de antenas</a></li>
+    <li role="presentation"><a href="graficos.html">Gráficos</a></li>
+    <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
+  </ul>
+  <div class="container">
+    <div class="form-group">
+      <div class='input-group date' id='datetimepicker1' onSelect=>
+          <input type='text' class="form-control" />
+          <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+      </div>
+    </div>
+  </div>
+  <div class="container" id="reports" style="display: none;">
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+      <div class="panel-heading">Dispositivos</div>
+      <div class="table-responsive">
+        <table class="table" id="devices">
+          <thead>
+            <tr>
+              <th>Operador</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Mediciones</div>
+      <table class="table" id="gsm">
+        <thead>
+          <tr>
+            <th>Operador</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Sims</div>
+      <table class="table" id="sims">
+        <thead>
+          <tr>
+            <th>Operador</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="container">
+    <h3><span class="label label-danger" id="error"></span></h3>
+  </div>
+
+
+</body>
+<script type="text/javascript">
+    var server = "http://172.30.65.50:9000/";
+    var data_totales;
+    //datetimepicker format
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+          format: 'MM-YYYY',
+          useCurrent: false
+        });
+    });
+    function getUrl(year,month){
+      return server+"reports/general_reports/"+year+"/"+month;
+    }
+    //datetimepicker event
+    $("#datetimepicker1").on("dp.change", function(e) {
+      var date =  $("#datetimepicker1").data("DateTimePicker").date().toDate();
+      var year = date.getFullYear();
+      var month = date.getMonth()+1;
+      var url = getUrl(year,month);
+      var jqxhr = $.getJSON(url, function() {
+      })
+      .done(function(data) {
+        var add, mnc;
+        $("#error").html("");
+        $("#reports").show();
+
+        //populate devices
+        add = "";
+        $.each(data.total_device_carrier, function( k, v ) {
+          mnc = k.substring(3);
+          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+        });
+        add += "<tr><td>Total</td><td>"+data.total_devices+"</td></tr>"
+        $("#devices tbody").html(add);
+        //populate gsm
+        add = "";
+        $.each(data.total_gsm_carrier, function( k, v ) {
+          mnc = k.substring(3);
+          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+        });
+        add += "<tr><td>Total</td><td>"+data.total_gsm+"</td></tr>"
+        $("#gsm tbody").html(add);
+        //populate sims
+        add = "";
+        $.each(data.total_sims_carrier, function( k, v ) {
+          mnc = k.substring(3);
+          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+        });
+        add += "<tr><td>Total</td><td>"+data.total_sims+"</td></tr>"
+        $("#sims tbody").html(add);
+
+      })
+      .fail(function() {
+          $("#error").html("<i>No hay información disponible para esta fecha</i>");
+          $("#reports").hide();
+      });
+});
+
+</script>
+</html>
