@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Circulo alrededor de Antenas</title>
+  <title> Adkintun - Gráficos </title>
 
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -17,10 +17,12 @@
 </head>
 <body>
   <ul class="nav nav-pills">
-    <li role="presentation"><a href="index.html">Mapa de antenas</a></li>
+    <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
     <li role="presentation" class="active"><a href="#">Gráficos</a></li>
-    <li role="presentation"><a href="reportes-totales.html">Reportes totales</a></li>
+    <li role="presentation"><a href="{{url_for('reports')}}">Reportes totales</a></li>
   </ul>
-<h1>Gráficos acá</h1>
+<div class="container-fluid">
+  <h1>Gráficos acá</h1>
+</div>
 </body>
 </html>

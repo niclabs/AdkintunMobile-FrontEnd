@@ -6,6 +6,13 @@ from flask import render_template, json, jsonify
 def index():
     return render_template('index.html')
 
+@app.route('/graficos')
+def graphs():
+    return render_template('graficos.html')
+
+@app.route('/reportes')
+def reports():
+    return render_template('reportes-totales.html')
 
 
 @app.errorhandler(404)

@@ -5,21 +5,20 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Circulo alrededor de Antenas</title>
+  <title>Adkintun - Reportes</title>
 
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="js/moment.js"></script>
+  <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
-  <script src="js/antennas.js"></script>
-  <script src="js/carriers.js"></script>
+  <script src="{{ url_for('static', filename='js/carriers.js') }}"></script>
 </head>
 <body>
   <ul class="nav nav-pills">
-    <li role="presentation"><a href="index.html">Mapa de antenas</a></li>
-    <li role="presentation"><a href="graficos.html">Gráficos</a></li>
+    <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
+    <li role="presentation"><a href="{{url_for('graphs')}}">Gráficos</a></li>
     <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
   </ul>
   <div class="container">

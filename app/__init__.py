@@ -12,3 +12,4 @@ app.config.from_object('config.DefaultConfig')
 db = SQLAlchemy(app)
 
 from . import public
+from . import admin

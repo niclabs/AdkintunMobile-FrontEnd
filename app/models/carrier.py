@@ -12,8 +12,6 @@ class Carrier(base_model.BaseModel):
     name = db.Column(db.String(50))
     mcc = db.Column(db.Integer)
     mnc = db.Column(db.Integer)
-    sims = db.relationship('Sim', backref='carrier', lazy='dynamic')
-    telephony_observation_events = db.relationship('TelephonyObservationEvent', backref='carrier', lazy='dynamic')
 
     def __init__(self, name=None, mcc=None, mnc=None):
         self.name = name
@@ -38,10 +36,3 @@ class Carrier(base_model.BaseModel):
         'Celupago': 'celupago',
         'Colo-Colo Móvil Wanderers Móvil': 'ccwm',
         'Netline': 'netline'}
-
-
-    def add_sim(self, sim):
-        from app.models.sim import Sim
-        existent_sim = self.sims.filter(Sim.serial_number == sim.serial_number).first()
-        if not existent_sim:
-            self.sims.append(sim)
