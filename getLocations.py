@@ -39,11 +39,12 @@ def main():
             url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&sensor=false"
             response = urllib.request.urlopen(url)
             data = json.load(reader(response))
-            for element in data["results"][0]["address_components"]:
-                if element["types"] == ["locality", "political"]:
-                    city = element["long_name"]
-                if element["types"] == ["administrative_area_level_1", "political"]:
-                    region = element["long_name"]
+            if data["status"]=="OK":
+                for element in data["results"][0]["address_components"]:
+                    if element["types"] == ["locality", "political"]:
+                        city = element["long_name"]
+                    if element["types"] == ["administrative_area_level_1", "political"]:
+                        region = element["long_name"]
             time.sleep(1)
         antennas[i]["city"] = city
         antennas[i]["region"] = region
