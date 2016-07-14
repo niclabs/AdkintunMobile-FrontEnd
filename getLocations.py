@@ -16,35 +16,35 @@ def main():
     for i in range(size):
         if (not (i+1)%200):
             print ("Wrote ",i+1," antennas")
+        #print (i)
         lat = str(antennas[i]["lat"])
         lon = str(antennas[i]["lon"])
         url = "http://localhost/nominatim/reverse?format=json&lat="+lat+"&lon="+lon+"&zoom=18&addressdetails=1"
-        response = urllib.request.urlopen(url)
-        data = json.load(reader(response))
         city = "unknown"
         region = "unknown"
-        if ('error' not in data):
-            if ('state' not in data["address"]):
-                print("Searching ",i," in googlemaps")
-                url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&sensor=false"
-                response = urllib.request.urlopen(url)
-                data = json.load(reader(response))
-                for element in data["results"][0]["address_components"]:
-                    if element["types"] == ["locality", "political"]:
-                        city = element["long_name"]
-                    if element["types"] == [ "administrative_area_level_1", "political" ]:
-                        region = element["long_name"]
-                time.sleep(1)
-            elif ('city' in data["address"]):
-                city = data["address"]["city"]
-            elif ('town' in data["address"]):
-                city = data["address"]["town"]
-            elif ('village' in data["address"]):
-                city = data["address"]["village"]
+        try:
+            response = urllib.request.urlopen(url)
+            data = json.load(reader(response))
+            if ('error' not in data):
+                if ('city' in data["address"]):
+                    city = data["address"]["city"]
+                elif ('town' in data["address"]):
+                    city = data["address"]["town"]
+                elif ('village' in data["address"]):
+                    city = data["address"]["village"]
 
-            if region=="unknown":
                 region = data["address"]["state"]
-
+        except:
+            print("Searching ", i, " in googlemaps")
+            url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&sensor=false"
+            response = urllib.request.urlopen(url)
+            data = json.load(reader(response))
+            for element in data["results"][0]["address_components"]:
+                if element["types"] == ["locality", "political"]:
+                    city = element["long_name"]
+                if element["types"] == ["administrative_area_level_1", "political"]:
+                    region = element["long_name"]
+            time.sleep(1)
         antennas[i]["city"] = city
         antennas[i]["region"] = region
         result = json.dumps(antennas[i], ensure_ascii=False)
