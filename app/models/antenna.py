@@ -15,6 +15,8 @@ class Antenna(base_model.BaseModel):
     lon = db.Column(db.Float)
     carriers = db.relationship('Carrier', secondary=antennas_carriers,
                                backref=db.backref('antennas', lazy='dynamic'), lazy='dynamic')  # relationship
+    city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
+
 
     def __init__(self, cid=None, lac=None, lat=None, lon=None):
         self.cid = cid
