@@ -1,7 +1,7 @@
 from app import db
 from app.data import initial_data_antennas
 from app.data import initial_data_carriers
-from app.data.communes import get_commune_code_by_name,get_commune_name_by_id,uniform
+from app.data.regions import get_region_code_by_name
 from app.data.data_antennas import data_antennas
 from flask_script import Command
 from sqlalchemy.exc import IntegrityError
@@ -106,8 +106,10 @@ class PopulateCities(Command):
 
 
 class PopulateRegions(Command):
+    from app.models.region import Region
+
     def run(self):
-        return
+       return
 
 
 def delete_db():
