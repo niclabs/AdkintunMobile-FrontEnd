@@ -5,12 +5,13 @@ class City(base_model.BaseModel):
     '''
     Clase ciudad.
     '''
-    __tablename__ = 'cities'
+    __tablename__ = 'city'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(50))
     antennas = db.relationship('Antenna', backref='city',
                                 lazy='dynamic')
     region_id = db.Column(db.Integer, db.ForeignKey('region.id'))
+
 
     def __init__(self, id, name=None, region_id=None):
         self.id = id
@@ -19,4 +20,4 @@ class City(base_model.BaseModel):
 
 
     def __repr__(self):
-        return '<City id: %r,  name: %r, region_id: %r>' % (self.id, self.name, self.region_id)
+        return '<City name: %r, region: %r>' % (self.name, self.region)

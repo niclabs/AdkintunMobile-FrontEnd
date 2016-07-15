@@ -1,9 +1,11 @@
 from app import db
 from app.data import initial_data_antennas
 from app.data import initial_data_carriers
+from app.data.communes import get_commune_code_by_name,get_commune_name_by_id,uniform
+from app.data.data_antennas import data_antennas
 from flask_script import Command
 from sqlalchemy.exc import IntegrityError
-
+import json
 
 class Test(Command):
     def run(self):
@@ -46,7 +48,6 @@ class Populate(Command):
 
 class PopulateAntennas(Command):
     def run(self):
-        import json
         from app.models.carrier import Carrier
         from app.models.antenna import Antenna
 
@@ -74,7 +75,6 @@ class PopulateAntennas(Command):
 
 
 def populate():
-    import json
     from app.models.carrier import Carrier
     from config import AdminUser
     from app.models.user import User
@@ -97,6 +97,17 @@ def populate():
     for k, v in jsonvar.items():
         if k == "carriers":
             save_models(v, Carrier)
+
+class PopulateCities(Command):
+    from app.models.city import City
+
+    def run(self):
+        return
+
+
+class PopulateRegions(Command):
+    def run(self):
+        return
 
 
 def delete_db():

@@ -25,4 +25,4 @@ class Antenna(base_model.BaseModel):
         self.lon = lon
 
     def __repr__(self):
-        return '<Antenna, id: %r,  cid: %r, lac: %r, carriers: %r,>' % (self.id, self.cid, self.lac, self.carriers)
+        return '<Antenna, id: %r,  cid: %r, lac: %r, carriers: %r, city: %r>' % (self.id, self.cid, self.lac, self.carriers, self.city)

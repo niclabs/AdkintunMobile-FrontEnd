@@ -6,7 +6,7 @@ class Region(base_model.BaseModel):
     '''
     Clase region.
     '''
-    __tablename__ = 'regions'
+    __tablename__ = 'region'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(50))
     cities = db.relationship('City', backref='region',

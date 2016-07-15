@@ -3,6 +3,8 @@ from app import db
 from app.admin import admin
 from app.models.antenna import Antenna
 from app.models.carrier import Carrier
+from app.models.region import Region
+from app.models.city import City
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -21,3 +23,5 @@ class StandardView(ModelView):
 
 admin.add_view(StandardView(Antenna, db.session))
 admin.add_view(StandardView(Carrier, db.session))
+admin.add_view(StandardView(Region, db.session))
+admin.add_view(StandardView(City, db.session))
