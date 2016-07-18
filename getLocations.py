@@ -15,10 +15,10 @@ def main():
     file.write("data_antennas = [\n")
     for i in range(size):
         if (not (i+1)%200):
-            print ("Wrote ",i+1," antennas")
+            print ("Wrote ",i," antennas")
         lat = str(antennas[i]["lat"])
         lon = str(antennas[i]["lon"])
-            url = "http://localhost/nominatim/reverse?format=json&lat="+lat+"&lon="+lon+"&zoom=18&addressdetails=1"
+        url = "http://localhost/nominatim/reverse?format=json&lat="+lat+"&lon="+lon+"&zoom=18&addressdetails=1"
         city = "unknown"
         region = "unknown"
         try:

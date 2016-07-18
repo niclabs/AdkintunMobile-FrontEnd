@@ -2,19 +2,19 @@ initial_data_carriers = '''
 {
     "carriers":[
         {
-            "name": "entel",
+            "name": "Entel PCS Telecomunicaciones S.A.",
             "mcc": 730,
             "mnc": 1,
             "id": 7301
         },
         {
-            "name": "movistar",
+            "name": "Movistar",
             "mcc": 730,
             "mnc": 2,
             "id": 7302
         },
         {
-            "name": "claro",
+            "name": "Claro",
             "mcc": 730,
             "mnc": 3,
             "id": 7303
@@ -50,7 +50,7 @@ initial_data_carriers = '''
             "id": 7309
         },
         {
-            "name": "entel",
+            "name": "Entel Telefonía Móvil S.A.",
             "mcc": 730,
             "mnc": 10,
             "id": 73010

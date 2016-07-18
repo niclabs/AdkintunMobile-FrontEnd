@@ -1,8 +1,8 @@
 from app import db
 from app.data import initial_data_antennas
 from app.data import initial_data_carriers
-from app.data.regions import get_region_code_by_name
-from app.data.data_antennas import data_antennas
+from app.data.regions import get_region_code_by_name, region_codes
+from app.models.region import Region
 from flask_script import Command
 from sqlalchemy.exc import IntegrityError
 import json
@@ -106,10 +106,16 @@ class PopulateCities(Command):
 
 
 class PopulateRegions(Command):
-    from app.models.region import Region
-
     def run(self):
-       return
+        for key,value in region_codes.items():
+            reg = Region(key,value)
+            try:
+                db.session.add(reg)
+                db.session.commit()
+            except (IntegrityError, Exception):
+                db.session.rollback()
+                continue
+
 
 
 def delete_db():
