@@ -392,4 +392,5 @@ inv_map = {uniform(v): k for k, v in commune_codes.items()}
 def get_commune_code_by_name(commune_name):
     return inv_map.get(commune_name)
 
-
+def region_code_by_commune_code(commune_code):
+    return int(str(commune_code)[0:2])

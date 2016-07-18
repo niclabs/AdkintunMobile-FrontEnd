@@ -1,8 +1,6 @@
 from app import db
 from app.data import initial_data_antennas
 from app.data import initial_data_carriers
-from app.data.regions import get_region_code_by_name, region_codes
-from app.models.region import Region
 from flask_script import Command
 from sqlalchemy.exc import IntegrityError
 import json
@@ -98,25 +96,41 @@ def populate():
         if k == "carriers":
             save_models(v, Carrier)
 
-class PopulateCities(Command):
+def populate_regions():
+    from app.models.region import Region
+    from app.data.regions import region_codes
+    for key, value in region_codes.items():
+        reg = Region(key, value)
+        try:
+            db.session.add(reg)
+            db.session.commit()
+        except (IntegrityError, Exception):
+            db.session.rollback()
+            continue
+
+def populate_cities():
     from app.models.city import City
-
-    def run(self):
-        return
-
+    from app.data.communes import commune_codes, region_code_by_commune_code
+    for key, value in commune_codes.items():
+        city = City(key, value, region_code_by_commune_code(key))
+        try:
+            db.session.add(city)
+            db.session.commit()
+        except (IntegrityError, Exception):
+            db.session.rollback()
+            continue
 
 class PopulateRegions(Command):
     def run(self):
-        for key,value in region_codes.items():
-            reg = Region(key,value)
-            try:
-                db.session.add(reg)
-                db.session.commit()
-            except (IntegrityError, Exception):
-                db.session.rollback()
-                continue
+        populate_regions()
+
+class PopulateCities(Command):
+
+    def run(self):
+        populate_cities()
 
 
 
 def delete_db():
     db.drop_all(bind=None)
+
