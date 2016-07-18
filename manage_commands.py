@@ -134,3 +134,35 @@ class PopulateCities(Command):
 def delete_db():
     db.drop_all(bind=None)
 
+class DeleteDb(Command):
+    def run(self):
+        delete_db()
+
+def example_report():
+    from app.models.report import Report
+    db.session.add(Report(2016, 5, "total_device_carrier", 7301,3))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7302,2))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7303,1))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7307,2))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7308,1))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7309,1))
+    db.session.add(Report(2016, 5, "total_gsm_carrier", 7301, 8555))
+    db.session.add(Report(2016, 5, "total_gsm_carrier", 7302, 702))
+    db.session.add(Report(2016, 5, "total_gsm_carrier", 7303, 884))
+    db.session.add(Report(2016, 5, "total_gsm_carrier", 7307, 9455))
+    db.session.add(Report(2016, 5, "total_gsm_carrier", 7308, 24))
+    db.session.add(Report(2016, 5, "total_gsm_carrier", 7309, 68))
+    db.session.add(Report(2016, 5, "total_sims_carrier", 7301, 3))
+    db.session.add(Report(2016, 5, "total_sims_carrier", 7302, 2))
+    db.session.add(Report(2016, 5, "total_sims_carrier", 7303, 1))
+    db.session.add(Report(2016, 5, "total_sims_carrier", 7307, 2))
+    db.session.add(Report(2016, 5, "total_sims_carrier", 7308, 1))
+    db.session.add(Report(2016, 5, "total_sims_carrier", 7309, 1))
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+
+class ExampleReport(Command):
+    def run(self):
+        example_report()

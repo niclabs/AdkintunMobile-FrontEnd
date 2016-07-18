@@ -393,4 +393,4 @@ def get_commune_code_by_name(commune_name):
     return inv_map.get(commune_name)
 
 def region_code_by_commune_code(commune_code):
-    return int(str(commune_code)[0:2])
+    return commune_code//1000
