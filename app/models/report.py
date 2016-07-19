@@ -21,3 +21,6 @@ class Report(base_model.BaseModel):
         self.type = type
         self.carrier_id = carrier_id
         self.quantity = quantity
+
+    def __repr__(self):
+        return '<Report year: %r,  month: %r>, carrier: %r, type: %r, quantity: %r' % (self.year, self.month, self.carrier, self.type, self.quantity)
