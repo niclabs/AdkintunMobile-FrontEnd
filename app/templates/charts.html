@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title> Adkintun - Gráficos </title>
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+</head>
+<body>
+  <ul class="nav nav-pills">
+    <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
+    <li role="presentation" class="active"><a href="#">Gráficos</a></li>
+    <li role="presentation"><a href="{{url_for('reports')}}">Reportes totales</a></li>
+  </ul>
+  <div class="container-fluid" style="height:100%;">
+    <div class="row" style="height:100%;">
+      <div class="col-xs-12 col-sm-6 col-lg-4">
+        asd
+      </div>
+      <div class="col-xs-12 col-sm-6 col-lg-4">
+        asd
+      </div>
+      <div class="col-xs-12 col-sm-6 col-lg-4">
+        asd
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div id="chart"></div>
+  </div>
+</body>
+<script>
+  var chart = c3.generate({
+    bindto: '#chart',
+    data: {
+      columns: [
+        ['data1', 30, 200, 100, 400, 150, 250],
+        ['data2', 50, 20, 10, 40, 15, 25]
+      ]
+    }
+  });
+</script>
+</html>

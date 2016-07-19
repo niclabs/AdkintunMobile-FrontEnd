@@ -15,10 +15,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
   <script src="{{ url_for('static', filename='js/carriers.js') }}"></script>
 </head>
+
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
 <body>
   <ul class="nav nav-pills">
     <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
-    <li role="presentation"><a href="{{url_for('graphs')}}">Gráficos</a></li>
+    <li role="presentation"><a href="{{url_for('charts')}}">Gráficos</a></li>
     <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
   </ul>
   <div class="container">
@@ -88,7 +93,7 @@
 
 </body>
 <script type="text/javascript">
-    var server = "http://172.30.65.50:9000/";
+
     var data_totales;
     //datetimepicker format
     $(function () {
@@ -97,16 +102,17 @@
           useCurrent: false
         });
     });
-    function getUrl(year,month){
-      return server+"reports/general_reports/"+year+"/"+month;
-    }
+
     //datetimepicker event
     $("#datetimepicker1").on("dp.change", function(e) {
       var date =  $("#datetimepicker1").data("DateTimePicker").date().toDate();
       var year = date.getFullYear();
       var month = date.getMonth()+1;
-      var url = getUrl(year,month);
-      var jqxhr = $.getJSON(url, function() {
+      var url = $SCRIPT_ROOT+"/getReport"
+      var jqxhr = $.getJSON(url, {
+        year : year,
+        month : month
+      }, function() {
       })
       .done(function(data) {
         var add, mnc;
@@ -116,24 +122,21 @@
         //populate devices
         add = "";
         $.each(data.total_device_carrier, function( k, v ) {
-          mnc = k.substring(3);
-          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+          add += "<tr><td>"+k+"</td><td>"+v+"</td></tr>";
         });
         add += "<tr><td>Total</td><td>"+data.total_devices+"</td></tr>"
         $("#devices tbody").html(add);
         //populate gsm
         add = "";
         $.each(data.total_gsm_carrier, function( k, v ) {
-          mnc = k.substring(3);
-          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+          add += "<tr><td>"+k+"</td><td>"+v+"</td></tr>";
         });
         add += "<tr><td>Total</td><td>"+data.total_gsm+"</td></tr>"
         $("#gsm tbody").html(add);
         //populate sims
         add = "";
         $.each(data.total_sims_carrier, function( k, v ) {
-          mnc = k.substring(3);
-          add += "<tr><td>"+mncToName[mnc]+"</td><td>"+v+"</td></tr>";
+          add += "<tr><td>"+k+"</td><td>"+v+"</td></tr>";
         });
         add += "<tr><td>Total</td><td>"+data.total_sims+"</td></tr>"
         $("#sims tbody").html(add);

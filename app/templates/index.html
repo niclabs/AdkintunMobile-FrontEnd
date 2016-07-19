@@ -10,13 +10,12 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="http://d3js.org/topojson.v1.min.js"></script>
-    <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/polygonMap.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/markerclusterer.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/antennas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/carriers.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/polygonMap.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/markerclusterer.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/antennas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/map.js') }}"></script>
   <style>
     html, body {
       height: 100%;
@@ -29,10 +28,14 @@
   </style>
 </head>
 
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
 <body>
   <ul class="nav nav-pills">
     <li role="presentation" class="active"><a href="#">Mapa interactivo</a></li>
-    <li role="presentation"><a href="{{url_for('graphs')}}">Gráficos</a></li>
+    <li role="presentation"><a href="{{url_for('charts')}}">Gráficos</a></li>
     <li role="presentation"><a href="{{url_for('reports')}}">Reportes totales</a></li>
   </ul>
   <div class="form-group">
@@ -56,21 +59,16 @@
 
   </script>
 
-  <script>
-  //populate carriers
-    var data = data_carriers.carriers;
-    var size = data.length;
-    var option = '';
-    for( var i = 0;i<size;i++)
-    {
-      option += '<option value="'+data[i].mnc +'">' + data[i].name + '</option>';
-    }
-    $('#sel1').append(option);
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 
+  <script>
+    //populate carriers
+    populateCarriers('#sel1')
     $('#sel1').on('change', '', function (e) {
       showMarkers();
     });
   </script>
 
 </body>
+
 </html>
