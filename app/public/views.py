@@ -4,11 +4,11 @@ from flask import render_template, jsonify, request, json
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', carriers = getCarriers())
 
 @app.route('/charts')
 def charts():
-    return render_template('charts.html')
+    return render_template('charts.html', carriers = getCarriers())
 
 @app.route('/reports')
 def reports():
@@ -20,6 +20,7 @@ def getReports():
 
     year = request.args.get('year')
     month = request.args.get('month')
+    Report.query.filter_by(year=year, month=month).first_or_404()
     reports = Report.query.filter_by(year=year, month=month).all()
     total_device_carrier = {}
     total_devices = 0
@@ -45,16 +46,20 @@ def getReports():
             "total_sims": total_sims}
     return json.dumps(data)
 
-@app.route('/getCarriers')
-def getCarriers():
-    from app.models.carrier import Carrier
-    carriers = Carrier.query.with_entities(Carrier.id,Carrier.name).all()
-    data = {}
-    for carrier in carriers:
-        data[carrier.id] = carrier.name
-    return json.dumps(data)
+@app.route('/getAppRanking')
+def getAppRanking():
+    from app.models.ranking import Ranking
 
+    year = request.args.get('year')
+    month = request.args.get('month')
+    ranking = Ranking.query.filter_by(year=year, month=month).first_or_404()
+    return ranking.json
 
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
+
+def getCarriers():
+    from app.models.carrier import Carrier
+    carriers = Carrier.query.with_entities(Carrier.id,Carrier.name).all()
+    return carriers

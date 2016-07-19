@@ -8,14 +8,21 @@
   <title> Adkintun - Gráficos </title>
 
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
   <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
   <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 
 </head>
+
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
 <body>
   <ul class="nav nav-pills">
     <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
@@ -25,29 +32,76 @@
   <div class="container-fluid" style="height:100%;">
     <div class="row" style="height:100%;">
       <div class="col-xs-12 col-sm-6 col-lg-4">
-        asd
+        <div class="form-group">
+          <label for="sel2">Seleccione tipo de tráfico</label>
+          <select class="form-control" id="sel2">
+            <option value=>Tráfico Wifi - Subida</option>
+            <option value=>Tráfico Wifi - Bajada</option>
+            <option value=>Tráfico Móvil - Subida</option>
+            <option value=>Tráfico Móvil - Bajada</option>
+
+          </select>
+         </div>
       </div>
       <div class="col-xs-12 col-sm-6 col-lg-4">
-        asd
+        <div class="form-group">
+          <label for="sel1">Seleccione operador</label>
+          <select class="form-control" id="sel1">
+            <option value=0>Todos los operadores</option>
+              {% for carrier in carriers %}
+                <option value={{carrier.id}}>{{carrier.name}}</option>
+              {% endfor %}
+          </select>
+         </div>
       </div>
       <div class="col-xs-12 col-sm-6 col-lg-4">
-        asd
+        <div class="form-group">
+          <label for="datetimepicker1">Seleccione fecha</label>
+          <div class='input-group date' id='datetimepicker1'>
+              <input type='text' class="form-control" />
+              <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-calendar"></span>
+              </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="container-fluid">
+  <div class="container">
     <div id="chart"></div>
   </div>
 </body>
+
 <script>
+  //datetimepicker format
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+          format: 'MM-YYYY',
+          useCurrent: false
+        });
+    });
+
   var chart = c3.generate({
-    bindto: '#chart',
     data: {
-      columns: [
-        ['data1', 30, 200, 100, 400, 150, 250],
-        ['data2', 50, 20, 10, 40, 15, 25]
-      ]
-    }
+        x : 'x',
+        columns: [
+          ['x', 'facebook', 'google', 'android', '$400', 'b', 'c'],
+          ['bytes descargados', 30, 200, 100, 400, 150, 250],
+          ['bytes subidos', 130, 100, 140, 200, 150, 50],
+        ],
+        type: 'bar'
+    },
+    bar: {
+        width: {
+            ratio: 0.6
+        }
+    },
+    axis: {
+        x: {
+            type: 'categorized'
+        },
+        rotated: true
+    },
   });
 </script>
 </html>

@@ -41,7 +41,10 @@
   <div class="form-group">
     <label for="sel1">Seleccione operador</label>
     <select class="form-control" id="sel1">
-      <option value=-1>Todos los operadores</option>;
+      <option value=0>Todos los operadores</option>
+      {% for carrier in carriers %}
+                <option value={{carrier.id}}>{{carrier.name}}</option>
+      {% endfor %}
     </select>
   </div>
   <div class="container-fluid" style="height:100%;">
@@ -59,11 +62,7 @@
 
   </script>
 
-  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-
   <script>
-    //populate carriers
-    populateCarriers('#sel1')
     $('#sel1').on('change', '', function (e) {
       showMarkers();
     });
