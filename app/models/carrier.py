@@ -13,6 +13,8 @@ class Carrier(base_model.BaseModel):
     mnc = db.Column(db.Integer)
     reports = db.relationship('Report', backref='carrier',
                              lazy='dynamic')
+    rankings = db.relationship('Ranking', backref='carrier',
+                             lazy='dynamic')
 
     def __init__(self, name=None, mcc=None, mnc=None):
         self.name = name

@@ -2,6 +2,10 @@ initial_data_carriers = '''
 {
     "carriers":[
         {
+            "name": "Todos los operadores",
+            "id": 0
+        },
+        {
             "name": "Entel PCS Telecomunicaciones S.A.",
             "mcc": 730,
             "mnc": 1,

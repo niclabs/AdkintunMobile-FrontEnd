@@ -15,7 +15,7 @@ class Report(base_model.BaseModel):
     quantity = db.Column(db.Integer)
     __table_args__= (PrimaryKeyConstraint("year","month","type","carrier_id",name = "region_pk"),{})
 
-    def __init__(self, year, month, type, carrier_id, quantity):
+    def __init__(self, year = None, month = None, type = None, carrier_id = None, quantity = None   ):
         self.year = year
         self.month = month
         self.type = type

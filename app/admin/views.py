@@ -6,6 +6,7 @@ from app.models.carrier import Carrier
 from app.models.region import Region
 from app.models.city import City
 from app.models.report import Report
+from app.models.ranking import Ranking
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -14,7 +15,7 @@ class StandardView(ModelView):
         return login.current_user.is_authenticated
 
     column_display_pk = True
-    can_delete = False
+    can_delete = True
     can_create = False
     can_edit = False
     can_export = True
@@ -27,3 +28,4 @@ admin.add_view(StandardView(Carrier, db.session))
 admin.add_view(StandardView(Region, db.session))
 admin.add_view(StandardView(City, db.session))
 admin.add_view(StandardView(Report, db.session))
+admin.add_view(StandardView(Ranking, db.session))
