@@ -72,6 +72,25 @@
 </body>
 
 <script>
+    var chart = c3.generate({
+        data: {
+            x: 'x',
+            columns: [
+            ],
+            type: 'bar'
+        },
+        bar: {
+            width: {
+                ratio: 0.6
+            }
+        },
+        axis: {
+            x: {
+                type: 'categorized'
+            },
+            rotated: true
+        }
+    });
     //datetimepicker format
     $(function () {
         $('#datetimepicker1').datetimepicker({
@@ -108,27 +127,14 @@
         else var transfer = "bajados";
         var xaxis = $.map(data, function(value, key) { return key });
         var yaxis = $.map(data, function(value, key) { return value });
-        var chart = c3.generate({
-            data: {
-                x: 'x',
+        setTimeout(function () {
+            chart.load({
                 columns: [
                     ['x'].concat(data.xaxis),
                     ['bytes '+transfer].concat(data.yaxis),
-                        ],
-                type: 'bar'
-            },
-            bar: {
-                width: {
-                    ratio: 0.6
-                }
-            },
-            axis: {
-                x: {
-                    type: 'categorized'
-                },
-                rotated: true
-            }
-        })
+                        ]
+            });
+        }, 0);
     }
 </script>
 </html>
