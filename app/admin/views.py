@@ -17,7 +17,7 @@ class StandardView(ModelView):
     column_display_pk = True
     can_delete = True
     can_create = False
-    can_edit = False
+    can_edit = True
     can_export = True
 
 # Add views

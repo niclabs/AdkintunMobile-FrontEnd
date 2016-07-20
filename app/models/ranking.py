@@ -28,4 +28,4 @@ class Ranking(base_model.BaseModel):
         self.rank = rank
 
     def __repr__(self):
-        return '<Ranking year:%r, month:%r' % (self.year,self.month)
+        return '<Ranking year:%r, month:%r >' % (self.year,self.month)

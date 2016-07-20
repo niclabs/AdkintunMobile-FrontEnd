@@ -41,7 +41,6 @@
   <div class="form-group">
     <label for="sel1">Seleccione operador</label>
     <select class="form-control" id="sel1">
-      <option value=0>Todos los operadores</option>
       {% for carrier in carriers %}
                 <option value={{carrier.id}}>{{carrier.name}}</option>
       {% endfor %}

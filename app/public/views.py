@@ -46,18 +46,25 @@ def getReports():
             "total_sims": total_sims}
     return json.dumps(data)
 
-@app.route('/getAppRanking')
+@app.route('/getRanking')
 def getAppRanking():
+    import operator
     from app.models.ranking import Ranking
 
     year = request.args.get('year')
     month = request.args.get('month')
-    ranking = Ranking.query.filter_by(year=year, month=month).first_or_404()
-    return ranking.json
+    traffic_type = request.args.get('traffic_type')
+    transfer_type = request.args.get('transfer_type')
+    carrier_id = request.args.get('carrier_id')
+    ranking = Ranking.query.filter_by(year=year, month=month, carrier_id = carrier_id, traffic_type = traffic_type, transfer_type = transfer_type).first_or_404()
+    list = sorted(ranking.rank.items(), key=operator.itemgetter(1))
+    data = {"xaxis" : [tuple[0] for tuple in list],
+            "yaxis" : [tuple[1] for tuple in list]}
+    return json.dumps(data)
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('page_not_found.html'), 404
+    return render_template('page-not-found.html'), 404
 
 def getCarriers():
     from app.models.carrier import Carrier

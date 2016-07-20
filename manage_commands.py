@@ -166,3 +166,29 @@ def example_report():
 class ExampleReport(Command):
     def run(self):
         example_report()
+
+def example_ranking():
+    from app.models.ranking import Ranking
+    data = {"Facebook" : 23003,
+            "Google" : 3123213,
+            "Adkintun" : 232,
+            "Tinder" : 344,
+            "Spotify" : 0}
+    rank = Ranking(2016,5,0,"wifi","upload", data)
+    data2 = {"Facebook" : 233,
+            "Google" : 33213,
+            "Adkintun" : 236752,
+            "Tinder" : 344,
+            "Spotify" : 4324}
+    rank2 = Ranking(2016,5,0,"wifi","download", data2)
+    try:
+        db.session.add(rank)
+        db.session.add(rank2)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+
+class ExampleRanking(Command):
+    def run(self):
+        example_ranking()
+
