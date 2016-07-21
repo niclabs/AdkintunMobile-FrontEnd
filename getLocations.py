@@ -31,6 +31,9 @@ def main():
                     city = data["address"]["town"]
                 elif ('village' in data["address"]):
                     city = data["address"]["village"]
+                else:
+                    region = data["address"]["state"]
+                    raise UnknownCityError()
 
                 region = data["address"]["state"]
         except:
@@ -51,6 +54,8 @@ def main():
         file.write(result + (",\n" if (i!=size-1) else "]"))
     file.close()
 
+class UnknownCityError(Exception):
+    pass
 
 
 if __name__ == "__main__":
