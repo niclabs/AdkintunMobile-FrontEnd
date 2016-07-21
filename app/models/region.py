@@ -11,10 +11,14 @@ class Region(base_model.BaseModel):
     name = db.Column(db.String(50))
     cities = db.relationship('City', backref='region',
                                lazy='dynamic')
+    lat = db.Column(db.Float)
+    lon = db.Column(db.Float)
 
-    def __init__(self, id, name=None):
+    def __init__(self, id = None, name=None, lat = None, lon = None):
         self.id = id
         self.name = name
+        self.lat = lat
+        self.lon = lon
 
     def __repr__(self):
         return '<Region id: %r,  name: %r>' % (self.id, self.name)

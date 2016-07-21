@@ -15,6 +15,7 @@ class Carrier(base_model.BaseModel):
                              lazy='dynamic')
     rankings = db.relationship('Ranking', backref='carrier',
                              lazy='dynamic')
+    antennas = db.relationship("Antenna", backref='carrier', lazy='dynamic')
 
     def __init__(self, name=None, mcc=None, mnc=None):
         self.name = name
