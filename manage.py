@@ -9,7 +9,7 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 
 from manage_commands import PopulateAntennas, Populate, PopulateCities,PopulateRegions, DeleteDb, ExampleReport, ExampleRanking
-manager.add_command('runserver', Server(host="0.0.0.0", port=9000))
+manager.add_command('runserver', Server(host="0.0.0.0", port=5000))
 manager.add_command('db', MigrateCommand)
 manager.add_command('populate', Populate())
 manager.add_command('populate_antennas', PopulateAntennas())
