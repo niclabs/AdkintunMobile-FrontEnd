@@ -62,6 +62,13 @@ def getAppRanking():
             "yaxis" : [tuple[1] for tuple in list]}
     return json.dumps(data)
 
+@app.route('/getAntennas')
+def getAntennas():
+    from app.data.data_antennas import data_antennas
+
+    print(len(data_antennas))
+    return json.dumps(data_antennas)
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page-not-found.html'), 404
