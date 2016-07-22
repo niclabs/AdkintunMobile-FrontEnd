@@ -42,8 +42,12 @@ def main():
             response = urllib.request.urlopen(url)
             data = json.load(reader(response))
             if data["status"]=="OK":
+                found = False
                 for element in data["results"][0]["address_components"]:
                     if element["types"] == ["locality", "political"]:
+                        city = element["long_name"]
+                        found = True
+                    if ["administrative_area_level_3", "political" ] and not found:
                         city = element["long_name"]
                     if element["types"] == ["administrative_area_level_1", "political"]:
                         region = element["long_name"]

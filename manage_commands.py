@@ -46,30 +46,18 @@ class Populate(Command):
 
 class PopulateAntennas(Command):
     def run(self):
-        from app.models.carrier import Carrier
         from app.models.antenna import Antenna
+        from app.data.communes import get_commune_code_by_name
+        from app.data import data_antennas
 
-        jsonvar = json.loads(initial_data_antennas.initial_data_antennas)
-        for k, v in jsonvar.items():
-            if k == "antennas":
-                for json_element in v:
-                    antenna = Antenna()
-                    try:
-                        mnc = json_element['mnc']
-                        mcc = json_element['mcc']
-                        carrier = Carrier.query.filter(Carrier.mnc == mnc and Carrier.mcc == mcc).first()
-                        antenna.carriers.append(carrier)
-                    except KeyError:
-                        continue
-                    for k, v in json_element.items():
-                        if hasattr(antenna, k):
-                            setattr(antenna, k, v)
-                    try:
-                        db.session.add(antenna)
-                        db.session.commit()
-                    except (IntegrityError, Exception):
-                        db.session.rollback()
-                        continue
+        antennas = data_antennas.data_antennas
+        for e in antennas:
+            antenna = Antenna(e["cid"], e["lac"], e["lat"], e["lon"], int(str(e["mcc"])+str(e["mnc"])), get_commune_code_by_name(e["city"]))
+            try:
+                db.session.add(antenna)
+                db.session.commit()
+            except (IntegrityError, Exception):
+                db.session.rollback()
 
 
 def populate():
