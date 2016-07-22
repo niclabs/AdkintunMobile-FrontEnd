@@ -47,7 +47,7 @@ def main():
                     if element["types"] == ["locality", "political"]:
                         city = element["long_name"]
                         found = True
-                    if ["administrative_area_level_3", "political" ] and not found:
+                    if element["types"] == ["administrative_area_level_3", "political" ] and not found:
                         city = element["long_name"]
                     if element["types"] == ["administrative_area_level_1", "political"]:
                         region = element["long_name"]

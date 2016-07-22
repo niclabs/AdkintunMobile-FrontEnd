@@ -64,10 +64,18 @@ def getAppRanking():
 
 @app.route('/getAntennas')
 def getAntennas():
-    from app.data.data_antennas import data_antennas
+    from app.models.carrier import Carrier
+    from app.models.antenna import Antenna
 
-    print(len(data_antennas))
-    return json.dumps(data_antennas)
+    carriers = Carrier.query.all()
+    idToName = {}
+    carrier_id = request.args.get('carrier')
+    antennas = Antenna.query.all()
+    data = list(map(modelToDict, antennas ))
+    for carrier in carriers:
+        idToName[carrier.id]=carrier.name
+    response = {"data":data, "idToName":idToName}
+    return json.dumps(response)
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -77,3 +85,6 @@ def getCarriers():
     from app.models.carrier import Carrier
     carriers = Carrier.query.with_entities(Carrier.id,Carrier.name).all()
     return carriers
+
+def modelToDict(model):
+    return  model.dict

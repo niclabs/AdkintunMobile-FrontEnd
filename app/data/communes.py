@@ -390,7 +390,7 @@ def get_commune_name_by_id(commune_id):
 inv_map = {uniform(v): k for k, v in commune_codes.items()}
 
 def get_commune_code_by_name(commune_name):
-    return inv_map.get(commune_name)
+    return inv_map.get(uniform(commune_name))
 
 def region_code_by_commune_code(commune_code):
     return commune_code//1000
