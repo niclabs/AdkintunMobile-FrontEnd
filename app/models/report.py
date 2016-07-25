@@ -5,7 +5,7 @@ from sqlalchemy import PrimaryKeyConstraint
 
 class Report(base_model.BaseModel):
     '''
-    Clase reporte de totales en un mes
+    Clase reporte de un mes
     '''
     __tablename__ = 'report'
     year = db.Column(db.Integer)
@@ -13,9 +13,9 @@ class Report(base_model.BaseModel):
     type = db.Column(db.String)
     carrier_id = db.Column(db.Integer, db.ForeignKey('carriers.id'))
     quantity = db.Column(db.Integer)
-    __table_args__= (PrimaryKeyConstraint("year","month","type","carrier_id",name = "region_pk"),{})
+    __table_args__= (PrimaryKeyConstraint("year","month","type","carrier_id",name = "report_pk"),{})
 
-    def __init__(self, year = None, month = None, type = None, carrier_id = None, quantity = None   ):
+    def __init__(self, year = None, month = None, type = None, carrier_id = None, quantity = None):
         self.year = year
         self.month = month
         self.type = type
