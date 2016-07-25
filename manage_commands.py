@@ -180,3 +180,8 @@ class ExampleRanking(Command):
     def run(self):
         example_ranking()
 
+
+class MonthlyImport(Command):
+    def run(self):
+        from app.importation.monthly_importation import monthly_import
+        monthly_import()
