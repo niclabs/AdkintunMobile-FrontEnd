@@ -3,9 +3,7 @@ from app.models import base_model
 
 
 class Region(base_model.BaseModel):
-    '''
-    Clase region.
-    '''
+
     __tablename__ = 'region'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(50))

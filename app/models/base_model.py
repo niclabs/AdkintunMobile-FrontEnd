@@ -3,9 +3,6 @@ from app.models import utils
 
 
 class BaseModel(db.Model):
-    '''
-    Clase modelo base.
-    '''
     __abstract__  = True
 
     @property

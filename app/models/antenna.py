@@ -4,9 +4,7 @@ from sqlalchemy import UniqueConstraint
 
 
 class Antenna(base_model.BaseModel):
-    '''
-    Clase antena.
-    '''
+
     __tablename__ = 'antennas'
     __table_args__ = (UniqueConstraint("cid", "lac", "carrier_id", name="antenna_pk"), {})
     id = db.Column(db.Integer, primary_key=True)

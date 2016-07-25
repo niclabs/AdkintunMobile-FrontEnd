@@ -4,9 +4,7 @@ from sqlalchemy import PrimaryKeyConstraint
 
 
 class Report(base_model.BaseModel):
-    '''
-    Clase reporte de un mes
-    '''
+
     __tablename__ = 'report'
     year = db.Column(db.Integer)
     month = db.Column(db.Integer)

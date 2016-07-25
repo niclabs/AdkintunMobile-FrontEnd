@@ -3,9 +3,7 @@ from app.models import base_model
 
 
 class Carrier(base_model.BaseModel):
-    '''
-    Clase reportes totales,
-    '''
+
     __tablename__ = 'carriers'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(50))

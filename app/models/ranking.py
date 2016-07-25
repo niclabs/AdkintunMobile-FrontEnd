@@ -5,9 +5,7 @@ from sqlalchemy.dialects.postgresql import JSON
 
 
 class Ranking(base_model.BaseModel):
-    '''
-    Clase ranking aplicaciones
-    '''
+
     __tablename__ = 'ranking'
     year = db.Column(db.Integer)
     month = db.Column(db.Integer)

@@ -2,9 +2,7 @@ from app import db
 from app.models import base_model
 
 class City(base_model.BaseModel):
-    '''
-    Clase ciudad.
-    '''
+
     __tablename__ = 'city'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(50))
