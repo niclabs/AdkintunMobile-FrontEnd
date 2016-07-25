@@ -132,7 +132,7 @@
                 success: (function (data) {
                     $("#error").html("");
                     $("#chart").show();
-                    createChart(data);
+                    createChart(data,transfer_type);
                 }),
                 error: (function () {
                     $("#error").html("<i>No hay información disponible para esta fecha</i>");
@@ -144,19 +144,20 @@
 
     $("#datetimepicker1").on("dp.change", dataThenCreate);
 
-    function createChart(data) {
-        if (data.transfer_type == "upload") var transfer = "subidos";
+    function createChart(data,transfer_type) {
+        if (transfer_type == "upload") var transfer = "subidos";
         else var transfer = "bajados";
         var xaxis = $.map(data, function(value, key) { return key });
         var yaxis = $.map(data, function(value, key) { return value });
         setTimeout(function () {
+            chart.unload();
             chart.load({
                 columns: [
                     ['x'].concat(data.xaxis),
                     ['bytes '+transfer].concat(data.yaxis),
                         ]
             });
-        }, 0);
+        }, 1);
     }
 </script>
 </html>
