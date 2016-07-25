@@ -1,7 +1,6 @@
 from app import app
 from flask import render_template, jsonify, request, json
 
-
 @app.route('/')
 def index():
     return render_template('index.html', carriers = getCarriers())
@@ -23,21 +22,21 @@ def getReports():
     Report.query.filter_by(year=year, month=month).first_or_404()
     reports = Report.query.filter_by(year=year, month=month).all()
     total_device_carrier = {}
-    total_devices = 0
     total_gsm_carrier = {}
-    total_gsm = 0
     total_sims_carrier = {}
-    total_sims = 0
     for report in reports:
         if report.type == "total_device_carrier":
             total_device_carrier[report.carrier.name] = report.quantity
-            total_devices += report.quantity
         elif report.type == "total_gsm_carrier":
             total_gsm_carrier[report.carrier.name] = report.quantity
-            total_gsm += report.quantity
-        else:
+        elif report.type == "total_sims_carrier":
             total_sims_carrier[report.carrier.name] = report.quantity
-            total_sims += report.quantity
+        elif report.type == "total_sims":
+            total_sims = report.quantity
+        elif report.type == "total_gsm":
+            total_gsm = report.quantity
+        elif report.type == "total_devices":
+            total_devices = report.quantity
     data = {"total_device_carrier": total_device_carrier,
             "total_devices": total_devices,
             "total_gsm_carrier": total_gsm_carrier,
@@ -70,7 +69,7 @@ def getAntennas():
     carriers = Carrier.query.all()
     idToName = {}
     carrier_id = request.args.get('carrier')
-    antennas = Antenna.query.all()
+    antennas = Antenna.query.filter(Antenna.city_id != None).all()
     data = list(map(modelToDict, antennas ))
     for carrier in carriers:
         idToName[carrier.id]=carrier.name
@@ -88,3 +87,15 @@ def getCarriers():
 
 def modelToDict(model):
     return  model.dict
+
+@app.route('/getAntennas2')
+def getAntennas2():
+    from app.map.mapManagement import build, change
+
+    zoom = request.args.get('zoom')
+    lastZoom = request.args.get('lastZoom')
+    if not lastZoom:
+        data = build(zoom)
+    else:
+        data = change(zoom, lastZoom)
+    return json.dumps(data)
