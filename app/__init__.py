@@ -12,8 +12,8 @@ app.config.from_object('config.DefaultConfig')
 db = SQLAlchemy(app)
 
 from app.automatization.scheduler_manager import start_scheduler
-from . import public
-from . import admin
+from app import public
+from app import admin
 
 # Start scheduler with automatic importation
 start_scheduler()
