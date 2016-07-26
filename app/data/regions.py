@@ -16,14 +16,16 @@ region_codes = {
     13: "Región Metropolitana"
 }
 
+
 def get_region_name_by_id(region_id):
     return region_codes.get(region_id)
 
+
 inv_map = {v: k for k, v in region_codes.items()}
+
 
 def get_region_code_by_name(region_name):
     for key in inv_map.keys():
         if key.lower() in region_name.lower():
             return inv_map.get(key)
     return "error"
-

@@ -3,7 +3,7 @@ from app.models import utils
 
 
 class BaseModel(db.Model):
-    __abstract__  = True
+    __abstract__ = True
 
     @property
     def dict(self):

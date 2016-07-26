@@ -50,7 +50,6 @@ def init_login():
 
 
 class MyAdminIndexView(AdminIndexView):
-
     @expose('/')
     def index(self):
         if not login.current_user.is_authenticated:
@@ -75,4 +74,3 @@ class MyAdminIndexView(AdminIndexView):
     def logout_view(self):
         login.logout_user()
         return redirect(url_for('.index'))
-

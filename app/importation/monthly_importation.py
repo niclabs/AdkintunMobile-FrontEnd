@@ -13,5 +13,5 @@ def monthly_import():
 
     year = str(year_new_import)
     month = str(month_new_import)
-    report_import(year,month)
-    ranking_import(year,month)
+    report_import(year, month)
+    ranking_import(year, month)

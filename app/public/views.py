@@ -1,17 +1,21 @@
 from app import app
-from flask import render_template, jsonify, request, json
+from flask import render_template, request, json
+
 
 @app.route('/')
 def index():
-    return render_template('index.html', carriers = getCarriers())
+    return render_template('index.html', carriers=getCarriers())
+
 
 @app.route('/charts')
 def charts():
-    return render_template('charts.html', carriers = getCarriers())
+    return render_template('charts.html', carriers=getCarriers())
+
 
 @app.route('/reports')
 def reports():
     return render_template('total-reports.html')
+
 
 @app.route('/getReport')
 def getReports():
@@ -45,6 +49,7 @@ def getReports():
             "total_sims": total_sims}
     return json.dumps(data)
 
+
 @app.route('/getRanking')
 def getAppRanking():
     import operator
@@ -55,11 +60,13 @@ def getAppRanking():
     traffic_type = request.args.get('traffic_type')
     transfer_type = request.args.get('transfer_type')
     carrier_id = request.args.get('carrier_id')
-    ranking = Ranking.query.filter_by(year=year, month=month, carrier_id = carrier_id, traffic_type = traffic_type, transfer_type = transfer_type).first_or_404()
+    ranking = Ranking.query.filter_by(year=year, month=month, carrier_id=carrier_id, traffic_type=traffic_type,
+                                      transfer_type=transfer_type).first_or_404()
     list = sorted(ranking.rank.items(), key=operator.itemgetter(1))
-    data = {"xaxis" : [tuple[0] for tuple in list],
-            "yaxis" : [tuple[1] for tuple in list]}
+    data = {"xaxis": [tuple[0] for tuple in list],
+            "yaxis": [tuple[1] for tuple in list]}
     return json.dumps(data)
+
 
 @app.route('/getAntennas')
 def getAntennas():
@@ -70,32 +77,23 @@ def getAntennas():
     idToName = {}
     carrier_id = request.args.get('carrier')
     antennas = Antenna.query.filter(Antenna.city_id != None).all()
-    data = list(map(modelToDict, antennas ))
+    data = list(map(modelToDict, antennas))
     for carrier in carriers:
-        idToName[carrier.id]=carrier.name
-    response = {"data":data, "idToName":idToName}
+        idToName[carrier.id] = carrier.name
+    response = {"data": data, "idToName": idToName}
     return json.dumps(response)
+
 
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page-not-found.html'), 404
 
+
 def getCarriers():
     from app.models.carrier import Carrier
-    carriers = Carrier.query.with_entities(Carrier.id,Carrier.name).all()
+    carriers = Carrier.query.with_entities(Carrier.id, Carrier.name).all()
     return carriers
 
+
 def modelToDict(model):
-    return  model.dict
-
-@app.route('/getAntennas2')
-def getAntennas2():
-    from app.map.mapManagement import build, change
-
-    zoom = request.args.get('zoom')
-    lastZoom = request.args.get('lastZoom')
-    if not lastZoom:
-        data = build(zoom)
-    else:
-        data = change(zoom, lastZoom)
-    return json.dumps(data)
+    return model.dict

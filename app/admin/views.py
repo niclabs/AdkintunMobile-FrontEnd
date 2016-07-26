@@ -20,6 +20,7 @@ class StandardView(ModelView):
     can_edit = True
     can_export = True
 
+
 # Add views
 # admin.add_view(UserView(User, db.session))
 

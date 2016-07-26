@@ -1,30 +1,9 @@
+import json
+
 from app import db
-from app.data import initial_data_antennas
 from app.data import initial_data_carriers
 from flask_script import Command
 from sqlalchemy.exc import IntegrityError
-import json
-
-class Test(Command):
-    def run(self):
-        import unittest
-        testmodules = [
-            'tests',
-        ]
-
-        suite = unittest.TestSuite()
-
-        for t in testmodules:
-            try:
-                # If the module defines a suite() function, call it to get the suite.
-                mod = __import__(t, globals(), locals(), ['suite'])
-                suitefn = getattr(mod, 'suite')
-                suite.addTest(suitefn())
-            except (ImportError, AttributeError):
-                # else, just load all the test cases from the module.
-                suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
-
-        unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 def save_models(elements, model_class):
@@ -52,7 +31,8 @@ class PopulateAntennas(Command):
 
         antennas = data_antennas.data_antennas
         for e in antennas:
-            antenna = Antenna(e["cid"], e["lac"], e["lat"], e["lon"], int(str(e["mcc"])+str(e["mnc"])), get_commune_code_by_name(e["city"]))
+            antenna = Antenna(e["cid"], e["lac"], e["lat"], e["lon"], int(str(e["mcc"]) + str(e["mnc"])),
+                              get_commune_code_by_name(e["city"]))
             try:
                 db.session.add(antenna)
                 db.session.commit()
@@ -84,6 +64,7 @@ def populate():
         if k == "carriers":
             save_models(v, Carrier)
 
+
 def populate_regions():
     from app.models.region import Region
     from app.data.regions import region_codes
@@ -95,6 +76,7 @@ def populate_regions():
         except (IntegrityError, Exception):
             db.session.rollback()
             continue
+
 
 def populate_cities():
     from app.models.city import City
@@ -108,33 +90,35 @@ def populate_cities():
             db.session.rollback()
             continue
 
+
 class PopulateRegions(Command):
     def run(self):
         populate_regions()
 
-class PopulateCities(Command):
 
+class PopulateCities(Command):
     def run(self):
         populate_cities()
-
 
 
 def delete_db():
     db.drop_all(bind=None)
 
+
 class DeleteDb(Command):
     def run(self):
         delete_db()
 
+
 def example_report():
     from app.models.report import Report
-    db.session.add(Report(2016, 5, "total_device_carrier", 7301,3))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7302,2))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7303,1))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7307,2))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7308,1))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7309,1))
-    db.session.add(Report(2016, 5, "total_devices", 0,10))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7301, 3))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7302, 2))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7303, 1))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7307, 2))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7308, 1))
+    db.session.add(Report(2016, 5, "total_device_carrier", 7309, 1))
+    db.session.add(Report(2016, 5, "total_devices", 0, 10))
     db.session.add(Report(2016, 5, "total_gsm_carrier", 7301, 8555))
     db.session.add(Report(2016, 5, "total_gsm_carrier", 7302, 702))
     db.session.add(Report(2016, 5, "total_gsm_carrier", 7303, 884))
@@ -148,36 +132,39 @@ def example_report():
     db.session.add(Report(2016, 5, "total_sims_carrier", 7307, 2))
     db.session.add(Report(2016, 5, "total_sims_carrier", 7308, 1))
     db.session.add(Report(2016, 5, "total_sims_carrier", 7309, 1))
-    db.session.add(Report(2016, 5, "total_simms", 0, 10))
+    db.session.add(Report(2016, 5, "total_sims", 0, 10))
     try:
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
 
+
 class ExampleReport(Command):
     def run(self):
         example_report()
 
+
 def example_ranking():
     from app.models.ranking import Ranking
-    data = {"Facebook" : 23003,
-            "Google" : 3123213,
-            "Adkintun" : 232,
-            "Tinder" : 344,
-            "Spotify" : 0}
-    rank = Ranking(2016,5,0,"wifi","upload", data)
-    data2 = {"Facebook" : 233,
-            "Google" : 33213,
-            "Adkintun" : 236752,
-            "Tinder" : 344,
-            "Spotify" : 4324}
-    rank2 = Ranking(2016,5,0,"wifi","download", data2)
+    data = {"Facebook": 23003,
+            "Google": 3123213,
+            "Adkintun": 232,
+            "Tinder": 344,
+            "Spotify": 0}
+    rank = Ranking(2016, 5, 0, "wifi", "upload", data)
+    data2 = {"Facebook": 233,
+             "Google": 33213,
+             "Adkintun": 236752,
+             "Tinder": 344,
+             "Spotify": 4324}
+    rank2 = Ranking(2016, 5, 0, "wifi", "download", data2)
     try:
         db.session.add(rank)
         db.session.add(rank2)
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
+
 
 class ExampleRanking(Command):
     def run(self):

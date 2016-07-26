@@ -1,15 +1,13 @@
-from flask_migrate import Migrate, MigrateCommand
-
-from flask import g
-from flask_script import Manager, Server
-
 from app import app, db
+from flask_migrate import Migrate, MigrateCommand
+from flask_script import Manager, Server
 
 migrate = Migrate(app, db)
 manager = Manager(app)
 
-from manage_commands import PopulateAntennas, Populate, PopulateCities,PopulateRegions, DeleteDb, ExampleReport, ExampleRanking, MonthlyImport
-manager.add_command('runserver', Server(host="0.0.0.0", port=5000))
+from manage_commands import PopulateAntennas, Populate, PopulateCities, PopulateRegions, DeleteDb, ExampleReport, \
+    ExampleRanking, MonthlyImport
+
 manager.add_command('db', MigrateCommand)
 manager.add_command('populate', Populate())
 manager.add_command('populate_antennas', PopulateAntennas())
