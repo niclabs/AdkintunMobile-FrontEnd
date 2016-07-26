@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title> Adkintun - Gráficos </title>
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+
+</head>
+
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
+<body>
+  <ul class="nav nav-pills">
+    <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
+    <li role="presentation" class="active"><a href="#">Gráficos</a></li>
+    <li role="presentation"><a href="{{url_for('reports')}}">Reportes totales</a></li>
+  </ul>
+  <div class="container-fluid" style="height:100%;">
+    <div class="row" style="height:100%;">
+      <div class="col-xs-12 col-sm-6 col-lg-4">
+        <div class="form-group">
+          <label for="sel1">Seleccione tipo de tráfico</label>
+          <select class="form-control" id="sel1" onchange="dataThenCreate()">
+            <option value="wifi upload">Tráfico Wifi - Subida</option>
+            <option value="wifi download">Tráfico Wifi - Bajada</option>
+            <option value="mobile upload">Tráfico Móvil - Subida</option>
+            <option value="mobile download">Tráfico Móvil - Bajada</option>
+
+          </select>
+         </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-lg-4">
+        <div class="form-group">
+          <label for="sel2">Seleccione operador</label>
+          <select class="form-control" id="sel2" onchange="dataThenCreate()">
+              {% for carrier in carriers %}
+                <option value={{carrier.id}}>{{carrier.name}}</option>
+              {% endfor %}
+          </select>
+         </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-lg-4">
+        <div class="form-group">
+          <label for="datetimepicker1">Seleccione fecha</label>
+          <div class='input-group date' id='datetimepicker1'>
+              <input type='text' class="form-control" />
+              <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-calendar"></span>
+              </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div id="chart" style="display: none;"></div>
+  </div>
+  <div class="container">
+    <h3><span class="label label-danger" id="error"></span></h3>
+  </div>
+</body>
+
+<script>
+    var chart = c3.generate({
+        data: {
+            x: 'x',
+            columns: [
+            ],
+            type: 'bar'
+        },
+        bar: {
+            width: {
+                ratio: 0.6
+            }
+        },
+        axis: {
+            x: {
+                type: 'categorized'
+            },
+            rotated: true
+        }
+    });
+    //datetimepicker format
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'MM-YYYY',
+            useCurrent: false
+        });
+    });
+
+    function dataThenCreate(){
+        if ($("#datetimepicker1").data("DateTimePicker").date() != null) {
+            var date = $("#datetimepicker1").data("DateTimePicker").date().toDate();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var carrier_id = $("#sel2").val();
+            var parse = $("#sel1").val().split(" ");
+            var traffic_type = parse[0];
+            var transfer_type = parse[1];
+            var url = $SCRIPT_ROOT + "/getRanking";
+            var data = {
+                    year: year,
+                    month: month,
+                    traffic_type: traffic_type,
+                    transfer_type: transfer_type,
+                    carrier_id: carrier_id
+                };
+            $.ajax({
+                dataType: "json",
+                url: url,
+                data: {
+                    year: year,
+                    month: month,
+                    traffic_type: traffic_type,
+                    transfer_type: transfer_type,
+                    carrier_id: carrier_id
+                },
+                success: (function (data) {
+                    $("#error").html("");
+                    $("#chart").show();
+                    createChart(data,transfer_type);
+                }),
+                error: (function () {
+                    $("#error").html("<i>No hay información disponible para esta fecha</i>");
+                    $("#chart").hide();
+                })
+            });
+        }
+    }
+
+    $("#datetimepicker1").on("dp.change", dataThenCreate);
+
+    function createChart(data,transfer_type) {
+        if (transfer_type == "upload") var transfer = "subidos";
+        else var transfer = "bajados";
+        var xaxis = $.map(data, function(value, key) { return key });
+        var yaxis = $.map(data, function(value, key) { return value });
+        setTimeout(function () {
+            chart.unload();
+            chart.load({
+                columns: [
+                    ['x'].concat(data.xaxis),
+                    ['bytes '+transfer].concat(data.yaxis),
+                        ]
+            });
+        }, 1);
+    }
+</script>
+</html>

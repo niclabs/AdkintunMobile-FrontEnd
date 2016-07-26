@@ -1,0 +1,9 @@
+Flask
+Flask-Script
+sqlalchemy
+flask-sqlalchemy
+flask-migrate
+psycopg2
+flask_admin
+flask-login
+APScheduler
