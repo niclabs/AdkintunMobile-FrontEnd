@@ -175,3 +175,18 @@ class MonthlyImport(Command):
     def run(self):
         from app.importation.monthly_importation import monthly_import
         monthly_import()
+
+
+class ExampleGsmCount(Command):
+    def run(self):
+        from random import randint
+        from app.models.antenna import Antenna
+        from app.models.gsm_count import GsmCount
+        from app import db
+        antennas = Antenna.query.all()
+        year = 2016
+        month = 5
+        for antenna in antennas:
+            for type in range(17):
+                db.session.add(GsmCount(year, month, antenna.id, type, randint(200, 500)))
+        db.session.commit()

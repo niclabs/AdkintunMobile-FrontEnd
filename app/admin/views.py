@@ -7,6 +7,7 @@ from app.models.city import City
 from app.models.ranking import Ranking
 from app.models.region import Region
 from app.models.report import Report
+from app.models.gsm_count import GsmCount
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -27,3 +28,5 @@ admin.add_view(StandardView(Region, db.session))
 admin.add_view(StandardView(City, db.session))
 admin.add_view(StandardView(Report, db.session))
 admin.add_view(StandardView(Ranking, db.session))
+admin.add_view(StandardView(GsmCount, db.session))
+
