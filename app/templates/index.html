@@ -7,14 +7,16 @@
 
   <title>Adkintun - Mapa </title>
 
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script src="http://d3js.org/topojson.v1.min.js"></script>
-  <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/polygonMap.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/markerclusterer.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/map2.js') }}"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/polygonMap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/markerclusterer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map2.js') }}"></script>
   <style>
     html, body {
       height: 100%;

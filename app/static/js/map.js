@@ -1,4 +1,4 @@
-var clusterMarkers = [];
+    var clusterMarkers = [];
 var markers = [];
 var size;
 var idToName;

@@ -105,11 +105,6 @@ def getGsmCount():
     newZoom = float(request.args.get('zoom'))
     lastZoom = request.args.get('lastZoom')
     carrier = int(request.args.get('carrier'))
-    print(carrier)
     month = 5
     year = 2016
-    if lastZoom == None:
-        print(build(newZoom, carrier, year, month))
-        return json.dumps(build(newZoom, carrier, year, month))
-    else:
-        return json.dumps(change(float(lastZoom), newZoom, carrier))
+    return json.dumps(build(newZoom, carrier, year, month))
