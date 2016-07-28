@@ -10,18 +10,18 @@ def build(newZoom, carrier, year, month):
         if newZoom:
             data = {}
             regions = {}
-            query = "SELECT region.id, region.lat, region. lon, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id AND gsm_count.month = %r AND gsm_count.year = %r GROUP BY region.id;" % (
+            query = "SELECT region.id, region.name, region.lat, region. lon, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id AND gsm_count.month = %r AND gsm_count.year = %r GROUP BY region.id;" % (
                 month, year)
             result = db.engine.execute(query)
             for row in result:
-                regions[row["id"]] = {"lon": row["lon"], "lat": row["lat"], "quantity": row["quantity"]}
-                data[row["id"]]=[]
+                regions[row["id"]] = {"lon": row["lon"], "lat": row["lat"], "quantity": row["quantity"], "name": row["name"]}
+                data[row["id"]] = {}
             query = "SELECT region.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id AND gsm_count.month = %r AND gsm_count.year = %r GROUP BY region.id, gsm_count.network_type;" % (
                 month, year)
             result = db.engine.execute(query)
             for row in result:
-                data[row["id"]].append([[row["type"]],row["quantity"]])
-            return {"dataRegion": data, "regions":regions}
+                data[row["id"]][row["type"]] = row["quantity"]
+            return {"dataRegion": data, "regions": regions}
 
 
 def change(lastZoom, newZoom, carrier):
