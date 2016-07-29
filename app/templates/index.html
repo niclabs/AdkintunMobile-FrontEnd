@@ -42,7 +42,7 @@
 </ul>
 <div class="form-group">
     <label for="sel1">Seleccione operador</label>
-    <select class="form-control" id="sel1">
+    <select class="form-control" id="sel1" onchange="getMarkers()">
         {% for carrier in carriers %}
             <option value={{ carrier.id }}>{{ carrier.name }}</option>
         {% endfor %}
