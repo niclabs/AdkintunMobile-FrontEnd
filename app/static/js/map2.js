@@ -4,7 +4,8 @@ var size;
 var idToName;
 var map;
 var lastZoom;
-var global;
+var markers = [];
+
 function initMap() {
     var Santiago = {lat: -33.447487, lng: -70.673676};
     map = new google.maps.Map(document.getElementById('map'), {
@@ -19,13 +20,12 @@ function getMarkers() {
     var url = $SCRIPT_ROOT + "/getGsmCount";
     var carrier = $('#sel1').val();
     var zoom = map.getZoom();
-    var jqxhr = $.getJSON(url, {carrier: carrier, zoom: zoom, lastZoom: lastZoom}, function () {
-    })
-        .done(function (response) {
-            data = response.regions;
-            global = response.dataRegion[1];
-            $.each(data, function (key, data) {
-                visualization = new NetworkVisualization(response.dataRegion[key])
+    var jqxhr = $.getJSON(url, {carrier: carrier, zoom: zoom, lastZoom: lastZoom}, function (response) {
+        if (response.action == "change") {
+            deleteMarkers();
+            locations = response.locations;
+            $.each(locations, function (key, data) {
+                visualization = new NetworkVisualization(response.data[key]);
                 var marker = new google.maps.Marker({
                     position: {lat: data.lat, lng: data.lon},
                     visualization: visualization,
@@ -41,10 +41,11 @@ function getMarkers() {
                     map: map,
                     quantity: data.quantity,
                 });
+                markers.push(marker);
                 marker.addListener('mouseover', function () {
-                    global = this.visualization.getColorChart();
+                    $body.addClass("loading");
                     $("#info").html(
-                        "<h3>Información de la región</h3>" +
+                        "<h3>Información de la " + response.type + "</h3>" +
                         "<h4>" + this.name + "</h4>" +
                         "<br> <b>Cantidad de eventos</b>: " + this.quantity +
                         "<div id = 'chart'></div>"
@@ -58,10 +59,33 @@ function getMarkers() {
                         }
                     });
                 });
-
             });
-            lastZoom = zoom;
+        }
+        lastZoom = zoom;
+    })
+        .done(function () {
         });
 }
 
-//
+// Sets the map on all markers in the array.
+function setMapOnAll(map) {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+    }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function clearMarkers() {
+    setMapOnAll(null);
+}
+
+// Shows any markers currently in the array.
+function showMarkers() {
+    setMapOnAll(map);
+}
+
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+    clearMarkers();
+    markers = [];
+}
