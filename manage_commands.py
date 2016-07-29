@@ -25,20 +25,8 @@ class Populate(Command):
 
 class PopulateAntennas(Command):
     def run(self):
-        from app.models.antenna import Antenna
-        from app.data.communes import get_commune_code_by_name
-        from app.data import data_antennas
-
-        antennas = data_antennas.data_antennas
-        for e in antennas:
-            antenna = Antenna(e["cid"], e["lac"], e["lat"], e["lon"], int(str(e["mcc"]) + str(e["mnc"])),
-                              get_commune_code_by_name(e["city"]))
-            try:
-                db.session.add(antenna)
-                db.session.commit()
-            except (IntegrityError, Exception):
-                db.session.rollback()
-
+        from app.importation.general_importation import  antennas_import
+        antennas_import()
 
 def populate():
     from app.models.carrier import Carrier
@@ -188,5 +176,5 @@ class ExampleGsmCount(Command):
         month = 5
         for antenna in antennas:
             for type in range(17):
-                db.session.add(GsmCount(year, month, antenna.id, type, randint(200, 500)))
+                db.session.add(GsmCount(year, month, antenna.id, type, randint(0, 5)))
         db.session.commit()
