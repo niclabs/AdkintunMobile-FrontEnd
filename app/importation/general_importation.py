@@ -1,24 +1,32 @@
-from app.models.antenna import Antenna
-from app.models.report import Report
-from app.models.ranking import Ranking
-from config import server_settings
-from app import db
-import urllib.request, json
+import json
+import urllib.request
 from urllib.error import URLError
+
 import codecs
+from app import db
+from app.models.antenna import Antenna
+from app.models.ranking import Ranking
+from app.models.report import Report
+from config import AppTokens
+from config import ServerSettings
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-SERVER_BASE_URL = server_settings["server_url"]
-ANTENNA_URL = server_settings["antenna_url"]
-REPORT_URL = server_settings["report_url"]
-RANKING_URL = server_settings["ranking_url"]
+urls = ServerSettings.urls
+SERVER_BASE_URL = urls["server_url"]
+ANTENNA_URL = urls["antenna_url"]
+REPORT_URL = urls["report_url"]
+RANKING_URL = urls["ranking_url"]
 reader = codecs.getreader("utf-8")
+token = AppTokens.tokens["server"]
+header = {"Authorization": "token " + token}
 
 
 def report_import(year, month):
     url = SERVER_BASE_URL + "/" + REPORT_URL + "/" + year + "/" + month
+    request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
-        response = urllib.request.urlopen(url)
+        response = urllib.request.urlopen(request)
         data = json.load(reader(response))
         for type, element in data.items():
             try:
@@ -46,8 +54,9 @@ def report_import(year, month):
 
 def ranking_import(year, month):
     url = SERVER_BASE_URL + "/" + RANKING_URL + "/" + year + "/" + month
+    request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
-        response = urllib.request.urlopen(url)
+        response = urllib.request.urlopen(request)
         data = json.load(reader(response))
         for carrier, dict in data.iteritems():
             for traffic_type, dict in dict.items():
@@ -73,29 +82,36 @@ def ranking_import(year, month):
         print("Url is not valid")
 
 
-def get_antennas():
-    url = SERVER_BASE_URL + "/" + ANTENNA_URL
+def get_antenna(id):
+    url = SERVER_BASE_URL + "/" + ANTENNA_URL + "/" + str(id)
+    request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
-        response = urllib.request.urlopen(url)
+        response = urllib.request.urlopen(request)
         data = json.load(reader(response))
-        for row in data:
-            carrier_id = int(str(row["mcc"]) + str(row["mnc"]))
-            cid = row["cid"]
-            lac = row["lac"]
-            lat = row["lat"]
-            lon = row["lon"]
-            db.session.add(Antenna(cid=cid, lac=lac, lat=lat, lon=lon, carrier_id=carrier_id))
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-                antenna = Antenna.query.filter_by(cid=cid, lac=lac, carrier_id=carrier_id).first()
-                antenna.lat = lat
-                antenna.lon = lon
-                db.session.commit()
-
-    except URLError:
-        print("Can not access to ", url)
+        carrier_id = data["carrier_id"]
+        cid = data["cid"]
+        lac = data["lac"]
+        lat = data["lat"]
+        lon = data["lon"]
+        db.session.add(Antenna(id=id, cid=cid, lac=lac, lat=lat, lon=lon, carrier_id=carrier_id))
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            antenna = Antenna.query.filter_by(id=id).first()
+            antenna.lat = lat
+            antenna.lon = lon
+            db.session.commit()
 
     except ValueError:
         print("Url is not valid")
+
+
+def antennas_import():
+    id = db.session.query(func.max(Antenna.id))[0][0] + 1
+    while (True):
+        try:
+            get_antenna(id)
+        except URLError:
+            break
+        id = id + 1

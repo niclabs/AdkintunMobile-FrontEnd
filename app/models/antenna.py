@@ -16,7 +16,8 @@ class Antenna(base_model.BaseModel):
     gsm_counts = db.relationship('GsmCount', backref='antenna',
                                  lazy='dynamic')
 
-    def __init__(self, cid=None, lac=None, lat=None, lon=None, carrier_id=None, city_id=None):
+    def __init__(self, id=None, cid=None, lac=None, lat=None, lon=None, carrier_id=None, city_id=None):
+        self.id = id
         self.cid = cid
         self.lac = lac
         self.lat = lat
