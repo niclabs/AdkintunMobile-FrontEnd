@@ -9,6 +9,8 @@ class City(base_model.BaseModel):
     antennas = db.relationship('Antenna', backref='city',
                                lazy='dynamic')
     region_id = db.Column(db.Integer, db.ForeignKey('region.id'))
+    lat = db.Column(db.Float)
+    lon = db.Column(db.Float)
 
     def __init__(self, id, name=None, region_id=None):
         self.id = id
