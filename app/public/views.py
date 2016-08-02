@@ -104,10 +104,10 @@ def getGsmCount():
     from app.map.mapManagement import build, change
     newZoom = float(request.args.get('zoom'))
     lastZoom = request.args.get('lastZoom')
-    carrier = int(request.args.get('carrier'))
-    month = 5
-    year = 2016
+    newCarrier = int(request.args.get('carrier'))
+    lastCarrier = request.args.get('lastCarrier')
+    bounds = json.loads(request.args.get('mapBounds'))
     if not lastZoom:
-        return json.dumps(build(newZoom, carrier, year, month))
+        return json.dumps(build(newZoom, newCarrier, bounds))
     else:
-        return json.dumps(change(int(lastZoom), newZoom, carrier, year, month))
+        return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))

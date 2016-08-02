@@ -4,14 +4,17 @@ var size;
 var idToName;
 var map;
 var lastZoom;
+var lastCarrier;
 var markers = [];
-
+var mc;
 function initMap() {
     var Santiago = {lat: -33.447487, lng: -70.673676};
     map = new google.maps.Map(document.getElementById('map'), {
         center: Santiago,
         zoom: 7
     });
+    var mcOptions = {maxZoom: 15, imagePath: 'static/img/clusterer/m'};
+    mc = new MarkerClusterer(map, [], mcOptions);
     google.maps.event.addListener(map, 'idle', getMarkers);
 }
 
@@ -20,7 +23,26 @@ function getMarkers() {
     var url = $SCRIPT_ROOT + "/getGsmCount";
     var carrier = $('#sel1').val();
     var zoom = map.getZoom();
-    var jqxhr = $.getJSON(url, {carrier: carrier, zoom: zoom, lastZoom: lastZoom}, function (response) {
+    var bounds = map.getBounds();
+    var sw = bounds.getSouthWest();
+    var ne = bounds.getNorthEast();
+    var mapBounds = {
+        "ne" : {
+            "lat" : ne.lat(),
+            "lon" : ne.lng()
+        },
+        "sw" : {
+            "lat" : sw.lat(),
+            "lon" : sw.lng()
+        }
+    }
+    var jqxhr = $.getJSON(url, {
+        carrier: carrier,
+        zoom: zoom,
+        lastZoom: lastZoom,
+        lastCarrier: lastCarrier,
+        mapBounds: JSON.stringify(mapBounds),
+    }, function (response) {
         if (response.action == "change") {
             deleteMarkers();
             locations = response.locations;
@@ -32,7 +54,7 @@ function getMarkers() {
                     name: data.name,
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
+                        scale: getScale(zoom),
                         fillOpacity: 0.4,
                         strokeOpacity: 0.4,
                         strokeColor: visualization.getColorMarker(),
@@ -43,7 +65,6 @@ function getMarkers() {
                 });
                 markers.push(marker);
                 marker.addListener('mouseover', function () {
-                    $body.addClass("loading");
                     $("#info").html(
                         "<h3>Información de la " + response.type + "</h3>" +
                         "<h4>" + this.name + "</h4>" +
@@ -59,6 +80,26 @@ function getMarkers() {
                         }
                     });
                 });
+                marker.addListener('click', function () {
+                    this.setMap(null);
+                    map.setCenter(this.position);
+                    zoomAndUpdate();
+                });
+            });
+        }
+        else if (response.action == "cluster") {
+            deleteMarkers();
+            locations = response.locations;
+            $.each(locations, function (index, data) {
+                var marker = new google.maps.Marker({
+                    position: {lat: data.lat, lng: data.lon},
+                });
+                mc.addMarker(marker);
+            });
+        }
+        else if (zoom != lastZoom) {
+            $.each(markers, function (index, marker) {
+                marker.icon.scale = getScale(zoom);
             });
         }
         lastZoom = zoom;
@@ -88,4 +129,24 @@ function showMarkers() {
 function deleteMarkers() {
     clearMarkers();
     markers = [];
+}
+
+function getScale(zoom) {
+    if (zoom > 9) {
+        return zoom / 2;
+    }
+    else {
+        return 1.2 * zoom;
+    }
+}
+
+function zoomAndUpdate() {
+    var zoom = map.getZoom();
+    if (zoom <= 8) {
+        map.setZoom(11);
+    }
+    else if (zoom <= 11){
+        map.setZoom(14);
+    }
+    getMarkers();
 }
