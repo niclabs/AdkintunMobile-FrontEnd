@@ -43,6 +43,7 @@ function getMarkers() {
         lastCarrier: lastCarrier,
         mapBounds: JSON.stringify(mapBounds),
     }, function (response) {
+        console.log(zoom);
         if (response.action == "change") {
             deleteMarkers();
             locations = response.locations;
@@ -89,6 +90,7 @@ function getMarkers() {
         }
         else if (response.action == "cluster") {
             deleteMarkers();
+            mc.clearMarkers();
             locations = response.locations;
             $.each(locations, function (index, data) {
                 var marker = new google.maps.Marker({

@@ -22,7 +22,7 @@ def build(newZoom, carrier, bounds):
             return getData(query1, query2, type)
         else:
             locations = []
-            query = "SELECT antennas.lat, antennas.lon, gsm_count.quantity as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r;" % (
+            query = "SELECT antennas.lat, antennas.lon, SUM(gsm_count.quantity) as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r GROUP BY antennas.id;" % (
             bounds["sw"]["lat"], bounds["sw"]["lon"], bounds["ne"]["lat"], bounds["ne"]["lon"])
             print(query)
             result = db.engine.execute(query)
@@ -43,8 +43,14 @@ def build(newZoom, carrier, bounds):
             query2 = "SELECT city.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.gsm_count, public.antennas, public.carriers, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.carrier_id = carriers.id AND antennas.city_id = city.id AND carriers.id = %r GROUP BY city.id, gsm_count.network_type;" % carrier
             return getData(query1, query2, type)
         else:
-
-            return {"action": "cluster"}
+            locations = []
+            query = "SELECT antennas.lat, antennas.lon, SUM(gsm_count.quantity) as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r and antennas.carrier_id = %r GROUP BY antennas.id;" % (
+                bounds["sw"]["lat"], bounds["sw"]["lon"], bounds["ne"]["lat"], bounds["ne"]["lon"], carrier)
+            print(query)
+            result = db.engine.execute(query)
+            for row in result:
+                locations.append({"lat": row["lat"], "lon": row["lon"], "quantity": row["quantity"]})
+            return {"locations": locations, "action": "cluster"}
 
 
 def change(lastZoom, newZoom, lastCarrier, newCarrier, bounds):
