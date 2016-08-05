@@ -226,6 +226,19 @@ class CityAntennas(Command):
             except:
                 db.session.rollback()
 
+class LoadCitiesLocation(Command):
+    def run(self):
+        from app.data.communes_location import communes_locations
+        from app.models.city import City
+        for commune in communes_locations:
+            try:
+                city = City.query.get(commune["id"])
+                city.lat = commune["lat"]
+                city.lon = commune["lon"]
+                db.session.commit()
+            except:
+                db.session.rollback()
+
 
 class UnknownCityError(Exception):
     pass
