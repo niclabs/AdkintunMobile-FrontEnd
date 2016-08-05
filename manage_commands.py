@@ -25,8 +25,9 @@ class Populate(Command):
 
 class PopulateAntennas(Command):
     def run(self):
-        from app.importation.general_importation import  antennas_import
+        from app.importation.general_importation import antennas_import
         antennas_import()
+
 
 def populate():
     from app.models.carrier import Carrier
@@ -163,3 +164,68 @@ class MonthlyImport(Command):
     def run(self):
         from app.importation.monthly_importation import monthly_import
         monthly_import()
+
+
+class CityAntennas(Command):
+    def run(self):
+        import json
+        import time
+        import urllib.request
+        import codecs
+
+        from app.models.antenna import Antenna
+        from app.data.communes import get_commune_code_by_name
+        from app import db
+
+        reader = codecs.getreader("utf-8")
+        antennas = Antenna.query.all()
+        size = len(antennas)
+
+        for i in range(size):
+            if (not (i + 1) % 200):
+                print("Updated ", i, " antennas")
+            lat = str(antennas[i].lat)
+            lon = str(antennas[i].lon)
+            url = "http://localhost/nominatim/reverse?format=json&lat=" + lat + "&lon=" + lon + "&zoom=18&addressdetails=1"
+            city = "unknown"
+            region = "unknown"
+            try:
+                response = urllib.request.urlopen(url)
+                data = json.load(reader(response))
+                if ('error' not in data):
+                    if ('city' in data["address"]):
+                        city = data["address"]["city"]
+                    elif ('town' in data["address"]):
+                        city = data["address"]["town"]
+                    elif ('village' in data["address"]):
+                        city = data["address"]["village"]
+                    else:
+                        region = data["address"]["state"]
+                        raise UnknownCityError()
+
+                    region = data["address"]["state"]
+            except:
+                print("Searching ", i, " in googlemaps")
+                url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&sensor=false"
+                response = urllib.request.urlopen(url)
+                data = json.load(reader(response))
+                if data["status"] == "OK":
+                    found = False
+                    for element in data["results"][0]["address_components"]:
+                        if element["types"] == ["locality", "political"]:
+                            city = element["long_name"]
+                            found = True
+                        if element["types"] == ["administrative_area_level_3", "political"] and not found:
+                            city = element["long_name"]
+                        if element["types"] == ["administrative_area_level_1", "political"]:
+                            region = element["long_name"]
+                time.sleep(1)
+            try:
+                antennas[i].city_id = get_commune_code_by_name(city)
+                db.session.commit()
+            except:
+                db.session.rollback()
+
+
+class UnknownCityError(Exception):
+    pass
