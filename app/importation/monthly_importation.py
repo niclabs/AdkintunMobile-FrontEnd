@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.importation.general_importation import report_import, ranking_import
+from app.importation.general_importation import report_import, ranking_import, gsm_signal_import
 
 
 def monthly_import():
@@ -15,3 +15,5 @@ def monthly_import():
     month = month_new_import
     report_import(year, month)
     ranking_import(year, month)
+    ranking_import(year, month)
+    gsm_signal_import(year, month)

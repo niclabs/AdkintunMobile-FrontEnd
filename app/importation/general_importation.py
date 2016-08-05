@@ -5,6 +5,7 @@ from urllib.error import URLError
 import codecs
 from app import db
 from app.models.antenna import Antenna
+from app.models.gsm_signal import GsmSignal
 from app.models.ranking import Ranking
 from app.models.report import Report
 from config import AppTokens
@@ -17,6 +18,8 @@ SERVER_BASE_URL = urls["server_url"]
 ANTENNA_URL = urls["antenna_url"]
 REPORT_URL = urls["report_url"]
 RANKING_URL = urls["ranking_url"]
+NETWORK_URL = urls["network_url"]
+SIGNAL_URL = urls["signal_url"]
 reader = codecs.getreader("utf-8")
 token = AppTokens.tokens["server"]
 header = {"Authorization": "token " + token}
@@ -77,11 +80,47 @@ def ranking_import(year, month):
                     except IntegrityError:
                         db.session.rollback()
                         ranking = Ranking.query.filter_by(year=year, month=month, carrier_id=carrier_id,
-                                                          traffic_type=traffic_type, transfer_type=transfer_type)
+                                                          traffic_type=traffic_type,
+                                                          transfer_type=transfer_type).first()
                         ranking.rank = rank
                         db.session.commit()
 
 
+
+    except URLError:
+        print("Can not access to ", url)
+
+    except ValueError:
+        print("Url is not valid")
+
+
+def gsm_signal_import(year, month):
+    url = SERVER_BASE_URL + "/" + RANKING_URL + "/" + str(year) + "/" + str(month)
+    request = urllib.request.Request(url, headers={"Authorization": "token " + token})
+    try:
+        response = urllib.request.urlopen(request)
+        signals = json.load(reader(response))
+        for signal in signals:
+            antenna_id = signal["antenna_id"]
+            carrier_id = signal["carrier_id"]
+            quantity = signal["observations"]
+            signal_mean = signal["signal_mean"]
+            antenna = Antenna.query.get(signal["antenna_id"])
+            if not antenna:
+                get_antenna(antenna_id)
+                antenna = Antenna.query.get(signal["antenna_id"])
+
+            db.session.add(GsmSignal(year=year, month=month, antenna_id=antenna_id, carrier_id=carrier_id,
+                                     signal=signal_mean, quatity=quantity))
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                signal = GsmSignal.query.filter_by(year=year, month=month, carrier_id=carrier_id,
+                                                   antenna_id=antenna_id).first()
+                signal.quantity = quantity
+                signal.signal = signal_mean
+                db.session.commit()
 
     except URLError:
         print("Can not access to ", url)
@@ -96,6 +135,7 @@ def get_antenna(id):
     try:
         response = urllib.request.urlopen(request)
         data = json.load(reader(response))
+        print(data)
         carrier_id = data["carrier_id"]
         cid = data["cid"]
         lac = data["lac"]
@@ -105,11 +145,14 @@ def get_antenna(id):
         try:
             db.session.commit()
         except IntegrityError:
-            db.session.rollback()
-            antenna = Antenna.query.filter_by(id=id).first()
-            antenna.lat = lat
-            antenna.lon = lon
-            db.session.commit()
+            try:
+                db.session.rollback()
+                antenna = Antenna.query.filter_by(id=id).first()
+                antenna.lat = lat
+                antenna.lon = lon
+                db.session.commit()
+            except:
+                pass
 
     except ValueError:
         print("Url is not valid")
