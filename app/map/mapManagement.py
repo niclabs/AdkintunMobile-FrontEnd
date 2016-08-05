@@ -3,6 +3,7 @@ from app.models.gsm_count import GsmCount
 from app.models.carrier import Carrier
 from app import db
 
+points = [8, 11]
 
 def build(newZoom, carrier, bounds):
     if carrier == 0:
@@ -54,7 +55,6 @@ def build(newZoom, carrier, bounds):
 
 
 def change(lastZoom, newZoom, lastCarrier, newCarrier, bounds):
-    points = [8, 11]
     if lastCarrier != newCarrier:
         return build(newZoom, newCarrier, bounds)
     size = len(points)
