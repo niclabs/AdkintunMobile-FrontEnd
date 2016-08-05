@@ -14,6 +14,11 @@ class Carrier(base_model.BaseModel):
                                lazy='dynamic')
     antennas = db.relationship("Antenna", backref='carrier', lazy='dynamic')
 
+    gsm_counts = db.relationship('GsmCount', backref='carrier',
+                                 lazy='dynamic')
+    gsm_signals = db.relationship('GsmSignal', backref='carrier',
+                                  lazy='dynamic')
+
     def __init__(self, name=None, mcc=None, mnc=None):
         self.name = name
         self.mcc = mcc

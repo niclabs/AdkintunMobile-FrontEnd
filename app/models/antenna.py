@@ -15,6 +15,8 @@ class Antenna(base_model.BaseModel):
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     gsm_counts = db.relationship('GsmCount', backref='antenna',
                                  lazy='dynamic')
+    gsm_signals= db.relationship('GsmSignal', backref='antenna',
+                                 lazy='dynamic')
 
     def __init__(self, id=None, cid=None, lac=None, lat=None, lon=None, carrier_id=None, city_id=None):
         self.id = id

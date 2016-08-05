@@ -42,71 +42,70 @@ function getMarkers() {
         lastZoom: lastZoom,
         lastCarrier: lastCarrier,
         mapBounds: JSON.stringify(mapBounds),
-    }, function (response) {
-        console.log(zoom);
-        if (response.action == "change") {
-            deleteMarkers();
-            locations = response.locations;
-            $.each(locations, function (key, data) {
-                visualization = new NetworkVisualization(response.data[key]);
-                var marker = new google.maps.Marker({
-                    position: {lat: data.lat, lng: data.lon},
-                    visualization: visualization,
-                    name: data.name,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: getScale(zoom),
-                        fillOpacity: 0.4,
-                        strokeOpacity: 0.4,
-                        strokeColor: visualization.getColorMarker(),
-                        fillColor: visualization.getColorMarker(),
-                    },
-                    map: map,
-                    quantity: data.quantity,
-                });
-                markers.push(marker);
-                marker.addListener('mouseover', function () {
-                    $("#info").html(
-                        "<h3>Información de la " + response.type + "</h3>" +
-                        "<h4>" + this.name + "</h4>" +
-                        "<br> <b>Cantidad de eventos</b>: " + this.quantity +
-                        "<div id = 'chart'></div>"
-                    )
-                    ;
-                    var chart = c3.generate({
-                        data: {
-                            colors: this.visualization.getColorChart(),
-                            columns: this.visualization.getDataChart(),
-                            type: 'pie',
-                        }
+    }, function () {
+    })
+        .done(function (response) {
+            if (response.action != "notChange"){
+                mc.clearMarkers();
+                deleteMarkers();
+                locations = response.locations;
+            }
+            if (response.action == "change") {
+                $.each(locations, function (key, data) {
+                    visualization = new NetworkVisualization(response.data[key]);
+                    var marker = new google.maps.Marker({
+                        position: {lat: data.lat, lng: data.lon},
+                        visualization: visualization,
+                        name: data.name,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: getScale(zoom),
+                            fillOpacity: 0.4,
+                            strokeOpacity: 0.4,
+                            strokeColor: visualization.getColorMarker(),
+                            fillColor: visualization.getColorMarker(),
+                        },
+                        map: map,
+                        quantity: data.quantity,
+                    });
+                    markers.push(marker);
+                    marker.addListener('mouseover', function () {
+                        $("#info").html(
+                            "<h3>Información de la " + response.type + "</h3>" +
+                            "<h4>" + this.name + "</h4>" +
+                            "<br> <b>Cantidad de eventos</b>: " + this.quantity +
+                            "<div id = 'chart'></div>"
+                        )
+                        ;
+                        var chart = c3.generate({
+                            data: {
+                                colors: this.visualization.getColorChart(),
+                                columns: this.visualization.getDataChart(),
+                                type: 'pie',
+                            }
+                        });
+                    });
+                    marker.addListener('click', function () {
+                        this.setMap(null);
+                        map.setCenter(this.position);
+                        zoomAndUpdate();
                     });
                 });
-                marker.addListener('click', function () {
-                    this.setMap(null);
-                    map.setCenter(this.position);
-                    zoomAndUpdate();
+            }
+            else if (response.action == "cluster") {
+                $.each(locations, function (index, data) {
+                    var marker = new google.maps.Marker({
+                        position: {lat: data.lat, lng: data.lon},
+                    });
+                    mc.addMarker(marker);
                 });
-            });
-        }
-        else if (response.action == "cluster") {
-            deleteMarkers();
-            mc.clearMarkers();
-            locations = response.locations;
-            $.each(locations, function (index, data) {
-                var marker = new google.maps.Marker({
-                    position: {lat: data.lat, lng: data.lon},
+            }
+            else if (zoom != lastZoom) {
+                $.each(markers, function (index, marker) {
+                    marker.icon.scale = getScale(zoom);
                 });
-                mc.addMarker(marker);
-            });
-        }
-        else if (zoom != lastZoom) {
-            $.each(markers, function (index, marker) {
-                marker.icon.scale = getScale(zoom);
-            });
-        }
-        lastZoom = zoom;
-    })
-        .done(function () {
+            }
+            lastZoom = zoom;
         });
 }
 
