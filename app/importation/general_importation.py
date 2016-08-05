@@ -23,7 +23,7 @@ header = {"Authorization": "token " + token}
 
 
 def report_import(year, month):
-    url = SERVER_BASE_URL + "/" + REPORT_URL + "/" + year + "/" + month
+    url = SERVER_BASE_URL + "/" + REPORT_URL + "/" + str(year) + "/" + str(month)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
         response = urllib.request.urlopen(request)
@@ -43,7 +43,15 @@ def report_import(year, month):
                         db.session.commit()
             except AttributeError:
                 carrier_id = 0
-                db.session.add(Report(year, month, type, carrier_id, element))
+                try:
+                    db.session.add(Report(year, month, type, carrier_id, element))
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    report = Report.query.filter_by(year=year, month=month, type=type,
+                                                    carrier_id=carrier_id).first()
+                    report.quantity = element
+                    db.session.commit()
 
     except URLError:
         print("Can not access to ", url)
@@ -53,7 +61,7 @@ def report_import(year, month):
 
 
 def ranking_import(year, month):
-    url = SERVER_BASE_URL + "/" + RANKING_URL + "/" + year + "/" + month
+    url = SERVER_BASE_URL + "/" + RANKING_URL + "/" + str(year) + "/" + str(month)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
         response = urllib.request.urlopen(request)
