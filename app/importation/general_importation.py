@@ -95,7 +95,7 @@ def ranking_import(year, month):
 
 
 def gsm_signal_import(year, month):
-    url = SERVER_BASE_URL + "/" + RANKING_URL + "/" + str(year) + "/" + str(month)
+    url = SERVER_BASE_URL + "/" + SIGNAL_URL + "/" + str(year) + "/" + str(month)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
         response = urllib.request.urlopen(request)
@@ -107,11 +107,14 @@ def gsm_signal_import(year, month):
             signal_mean = signal["signal_mean"]
             antenna = Antenna.query.get(signal["antenna_id"])
             if not antenna:
-                get_antenna(antenna_id)
+                try:
+                    get_antenna(antenna_id)
+                except DifferentIdException:
+                    continue
                 antenna = Antenna.query.get(signal["antenna_id"])
 
             db.session.add(GsmSignal(year=year, month=month, antenna_id=antenna_id, carrier_id=carrier_id,
-                                     signal=signal_mean, quatity=quantity))
+                                     signal=signal_mean, quantity=quantity))
             try:
                 db.session.commit()
             except IntegrityError:
@@ -135,7 +138,6 @@ def get_antenna(id):
     try:
         response = urllib.request.urlopen(request)
         data = json.load(reader(response))
-        print(data)
         carrier_id = data["carrier_id"]
         cid = data["cid"]
         lac = data["lac"]
@@ -152,7 +154,7 @@ def get_antenna(id):
                 antenna.lon = lon
                 db.session.commit()
             except:
-                pass
+                raise DifferentIdException()
 
     except ValueError:
         print("Url is not valid")
@@ -166,3 +168,6 @@ def antennas_import():
         except URLError:
             break
         id = id + 1
+
+class DifferentIdException(Exception):
+    pass
