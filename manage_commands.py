@@ -226,6 +226,7 @@ class CityAntennas(Command):
             except:
                 db.session.rollback()
 
+
 class LoadCitiesLocation(Command):
     def run(self):
         from app.data.communes_location import communes_locations
@@ -238,6 +239,18 @@ class LoadCitiesLocation(Command):
                 db.session.commit()
             except:
                 db.session.rollback()
+
+
+class ExampleGsmCount(Command):
+    def run(self):
+        from app.models.gsm_count import GsmCount
+        from app.models.antenna import Antenna
+        from random import randint
+        antennas = Antenna.query.all()
+        for antenna in antennas:
+            db.session.add(GsmCount(2016, 7, antenna.id, randint(0, 16), 7301, randint(1, 10)))
+            db.session.add(GsmCount(2016, 7, antenna.id, randint(0, 16), 7302, randint(1, 10)))
+        db.session.commit()
 
 
 class UnknownCityError(Exception):
