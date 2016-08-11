@@ -6,6 +6,7 @@ import codecs
 from app import db
 from app.models.antenna import Antenna
 from app.models.gsm_signal import GsmSignal
+from app.models.gsm_count import GsmCount
 from app.models.ranking import Ranking
 from app.models.report import Report
 from config import AppTokens
@@ -111,7 +112,6 @@ def gsm_signal_import(year, month):
                     get_antenna(antenna_id)
                 except DifferentIdException:
                     continue
-                antenna = Antenna.query.get(signal["antenna_id"])
 
             db.session.add(GsmSignal(year=year, month=month, antenna_id=antenna_id, carrier_id=carrier_id,
                                      signal=signal_mean, quantity=quantity))
@@ -123,6 +123,42 @@ def gsm_signal_import(year, month):
                                                    antenna_id=antenna_id).first()
                 signal.quantity = quantity
                 signal.signal = signal_mean
+                db.session.commit()
+
+    except URLError:
+        print("Can not access to ", url)
+
+    except ValueError:
+        print("Url is not valid")
+
+
+def gsm_count_import(year, month):
+    url = SERVER_BASE_URL + "/" + NETWORK_URL + "/" + str(year) + "/" + str(month)
+    request = urllib.request.Request(url, headers={"Authorization": "token " + token})
+    try:
+        response = urllib.request.urlopen(request)
+        counts = json.load(reader(response))
+        for count in counts:
+            antenna_id = count["antenna_id"]
+            carrier_id = count["carrier_id"]
+            quantity = count["size"]
+            network_type = count["network_type"]
+            antenna = Antenna.query.get(count["antenna_id"])
+            if not antenna:
+                try:
+                    get_antenna(antenna_id)
+                except DifferentIdException:
+                    continue
+
+            db.session.add(GsmCount(year=year, month=month, antenna_id=antenna_id, network_type=network_type,
+                                    carrier_id=carrier_id, quantity=quantity))
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                count = GsmCount.query.filter_by(year=year, month=month, carrier_id=carrier_id,
+                                                  antenna_id=antenna_id, network_type=network_type).first()
+                count.quantity = quantity
                 db.session.commit()
 
     except URLError:
@@ -168,6 +204,7 @@ def antennas_import():
         except URLError:
             break
         id = id + 1
+
 
 class DifferentIdException(Exception):
     pass
