@@ -25,19 +25,8 @@ class Populate(Command):
 
 class PopulateAntennas(Command):
     def run(self):
-        from app.models.antenna import Antenna
-        from app.data.communes import get_commune_code_by_name
-        from app.data import data_antennas
-
-        antennas = data_antennas.data_antennas
-        for e in antennas:
-            antenna = Antenna(e["cid"], e["lac"], e["lat"], e["lon"], int(str(e["mcc"]) + str(e["mnc"])),
-                              get_commune_code_by_name(e["city"]))
-            try:
-                db.session.add(antenna)
-                db.session.commit()
-            except (IntegrityError, Exception):
-                db.session.rollback()
+        from app.importation.general_importation import antennas_import
+        antennas_import()
 
 
 def populate():
@@ -175,3 +164,94 @@ class MonthlyImport(Command):
     def run(self):
         from app.importation.monthly_importation import monthly_import
         monthly_import()
+
+
+class CityAntennas(Command):
+    def run(self):
+        import json
+        import time
+        import urllib.request
+        import codecs
+
+        from app.models.antenna import Antenna
+        from app.data.communes import get_commune_code_by_name
+        from app import db
+
+        reader = codecs.getreader("utf-8")
+        antennas = Antenna.query.all()
+        size = len(antennas)
+
+        for i in range(size):
+            if (not (i + 1) % 200):
+                print("Updated ", i, " antennas")
+            lat = str(antennas[i].lat)
+            lon = str(antennas[i].lon)
+            url = "http://localhost/nominatim/reverse?format=json&lat=" + lat + "&lon=" + lon + "&zoom=18&addressdetails=1"
+            city = "unknown"
+            region = "unknown"
+            try:
+                response = urllib.request.urlopen(url)
+                data = json.load(reader(response))
+                if ('error' not in data):
+                    if ('city' in data["address"]):
+                        city = data["address"]["city"]
+                    elif ('town' in data["address"]):
+                        city = data["address"]["town"]
+                    elif ('village' in data["address"]):
+                        city = data["address"]["village"]
+                    else:
+                        region = data["address"]["state"]
+                        raise UnknownCityError()
+
+                    region = data["address"]["state"]
+            except:
+                print("Searching ", i, " in googlemaps")
+                url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&sensor=false"
+                response = urllib.request.urlopen(url)
+                data = json.load(reader(response))
+                if data["status"] == "OK":
+                    found = False
+                    for element in data["results"][0]["address_components"]:
+                        if element["types"] == ["locality", "political"]:
+                            city = element["long_name"]
+                            found = True
+                        if element["types"] == ["administrative_area_level_3", "political"] and not found:
+                            city = element["long_name"]
+                        if element["types"] == ["administrative_area_level_1", "political"]:
+                            region = element["long_name"]
+                time.sleep(1)
+            try:
+                antennas[i].city_id = get_commune_code_by_name(city)
+                db.session.commit()
+            except:
+                db.session.rollback()
+
+
+class LoadCitiesLocation(Command):
+    def run(self):
+        from app.data.communes_location import communes_locations
+        from app.models.city import City
+        for commune in communes_locations:
+            try:
+                city = City.query.get(commune["id"])
+                city.lat = commune["lat"]
+                city.lon = commune["lon"]
+                db.session.commit()
+            except:
+                db.session.rollback()
+
+
+class ExampleGsmCount(Command):
+    def run(self):
+        from app.models.gsm_count import GsmCount
+        from app.models.antenna import Antenna
+        from random import randint
+        antennas = Antenna.query.all()
+        for antenna in antennas:
+            db.session.add(GsmCount(2016, 7, antenna.id, randint(0, 16), 7301, randint(1, 10)))
+            db.session.add(GsmCount(2016, 7, antenna.id, randint(0, 16), 7302, randint(1, 10)))
+        db.session.commit()
+
+
+class UnknownCityError(Exception):
+    pass

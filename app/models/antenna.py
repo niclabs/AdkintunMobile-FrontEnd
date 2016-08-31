@@ -13,8 +13,13 @@ class Antenna(base_model.BaseModel):
     lon = db.Column(db.Float)
     carrier_id = db.Column(db.Integer, db.ForeignKey("carriers.id"))
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
+    gsm_counts = db.relationship('GsmCount', backref='antenna',
+                                 lazy='dynamic')
+    gsm_signals= db.relationship('GsmSignal', backref='antenna',
+                                 lazy='dynamic')
 
-    def __init__(self, cid=None, lac=None, lat=None, lon=None, carrier_id=None, city_id=None):
+    def __init__(self, id=None, cid=None, lac=None, lat=None, lon=None, carrier_id=None, city_id=None):
+        self.id = id
         self.cid = cid
         self.lac = lac
         self.lat = lat
@@ -24,4 +29,4 @@ class Antenna(base_model.BaseModel):
 
     def __repr__(self):
         return '<Antenna, id: %r,  cid: %r, lac: %r, carriers: %r, city: %r>' % (
-        self.id, self.cid, self.lac, self.carrier, self.city)
+            self.id, self.cid, self.lac, self.carrier, self.city)
