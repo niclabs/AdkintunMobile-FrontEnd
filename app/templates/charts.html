@@ -35,8 +35,10 @@
         <div class="form-group">
           <label for="sel1">Seleccione tipo de tráfico</label>
           <select class="form-control" id="sel1" onchange="dataThenCreate()">
+            <option value="wifi all">Tráfico Wifi - Total</option>
             <option value="wifi upload">Tráfico Wifi - Subida</option>
             <option value="wifi download">Tráfico Wifi - Bajada</option>
+            <option value="mobile all">Tráfico Móvil - Total</option>
             <option value="mobile upload">Tráfico Móvil - Subida</option>
             <option value="mobile download">Tráfico Móvil - Bajada</option>
 
@@ -111,14 +113,7 @@
             var parse = $("#sel1").val().split(" ");
             var traffic_type = parse[0];
             var transfer_type = parse[1];
-            var url = $SCRIPT_ROOT + "/getRanking";
-            var data = {
-                    year: year,
-                    month: month,
-                    traffic_type: traffic_type,
-                    transfer_type: transfer_type,
-                    carrier_id: carrier_id
-                };
+            var url = $SCRIPT_ROOT + "/getRanking"; // Send to the public view getRanking
             $.ajax({
                 dataType: "json",
                 url: url,
@@ -145,8 +140,12 @@
     $("#datetimepicker1").on("dp.change", dataThenCreate);
 
     function createChart(data,transfer_type) {
-        if (transfer_type == "upload") var transfer = "subidos";
-        else var transfer = "bajados";
+        if (transfer_type == "upload")
+            var transfer = "subidos";
+        else if (transfer_type == "download")
+            var transfer = "bajados";
+        else
+            var transfer = "totales";
         var xaxis = $.map(data, function(value, key) { return key });
         var yaxis = $.map(data, function(value, key) { return value });
         setTimeout(function () {
@@ -154,7 +153,7 @@
             chart.load({
                 columns: [
                     ['x'].concat(data.xaxis),
-                    ['bytes '+transfer].concat(data.yaxis),
+                    ['bytes por usuario '+transfer].concat(data.yaxis),
                         ]
             });
         }, 1);

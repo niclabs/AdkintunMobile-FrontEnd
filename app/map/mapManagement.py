@@ -10,45 +10,88 @@ def build(newZoom, carrier, bounds):
     if carrier == 0:
         if newZoom <= 8:
             type = "Región"
-            query1 = "SELECT region.id, region.name, region.lat, region. lon, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id GROUP BY region.id;"
+            query1 = "SELECT region.id, region.name, region.lat, region.lon, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.region, public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id " \
+                     "GROUP BY region.id;"
 
-            query2 = "SELECT region.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id GROUP BY region.id, gsm_count.network_type;"
-
+            query2 = "SELECT region.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.region, public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.region_id = region.id " \
+                     "GROUP BY region.id, gsm_count.network_type;"
             return getData(query1, query2, type)
+
         elif newZoom <= 11:
             type = "Ciudad"
-            query1 = "SELECT city.id, city.name, city.lat, city.lon, SUM(gsm_count.quantity) as quantity FROM public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.lat IS NOT NULL AND city.lon IS NOT NULL GROUP BY city.id;"
+            query1 = "SELECT city.id, city.name, city.lat, city.lon, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND city.lat IS NOT NULL AND city.lon IS NOT NULL " \
+                     "GROUP BY city.id;"
 
-            query2 = "SELECT city.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id GROUP BY city.id, gsm_count.network_type;"
+            query2 = "SELECT city.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id " \
+                     "GROUP BY city.id, gsm_count.network_type;"
 
             return getData(query1, query2, type)
         else:
             type = "Antena"
-            query1 = "SELECT antennas.id as id, antennas.id as name, antennas.lat, antennas.lon, SUM(gsm_count.quantity) as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r GROUP BY antennas.id;" % (
+            query1 = "SELECT antennas.id as id, antennas.id as name, antennas.lat, antennas.lon, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.antennas, public.gsm_count " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r " \
+                     "GROUP BY antennas.id;" % (
                 bounds["sw"]["lat"], bounds["sw"]["lon"], bounds["ne"]["lat"], bounds["ne"]["lon"])
-            query2 = "SELECT antennas.id as id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r GROUP BY antennas.id, gsm_count.network_type;" % (
+
+            query2 = "SELECT antennas.id as id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.antennas, public.gsm_count " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r " \
+                     "GROUP BY antennas.id, gsm_count.network_type;" % (
                 bounds["sw"]["lat"], bounds["sw"]["lon"], bounds["ne"]["lat"], bounds["ne"]["lon"])
+
             return getData(query1, query2, type, "cluster")
 
     else:
         if newZoom <= 8:
             type = "Región"
-            query1 = "SELECT region.id, region.name, region.lat, region.lon, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id = %r AND city.region_id = region.id  GROUP BY region.id;" % carrier
+            query1 = "SELECT region.id, region.name, region.lat, region.lon, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.region, public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id = %r AND city.region_id = region.id  " \
+                     "GROUP BY region.id;" % carrier
 
-            query2 = "SELECT region.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.region, public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id = %r AND city.region_id = region.id GROUP BY region.id, gsm_count.network_type;" % carrier
+            query2 = "SELECT region.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.region, public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id = %r AND city.region_id = region.id " \
+                     "GROUP BY region.id, gsm_count.network_type;" % carrier
             return getData(query1, query2, type)
+
         elif newZoom <= 11:
             type = "Ciudad"
-            query1 = "SELECT city.id, city.name, city.lat, city.lon, SUM(gsm_count.quantity) as quantity FROM public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id = %r AND city.lat IS NOT NULL AND city.lon IS NOT NULL GROUP BY city.id;" % carrier
+            query1 = "SELECT city.id, city.name, city.lat, city.lon, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id = %r AND city.lat IS NOT NULL AND city.lon IS NOT NULL " \
+                     "GROUP BY city.id;" % carrier
 
-            query2 = "SELECT city.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.gsm_count, public.antennas, public.city WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id= %r GROUP BY city.id, gsm_count.network_type;" % carrier
+            query2 = "SELECT city.id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.gsm_count, public.antennas, public.city " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND antennas.city_id = city.id AND gsm_count.carrier_id= %r " \
+                     "GROUP BY city.id, gsm_count.network_type;" % carrier
+
             return getData(query1, query2, type)
+
         else:
             type = "Antena"
-            query1 = "SELECT antennas.id as id, antennas.id as name, antennas.lat, antennas.lon, SUM(gsm_count.quantity) as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND gsm_count.carrier_id = %r AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r GROUP BY antennas.id;" % (
+            query1 = "SELECT antennas.id as id, antennas.id as name, antennas.lat, antennas.lon, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.antennas, public.gsm_count " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND gsm_count.carrier_id = %r AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r " \
+                     "GROUP BY antennas.id;" % (
                 carrier, bounds["sw"]["lat"], bounds["sw"]["lon"], bounds["ne"]["lat"], bounds["ne"]["lon"])
-            query2 = "SELECT antennas.id as id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity FROM public.antennas, public.gsm_count WHERE gsm_count.antenna_id = antennas.id AND gsm_count.carrier_id = %r AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r GROUP BY antennas.id, gsm_count.network_type;" % (
+
+            query2 = "SELECT antennas.id as id, gsm_count.network_type as type, SUM(gsm_count.quantity) as quantity " \
+                     "FROM public.antennas, public.gsm_count " \
+                     "WHERE gsm_count.antenna_id = antennas.id AND gsm_count.carrier_id = %r AND antennas.lat > %r AND antennas.lon > %r AND antennas.lat < %r AND antennas.lon < %r " \
+                     "GROUP BY antennas.id, gsm_count.network_type;" % (
                 carrier, bounds["sw"]["lat"], bounds["sw"]["lon"], bounds["ne"]["lat"], bounds["ne"]["lon"])
+
             return getData(query1, query2, type, "cluster")
 
 

@@ -7,6 +7,7 @@ var lastZoom;
 var lastCarrier;
 var markers = [];
 var mc;
+
 function initMap() {
     var Santiago = {lat: -33.447487, lng: -70.673676};
     map = new google.maps.Map(document.getElementById('map'), {
@@ -17,7 +18,6 @@ function initMap() {
     mc = new MarkerClusterer(map, [], mcOptions);
     google.maps.event.addListener(map, 'idle', getMarkers);
 }
-
 
 function getMarkers() {
     var url = $SCRIPT_ROOT + "/getGsmCount";
@@ -53,6 +53,7 @@ function getMarkers() {
             if (response.action == "change") {
                 $.each(locations, function (key, data) {
                     visualization = new NetworkVisualization(response.data[key]);
+                    console.log(data);
                     var marker = new google.maps.Marker({
                         position: {lat: data.lat, lng: data.lon},
                         visualization: visualization,
@@ -103,6 +104,7 @@ function getMarkers() {
 function setMapOnAll(map) {
     for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(map);
+        console.log(markers[i]);
     }
 }
 
@@ -147,7 +149,7 @@ function mouseOverEvent(marker, response) {
             "<h3>Información de la " + response.type + "</h3>" +
             "<h4>" + this.name + "</h4>" +
             "<br> <b>Cantidad de eventos</b>: " + this.quantity +
-            "<div id = 'chart'></div>"
+            "<div id = 'chart'></div></div>"
         )
         ;
         var chart = c3.generate({

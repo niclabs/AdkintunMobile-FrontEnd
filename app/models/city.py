@@ -12,10 +12,11 @@ class City(base_model.BaseModel):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
 
+
     def __init__(self, id, name=None, region_id=None):
         self.id = id
         self.name = name
         self.region_id = region_id
 
     def __repr__(self):
-        return '<City name: %r, region: %r>' % (self.name, self.region)
+        return '<City name: %r, region: %r, lat: %r, lon: %r>' % (self.name, self.region, self.lat, self.lon)

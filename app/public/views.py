@@ -16,7 +16,7 @@ def charts():
 def reports():
     return render_template('total-reports.html')
 
-
+# View that handles the reports and return them in Json format
 @app.route('/getReport')
 def getReports():
     from app.models.report import Report
@@ -60,11 +60,20 @@ def getAppRanking():
     traffic_type = request.args.get('traffic_type')
     transfer_type = request.args.get('transfer_type')
     carrier_id = request.args.get('carrier_id')
-    ranking = Ranking.query.filter_by(year=year, month=month, carrier_id=carrier_id, traffic_type=traffic_type,
-                                      transfer_type=transfer_type).first_or_404()
-    list = sorted(ranking.rank.items(), key=operator.itemgetter(1))
-    data = {"xaxis": [tuple[0] for tuple in list],
-            "yaxis": [tuple[1] for tuple in list]}
+    ranking = Ranking.query.filter_by(year=year, month=month, carrier_id= carrier_id,
+                                      traffic_type=traffic_type,
+                                      transfer_type=transfer_type)
+    wrapper = [{'ranking_number':e.ranking_number,
+                'app_name':e.app_name,
+                'total_bytes':e.total_bytes,
+                'bytes_per_user':e.bytes_per_user,
+                'total_devices':e.total_devices} for e in ranking]
+
+    wrapper = sorted(wrapper, key= lambda x: x['ranking_number'])
+
+    data = {"xaxis": [e['app_name'] for e in wrapper],
+            "yaxis": [e['bytes_per_user'] for e in wrapper]}
+
     return json.dumps(data)
 
 

@@ -22,13 +22,6 @@ class Populate(Command):
     def run(self):
         populate()
 
-
-class PopulateAntennas(Command):
-    def run(self):
-        from app.importation.general_importation import antennas_import
-        antennas_import()
-
-
 def populate():
     from app.models.carrier import Carrier
     from config import AdminUser
@@ -47,14 +40,20 @@ def populate():
     except IntegrityError:
         db.session.rollback()
 
-    # Agregar carriers
+    # We aggregate carriers
     jsonvar = json.loads(initial_data_carriers.initial_data_carriers)
     for k, v in jsonvar.items():
         if k == "carriers":
             save_models(v, Carrier)
+    # We aggregate regions
+    populate_regions()
+    # We aggregate cities
+    populate_cities()
 
 
 def populate_regions():
+    import requests
+
     from app.models.region import Region
     from app.data.regions import region_codes
     for key, value in region_codes.items():
@@ -65,11 +64,24 @@ def populate_regions():
         except (IntegrityError, Exception):
             db.session.rollback()
             continue
+    for region in Region.query.all():
+        name = region.name.replace(' ', '%20')
+        r = requests.get('https://maps.googleapis.com/maps/api/geocode/json?address={}'.format(name))
+        jsonResponse = r.json()
+        if jsonResponse['status'] == 'OK':
+            loc = jsonResponse['results'][0]['geometry']['location']
+            region.lat = loc['lat']
+            region.lon = loc['lng']
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
 
 
 def populate_cities():
     from app.models.city import City
     from app.data.communes import commune_codes, region_code_by_commune_code
+    from app.data.communes_location import communes_locations
     for key, value in commune_codes.items():
         city = City(key, value, region_code_by_commune_code(key))
         try:
@@ -78,86 +90,20 @@ def populate_cities():
         except (IntegrityError, Exception):
             db.session.rollback()
             continue
-
-
-class PopulateRegions(Command):
-    def run(self):
-        populate_regions()
-
-
-class PopulateCities(Command):
-    def run(self):
-        populate_cities()
-
-
-def delete_db():
-    db.drop_all(bind=None)
+    # Charges the location of the cities
+    for commune in communes_locations:
+        try:
+            city = City.query.get(commune["id"])
+            city.lat = commune["lat"]
+            city.lon = commune["lon"]
+            db.session.commit()
+        except:
+            db.session.rollback()
 
 
 class DeleteDb(Command):
     def run(self):
-        delete_db()
-
-
-def example_report():
-    from app.models.report import Report
-    db.session.add(Report(2016, 5, "total_device_carrier", 7301, 3))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7302, 2))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7303, 1))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7307, 2))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7308, 1))
-    db.session.add(Report(2016, 5, "total_device_carrier", 7309, 1))
-    db.session.add(Report(2016, 5, "total_devices", 0, 10))
-    db.session.add(Report(2016, 5, "total_gsm_carrier", 7301, 8555))
-    db.session.add(Report(2016, 5, "total_gsm_carrier", 7302, 702))
-    db.session.add(Report(2016, 5, "total_gsm_carrier", 7303, 884))
-    db.session.add(Report(2016, 5, "total_gsm_carrier", 7307, 9455))
-    db.session.add(Report(2016, 5, "total_gsm_carrier", 7308, 24))
-    db.session.add(Report(2016, 5, "total_gsm_carrier", 7309, 68))
-    db.session.add(Report(2016, 5, "total_gsm", 0, 19583))
-    db.session.add(Report(2016, 5, "total_sims_carrier", 7301, 3))
-    db.session.add(Report(2016, 5, "total_sims_carrier", 7302, 2))
-    db.session.add(Report(2016, 5, "total_sims_carrier", 7303, 1))
-    db.session.add(Report(2016, 5, "total_sims_carrier", 7307, 2))
-    db.session.add(Report(2016, 5, "total_sims_carrier", 7308, 1))
-    db.session.add(Report(2016, 5, "total_sims_carrier", 7309, 1))
-    db.session.add(Report(2016, 5, "total_sims", 0, 10))
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-
-
-class ExampleReport(Command):
-    def run(self):
-        example_report()
-
-
-def example_ranking():
-    from app.models.ranking import Ranking
-    data = {"Facebook": 23003,
-            "Google": 3123213,
-            "Adkintun": 232,
-            "Tinder": 344,
-            "Spotify": 0}
-    rank = Ranking(2016, 5, 0, "wifi", "upload", data)
-    data2 = {"Facebook": 233,
-             "Google": 33213,
-             "Adkintun": 236752,
-             "Tinder": 344,
-             "Spotify": 4324}
-    rank2 = Ranking(2016, 5, 0, "wifi", "download", data2)
-    try:
-        db.session.add(rank)
-        db.session.add(rank2)
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-
-
-class ExampleRanking(Command):
-    def run(self):
-        example_ranking()
+        db.drop_all(bind=None)
 
 
 class MonthlyImport(Command):
@@ -227,31 +173,44 @@ class CityAntennas(Command):
                 db.session.rollback()
 
 
-class LoadCitiesLocation(Command):
-    def run(self):
-        from app.data.communes_location import communes_locations
-        from app.models.city import City
-        for commune in communes_locations:
-            try:
-                city = City.query.get(commune["id"])
-                city.lat = commune["lat"]
-                city.lon = commune["lon"]
-                db.session.commit()
-            except:
-                db.session.rollback()
-
-
-class ExampleGsmCount(Command):
-    def run(self):
-        from app.models.gsm_count import GsmCount
-        from app.models.antenna import Antenna
-        from random import randint
-        antennas = Antenna.query.all()
-        for antenna in antennas:
-            db.session.add(GsmCount(2016, 7, antenna.id, randint(0, 16), 7301, randint(1, 10)))
-            db.session.add(GsmCount(2016, 7, antenna.id, randint(0, 16), 7302, randint(1, 10)))
-        db.session.commit()
-
-
 class UnknownCityError(Exception):
     pass
+
+# Command for creating sample antennas
+class ExampleAntennas(Command):
+    def run(self):
+        from app.models.antenna import Antenna
+        from app.models.city import City
+        from app.models.carrier import Carrier
+        import random
+
+        n_antennas = 100
+        cities = City.query.all()
+        carriers = Carrier.query.all()
+
+        for i in range(n_antennas):
+            city = random.choice(cities)
+            while city.lat is None and city.lon is None:
+                city = random.choice(cities)
+            carrier = random.choice(carriers)
+            while carrier == 0:
+                carrier = random.choice(carriers)
+            db.session.add(Antenna(i, None, None, city.lat, city.lon, carrier.id, city.id))
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+# Import data from month 8, year 2016 (Example)
+class GeneralImport(Command):
+    def run(self):
+        from app.importation.general_importation import report_import, gsm_signal_import, gsm_count_import, ranking_import
+        # Reports
+        report_import(2016, 8)
+        # Ranking
+        ranking_import(2016, 8)
+        # Gsm signal
+        gsm_signal_import(2016, 8)
+        # Gsm count
+        gsm_count_import(2016, 8)
