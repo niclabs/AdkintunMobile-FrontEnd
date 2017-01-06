@@ -51,10 +51,43 @@ def getReports():
             "total_sims": total_sims}
     return json.dumps(data)
 
+@app.route('/getGsmSignal')
+def getGsmSignal():
+    from app.models.gsm_signal import GsmSignal
+    from app.models.carrier import Carrier
+
+    year = request.args.get('year')
+    month = request.args.get('month')
+    gsm = GsmSignal.query.filter_by(year=year, month=month).all()
+    carriersKnown = Carrier.query.all()
+    carrierIds = [c.id for c in carriersKnown]
+    carriers = set()
+
+    for e in gsm:
+        if e.carrier_id in carrierIds:
+            carriers.add(e.carrier_id)
+
+    signal = {}
+
+    for c in carriers:
+        signal[c] = []
+
+    for e in gsm:
+        # signal < 0 because there are outliers
+        if e.signal and e.signal < 0:
+            signal[e.carrier_id].append(abs(e.signal))
+
+    signalMean = {}
+
+    for k,v in signal.items():
+        carrierName = Carrier.query.filter_by(id=k).first().name
+        signalMean[carrierName] = sum(v) / len(v)
+
+    return json.dumps(signalMean)
+
 
 @app.route('/getRanking')
 def getAppRanking():
-    import operator
     from app.models.ranking import Ranking
 
     year = request.args.get('year')
