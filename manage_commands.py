@@ -202,15 +202,21 @@ class ExampleAntennas(Command):
         except IntegrityError:
             db.session.rollback()
 
-# Import data from month 8, year 2016 (Example)
+# Import data, asking the user the year and the month (Just for testing)
 class GeneralImport(Command):
     def run(self):
         from app.importation.general_importation import report_import, gsm_signal_import, gsm_count_import, ranking_import
+        year = int(input('Ingrese el año '))
+        month = int(input('Ingrese el mes '))
         # Reports
-        report_import(2016, 8)
+        print('Importando reportes del año {} mes {} ... '.format(year,month))
+        report_import(year, month)
         # Ranking
-        ranking_import(2016, 8)
+        print('Importando ranking del año {} mes {} ... '.format(year,month))
+        ranking_import(year, month)
         # Gsm signal
-        gsm_signal_import(2016, 8)
+        print('Importando gsm signal del año {} mes {} ... '.format(year,month))
+        gsm_signal_import(year, month)
         # Gsm count
-        gsm_count_import(2016, 8)
+        print('Importando gsm count del año {} mes {} ... '.format(year,month))
+        gsm_count_import(year, month)
