@@ -23,24 +23,26 @@ def getReports():
 
     year = request.args.get('year')
     month = request.args.get('month')
-    Report.query.filter_by(year=year, month=month).first_or_404()
     reports = Report.query.filter_by(year=year, month=month).all()
     total_device_carrier = {}
     total_gsm_carrier = {}
     total_sims_carrier = {}
+
     for report in reports:
+
         if report.type == "total_device_carrier":
             total_device_carrier[report.carrier.name] = report.quantity
-        elif report.type == "total_gsm_carrier":
+        elif report.type == "total_gsm_carrier": # check
             total_gsm_carrier[report.carrier.name] = report.quantity
         elif report.type == "total_sims_carrier":
             total_sims_carrier[report.carrier.name] = report.quantity
-        elif report.type == "total_sims":
+        elif report.type == "total_sims": # check
             total_sims = report.quantity
-        elif report.type == "total_gsm":
+        elif report.type == "total_gsm": # check
             total_gsm = report.quantity
-        elif report.type == "total_devices":
+        elif report.type == "total_devices": # check
             total_devices = report.quantity
+
     data = {"total_device_carrier": total_device_carrier,
             "total_devices": total_devices,
             "total_gsm_carrier": total_gsm_carrier,

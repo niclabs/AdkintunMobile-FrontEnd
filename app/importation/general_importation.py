@@ -36,35 +36,30 @@ def report_import(year, month):
     try:
         response = urllib.request.urlopen(request)
         data = json.load(reader(response))
-        for type, element in data.items():
 
-            try:
-                 for carrier, quantity in element.items():
-                    carrier_id = int(carrier)
+        # For each kind of report
+        for report_type, element in data.items():
+
+            if type(element) == dict:
+
+                for carrier, quantity in element.items():
+
+                    if carrier.isdigit():
+                        carrier_id = int(carrier)
+                    else:
+                        continue
 
                     # Ignoring the carriers not listed
                     if carrier_id not in carrierIds:
                         continue
 
-                    db.session.add(Report(year, month, type, carrier_id, quantity))
-                    try:
-                        db.session.commit()
-                    except IntegrityError:
-                        db.session.rollback()
-                        report = Report.query.filter_by(year=year, month=month, type=type, carrier_id=carrier_id).first()
-                        report.quantity = quantity
-                        db.session.commit()
+                    db.session.add(Report(year, month, report_type, carrier_id, quantity))
+                    db.session.commit()
 
-            except AttributeError:
+            else:
                 carrier_id = 0
-                try:
-                    db.session.add(Report(year, month, type, carrier_id, element))
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    report = Report.query.filter_by(year=year, month=month, type=type, carrier_id=carrier_id).first()
-                    report.quantity = element
-                    db.session.commit()
+                db.session.add(Report(year, month, report_type, carrier_id, element))
+                db.session.commit()
 
     except URLError:
         print("Can not access to ", url)
