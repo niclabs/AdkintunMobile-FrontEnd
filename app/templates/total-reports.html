@@ -9,91 +9,67 @@
 
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
   <script src="{{ url_for('static', filename='js/carriers.js') }}"></script>
-  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
 </head>
 
 <script type=text/javascript>
-  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 </script>
 
 <body>
-  <ul class="nav nav-pills">
-    <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
-    <li role="presentation"><a href="{{url_for('charts')}}">Gráficos</a></li>
-    <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
-  </ul>
-  <div class="container">
-    <div class="form-group">
-      <label for="datetimepicker1">Seleccione fecha</label>
-      <div class='input-group date' id='datetimepicker1'>
-          <input type='text' class="form-control" />
-          <span class="input-group-addon">
+<ul class="nav nav-pills">
+  <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
+  <li role="presentation"><a href="{{url_for('charts')}}">Gráficos</a></li>
+  <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
+</ul>
+<div class="container">
+  <div class="form-group">
+    <label for="datetimepicker1">Seleccione fecha</label>
+    <div class='input-group date' id='datetimepicker1'>
+      <input type='text' class="form-control" />
+      <span class="input-group-addon">
               <span class="glyphicon glyphicon-calendar"></span>
           </span>
-      </div>
     </div>
   </div>
-  <div class="container" id="reports" style="display: none;">
-    <div class="panel panel-default">
+</div>
+<div class="container" id="reports" style="display: none;">
+  <div class="panel panel-default">
     <!-- Default panel contents -->
-      <div class="panel-heading">Dispositivos</div>
-      <div class="devicesChart"></div>
-      <div class="table-responsive">
-        <table class="table" id="devices">
-          <thead>
-            <tr>
-              <th>Operador</th>
-              <th>Cantidad</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="panel panel-default">
+    <div class="panel-heading">Dispositivos</div>
+    <div id="devicesChart"></div>
+  </div>
+  <div class="panel panel-default">
     <!-- Default panel contents -->
     <div class="panel-heading">Mediciones</div>
-      <div class="gsmChart"></div>
-      <table class="table" id="gsm">
-        <thead>
-          <tr>
-            <th>Operador</th>
-            <th>Cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="panel panel-default">
+    <div id="gsmChart"></div>
+  </div>
+  <div class="panel panel-default">
     <!-- Default panel contents -->
     <div class="panel-heading">Sims</div>
-      <div class="simsChart"></div>
-      <table class="table" id="sims">
-        <thead>
-          <tr>
-            <th>Operador</th>
-            <th>Cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </div>
+    <div class="simsChart"></div>
+    <table class="table" id="sims">
+      <thead>
+      <tr>
+        <th>Operador</th>
+        <th>Cantidad</th>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
   </div>
-  <div class="container">
-    <h3><span class="label label-danger" id="error"></span></h3>
-  </div>
+</div>
+<div class="container">
+  <h3><span class="label label-danger" id="error"></span></h3>
+</div>
 
 
 </body>
@@ -123,13 +99,41 @@
                 $("#error").html("");
                 $("#reports").show();
 
+
                 //populate devices
-                add = "";
-                $.each(data.total_device_carrier, function (k, v) {
-                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-                });
-                add += "<tr><td>Total</td><td>" + data.total_devices + "</td></tr>"
-                $("#devices tbody").html(add);
+              /*add = "";
+               $.each(data.total_device_carrier, function (k, v) {
+               add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
+               });
+               add += "<tr><td>Total</td><td>" + data.total_devices + "</td></tr>"
+               $("#devices tbody").html(add);*/
+               //console.log(JSON.stringify(data, null, 4));
+                if (!(Object.keys(data.total_device_carrier).length === 0)) {
+                    var chart = c3.generate({
+                        bindto: '#devicesChart',
+                        data: {
+                            json: data.total_device_carrier,
+
+
+                            type: 'donut',
+                            onclick: function (d, i) {
+                                console.log("onclick", d, i);
+                            },
+                            onmouseover: function (d, i) {
+                                console.log("onmouseover", d, i);
+                            },
+                            onmouseout: function (d, i) {
+                                console.log("onmouseout", d, i);
+                            }
+                        },
+                        color: {
+                            pattern: ['#5987B2', '#76A3CC', '#334D66', '#395773', '#263A4C', '#9BC3E0']
+                        },
+                        donut: {
+                            title: "Dispositivos"
+                        }
+                    });
+                }
 
 
                 //populate gsm
@@ -138,121 +142,137 @@
                 $.each(data.total_gsm_carrier, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });
-                add += "<tr><td>Total</td><td>" + data.total_gsm + "</td></tr>"
+                add += "<tr><td>Total</td><td>" + data.total_gsm + "</td></tr>";
                 $("#gsm tbody").html(add);
-                console.log(JSON.stringify(data, null, 4));
 
-                /*var div = d3.select("body")
-                .append("div")
-                .attr("class", "toolTip");
-
-                var axisMargin = 20,
-                margin = 60,
-                valueMargin = 4,
-                width = parseInt(d3.select('body').style('width'), 10),
-                height = parseInt(d3.select('body').style('height'), 10),
-                barHeight = (height-axisMargin-margin*2)* 0.4/data.length-2,
-                barPadding = (height-axisMargin-margin*2)*0.6/data.length,
-                data, bar, svg, scale, xAxis, labelWidth = 0;
-                var chartTop = width - margin*2 - labelWidth;
-
-                var colors = ["#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8"];
-                var colorScale = d3.scaleQuantize()
-                .domain([0,data.length])
-                .range(colors);
-
-                max = d3.max(data, function(d) { return data.total_gsm; });
-
-                svg = d3.select('#gsmChart')
-                .append("svg")
-                .attr('width', width)
-                .attr('height', height);
-
-                bar = svg.selectAll("g")
-                .data(data)
-                .enter()
-                .append("g");
-
-                bar.attr("class", "bar")
-                .attr("cx",0)
-                .attr("transform", function(d, i) {
-                return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
-                });
-
-                bar.append("text")
-                .attr("class", "label")
-                .attr("y", barHeight / 2)
-                .attr("dy", ".35em")
-                .text(function(d){ return total_gsm_carrier;})
-                .each(function() {
-                labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width)) + 1;
-
-                });
-
-                scale = d3.scaleLinear()
-                .domain([0, max])
-                .range([0, width - margin*2 - labelWidth]);
-
-                xAxis = d3.axisBottom(scale)
-                //.tickSizeInner([10])
-                .tickSize(-height + 1.4*margin + axisMargin)
-                .tickSizeOuter([0]);
-                yAxis = d3.axisLeft(scale)
-                .tickFormat('')
-                .tickSize(0);
-
-                bar.append("rect")
-                .attr("transform", "translate("+labelWidth+", 0)")
-                .attr("height", barHeight)
-                //.style('fill',function(d,i){ return colorScale(i); })
-                .attr("width", function(d){ return scale(data.total_gsm); });
-
-                bar.append("text")
-                .attr("class", "value")
-                .attr("y", barHeight / 2)
-                .attr("dx", -valueMargin + labelWidth)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "end")
-                .text(function(d){return (data.total_gsm);})
-                .attr("x", function(d){
-                var width = this.getBBox().width;
-                return Math.max(width + valueMargin, scale(data.total_gsm));
-                });
-
-                bar.on("mousemove", function(d){
-                div.style("left", d3.event.pageX+10+"px");
-                div.style("top", d3.event.pageY-25+"px");
-                div.style("display", "inline-block");
-                div.html((total_gsm_carrier)+"<br>"+(data.total_gsm));
-                });
-
-                bar.on("mouseout", function(d){
-                div.style("display", "none");
-                });
-
-                svg.insert("g",":first-child")
-                .attr("class", "axisHorizontal")
-                .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
-                .call(xAxis);
-                svg.insert("g",":first-child")
-                .attr("class", "axisVertical")
-                .attr("transform", "translate(" + (margin + labelWidth) + ","+ (-height + 2.4*axisMargin + 1.6*margin)+")")
-                .call(yAxis);*/
-
-                //populate sims
+               //populate sims
                 add = "";
-                $.each(data.total_sims_carrier, function (k, v) {
-                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
+                $.each(data.total_sims_carrier, function( k, v ) {
+                    add += "<tr><td>"+k+"</td><td>"+v+"</td></tr>";
                 });
-                add += "<tr><td>Total</td><td>" + data.total_sims + "</td></tr>"
+                add += "<tr><td>Total</td><td>"+data.total_sims+"</td></tr>"
                 $("#sims tbody").html(add);
 
-            })
-            .fail(function () {
-                $("#error").html("<i>No hay información disponible para esta fecha</i>");
-                $("#reports").hide();
-            });
+                })
+                .fail(function() {
+                    $("#error").html("<i>No hay información disponible para esta fecha</i>");
+                    $("#reports").hide();
+                });
     });
+
+    /*var dataCarrier = [];
+     var dataCantidad = [];
+     $.each(data.total_gsm_carrier, function (k, v) {
+     dataCarrier.push(k);
+     var x = parseInt(v);
+     dataCantidad.push(x);
+     });
+
+     var i;
+     for (i = 0; i < dataCantidad.length; i++) {
+     console.log(dataCantidad[i]);
+     }
+
+     var div = d3.select("body")
+     .append("div")
+     .attr("class", "toolTip");
+
+     var axisMargin = 20,
+     margin = 60,
+     valueMargin = 4,
+     width = parseInt(d3.select('body').style('width'), 10),
+     height = parseInt(d3.select('body').style('height'), 10),
+     barHeight = (height-axisMargin-margin*2)* 0.4/dataCantidad.length-2,
+     barPadding = (height-axisMargin-margin*2)*0.6/dataCantidad.length,
+     data, bar, svg, scale, xAxis, labelWidth = 0;
+     var chartTop = width - margin*2 - labelWidth;
+
+     var colors = ["#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8"];
+     var colorScale = d3.scaleQuantize()
+     .domain([0,dataCantidad.length])
+     .range(colors);
+
+     max = d3.max(dataCantidad, function(d, i) { return dataCantidad[i]; });
+
+     d3.select('#gsmChart').select("svg").remove();
+
+     svg = d3.select('#gsmChart')
+     .append("svg")
+     .attr('width', width)
+     .attr('height', height);
+
+     bar = svg.selectAll("g")
+     .data(dataCantidad)
+     .enter()
+     .append("g");
+
+     bar.attr("class", "bar")
+     .attr("cx",0)
+     .attr("transform", function(d, i) {
+     return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
+     });
+
+     bar.append("text")
+     .attr("class", "label")
+     .attr("y", barHeight / 2)
+     .attr("dy", ".35em")
+     .text(function(d, i){ return dataCarrier[i];})
+     .each(function() {
+     labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width)) + 1;
+
+     });
+
+     scale = d3.scaleLinear()
+     .domain([0, max])
+     .range([0, width - margin*2 - labelWidth*4.5]);
+
+     xAxis = d3.axisBottom(scale)
+     .tickSize(-height + 1.6*margin + axisMargin)
+     .tickSizeOuter([0]);
+
+     yAxis = d3.axisLeft(scale)
+     .tickFormat('')
+     .tickSize(0);
+
+     bar.append("rect")
+     .attr("transform", "translate("+labelWidth+", 0)")
+     .attr("height", barHeight)
+     //.style('fill',function(d,i){ return colorScale(i); })
+     .attr("width", function(d, i){ return scale(dataCantidad[i]); });
+
+     bar.append("text")
+     .attr("class", "value")
+     .attr("y", barHeight / 2)
+     .attr("dx", -valueMargin + labelWidth)
+     .attr("dy", ".35em")
+     .attr("text-anchor", "end")
+     .text(function(d, i){return dataCantidad[i];})
+     .attr("x", function(d, i){
+     var width = this.getBBox().width;
+     return Math.max(width + valueMargin, scale(dataCantidad[i]));
+     });
+
+     bar.on("mousemove", function(d, i){
+     div.style("left", d3.event.pageX+10+"px");
+     div.style("top", d3.event.pageY-25+"px");
+     div.style("display", "inline-block");
+     div.html((dataCarrier[i])+"<br>"+(dataCantidad[i]));
+     });
+
+     bar.on("mouseout", function(d){
+     div.style("display", "none");
+     });
+
+     svg.insert("g",":first-child")
+     .attr("class", "axisHorizontal")
+     .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
+     .call(xAxis);
+     svg.insert("g",":first-child")
+     .attr("class", "axisVertical")
+     .attr("transform", "translate(" + (margin + labelWidth) + ","+ (-height + 2.4*axisMargin + margin)+")")
+     //.call(yAxis);
+     });
+     });*/
 
 </script>
 </html>
