@@ -56,7 +56,7 @@
 
     <div class="form-group col-md-4 col-md-offset-4 text-center">
         <label for="sel1">Seleccione operador</label>
-        <select class="form-control" id="sel1" onchange="getMarkers()">
+        <select class="form-control" id="sel1">
             {% for carrier in carriers %}
                 <option value={{ carrier.id }}>{{ carrier.name }}</option>
             {% endfor %}

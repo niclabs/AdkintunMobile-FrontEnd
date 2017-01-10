@@ -1,5 +1,9 @@
+var map;
+var markerCluster;
+var markerList;
+
 $(document).ready(function initmap() {
-    var map = L.map('map');
+    map = L.map('map');
     var Santiago = [-33.447487, -70.673676];
     map.setView(Santiago, 9);
 
@@ -9,18 +13,43 @@ $(document).ready(function initmap() {
         attribution: '&amp;copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var markers = L.markerClusterGroup();
+    markerCluster = L.markerClusterGroup();
+    markerList = [];
 
-    var markerList = [];
+    var carrier = '0';
 
-    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmCount", {}, function () {
+    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmCount", {
+        carrier: carrier,
+    }, function () {
     })
         .done(function (response) {
             $.each(response, function (id, location) {
                 var marker = L.marker(L.latLng(location.lat, location.lon));
                 markerList.push(marker);
             });
-            markers.addLayers(markerList);
-            map.addLayer(markers);
+            markerCluster.addLayers(markerList);
+            map.addLayer(markerCluster);
         });
+});
+
+$(document).ready(function () {
+    $('#sel1').on('change', function (e) {
+        var carrier = this.value;
+
+        markerCluster.clearLayers();
+        var markerList = [];
+
+        var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmCount", {
+            carrier: carrier,
+        }, function () {
+        })
+            .done(function (response) {
+                $.each(response, function (id, location) {
+                    var marker = L.marker(L.latLng(location.lat, location.lon));
+                    markerList.push(marker);
+                });
+                markerCluster.addLayers(markerList);
+                map.addLayer(markerCluster);
+            });
+    });
 });

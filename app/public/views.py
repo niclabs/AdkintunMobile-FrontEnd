@@ -208,14 +208,18 @@ def getGsmCount():
 
     # newZoom = float(request.args.get('zoom'))
     # lastZoom = request.args.get('lastZoom')
-    # newCarrier = int(request.args.get('carrier'))
+    carrier = request.args.get('carrier')
     # lastCarrier = request.args.get('lastCarrier')
     # bounds = json.loads(request.args.get('mapBounds'))
     # if not lastZoom:
     #     return json.dumps(build(newZoom, newCarrier, bounds))
     # else:
     #     return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))
-    antennas = Antenna.query.all()
+    if carrier == "0":
+        antennas = Antenna.query.all()
+    else:
+        antennas = Antenna.query.filter_by(carrier_id = carrier)
+
     carriersKnown = Carrier.query.all()
     carrierIds = [c.id for c in carriersKnown]
     antennasData = {}
@@ -223,8 +227,8 @@ def getGsmCount():
     for antenna in antennas:
         if antenna.carrier_id in carrierIds:
             antennasData[antenna.id] = {'lat': antenna.lat,
-                                'lon': antenna.lon}
+                                        'lon': antenna.lon}
 
-    print('Cantidad de antenas:',len(antennasData.keys()))
+    print('Cantidad de antenas:', len(antennasData.keys()))
 
     return json.dumps(antennasData)
