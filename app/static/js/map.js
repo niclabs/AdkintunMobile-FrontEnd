@@ -14,7 +14,7 @@ function initMap() {
         center: Santiago,
         zoom: 7
     });
-    var mcOptions = {maxZoom: 15, imagePath: 'static/img/clusterer/m'};
+    var mcOptions = {maxZoom: 15, imagePath: 'static/img/clusterer/m', gridSize: 200};
     mc = new MarkerClusterer(map, [], mcOptions);
     google.maps.event.addListener(map, 'idle', getMarkers);
 }
@@ -45,59 +45,69 @@ function getMarkers() {
     }, function () {
     })
         .done(function (response) {
-            if (response.action != "notChange") {
-                mc.clearMarkers();
-                deleteMarkers();
-                locations = response.locations;
-            }
-            if (response.action == "change") {
-                $.each(locations, function (key, data) {
-                    visualization = new NetworkVisualization(response.data[key]);
-                    console.log(data);
-                    var marker = new google.maps.Marker({
-                        position: {lat: data.lat, lng: data.lon},
-                        visualization: visualization,
-                        name: data.name,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: getScale(zoom),
-                            fillOpacity: 0.4,
-                            strokeOpacity: 0.4,
-                            strokeColor: visualization.getColorMarker(),
-                            fillColor: visualization.getColorMarker()
-                        },
-                        map: map,
-                        quantity: data.quantity
-                    });
-                    markers.push(marker);
-                    mouseOverEvent(marker, response);
-                    marker.addListener('click', function () {
-                        this.setMap(null);
-                        map.setCenter(this.position);
-                        zoomAndUpdate();
-                    });
+            $.each(response, function (id, location)
+            {
+                var marker = new google.maps.Marker({
+                    position: {lat: location.lat, lng: location.lon},
                 });
-            }
-            else if (response.action == "cluster") {
-                $.each(locations, function (key, data) {
-                    visualization = new NetworkVisualization(response.data[key]);
-                    var marker = new google.maps.Marker({
-                        position: {lat: data.lat, lng: data.lon},
-                        quantity: data.quantity,
-                        visualization: visualization,
-                        name: data.name
-                    });
-                    mouseOverEvent(marker, response);
-                    mc.addMarker(marker);
-                });
-            }
-            else if (zoom != lastZoom) {
-                $.each(markers, function (index, marker) {
-                    marker.icon.scale = getScale(zoom);
-                });
-            }
-            lastZoom = zoom;
+                console.log(location);
+                mc.addMarker(marker);
+            });
         });
+        // .done(function (response) {
+        //     if (response.action != "notChange") {
+        //         mc.clearMarkers();
+        //         deleteMarkers();
+        //         locations = response.locations;
+        //     }
+        //     if (response.action == "change") {
+        //         $.each(locations, function (key, data) {
+        //             visualization = new NetworkVisualization(response.data[key]);
+        //             console.log(data);
+        //             var marker = new google.maps.Marker({
+        //                 position: {lat: data.lat, lng: data.lon},
+        //                 visualization: visualization,
+        //                 name: data.name,
+        //                 icon: {
+        //                     path: google.maps.SymbolPath.CIRCLE,
+        //                     scale: getScale(zoom),
+        //                     fillOpacity: 0.4,
+        //                     strokeOpacity: 0.4,
+        //                     strokeColor: visualization.getColorMarker(),
+        //                     fillColor: visualization.getColorMarker()
+        //                 },
+        //                 map: map,
+        //                 quantity: data.quantity
+        //             });
+        //             markers.push(marker);
+        //             mouseOverEvent(marker, response);
+        //             marker.addListener('click', function () {
+        //                 this.setMap(null);
+        //                 map.setCenter(this.position);
+        //                 zoomAndUpdate();
+        //             });
+        //         });
+        //     }
+        //     else if (response.action == "cluster") {
+        //         $.each(locations, function (key, data) {
+        //             visualization = new NetworkVisualization(response.data[key]);
+        //             var marker = new google.maps.Marker({
+        //                 position: {lat: data.lat, lng: data.lon},
+        //                 quantity: data.quantity,
+        //                 visualization: visualization,
+        //                 name: data.name
+        //             });
+        //             mouseOverEvent(marker, response);
+        //             mc.addMarker(marker);
+        //         });
+        //     }
+        //     else if (zoom != lastZoom) {
+        //         $.each(markers, function (index, marker) {
+        //             marker.icon.scale = getScale(zoom);
+        //         });
+        //     }
+        //     lastZoom = zoom;
+        // });
 }
 
 // Sets the map on all markers in the array.
@@ -149,7 +159,7 @@ function mouseOverEvent(marker, response) {
             "<h3>Información de la " + response.type + "</h3>" +
             "<h4>" + this.name + "</h4>" +
             "<br> <b>Cantidad de eventos</b>: " + this.quantity +
-            "<div id = 'chart'></div></div>"
+            "<div id = 'chart'></div>"
         )
         ;
         var chart = c3.generate({

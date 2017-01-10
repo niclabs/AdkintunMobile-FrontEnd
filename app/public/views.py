@@ -203,12 +203,28 @@ def modelToDict(model):
 @app.route('/getGsmCount')
 def getGsmCount():
     from app.map.mapManagement import build, change
-    newZoom = float(request.args.get('zoom'))
-    lastZoom = request.args.get('lastZoom')
-    newCarrier = int(request.args.get('carrier'))
-    lastCarrier = request.args.get('lastCarrier')
-    bounds = json.loads(request.args.get('mapBounds'))
-    if not lastZoom:
-        return json.dumps(build(newZoom, newCarrier, bounds))
-    else:
-        return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))
+    from app.models.antenna import Antenna
+    from app.models.carrier import Carrier
+
+    # newZoom = float(request.args.get('zoom'))
+    # lastZoom = request.args.get('lastZoom')
+    # newCarrier = int(request.args.get('carrier'))
+    # lastCarrier = request.args.get('lastCarrier')
+    # bounds = json.loads(request.args.get('mapBounds'))
+    # if not lastZoom:
+    #     return json.dumps(build(newZoom, newCarrier, bounds))
+    # else:
+    #     return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))
+    antennas = Antenna.query.all()
+    carriersKnown = Carrier.query.all()
+    carrierIds = [c.id for c in carriersKnown]
+    antennasData = {}
+
+    for antenna in antennas:
+        if antenna.carrier_id in carrierIds:
+            antennasData[antenna.id] = {'lat': antenna.lat,
+                                'lon': antenna.lon}
+
+    print('Cantidad de antenas:',len(antennasData.keys()))
+
+    return json.dumps(antennasData)

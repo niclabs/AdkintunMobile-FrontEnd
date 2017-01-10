@@ -196,15 +196,15 @@
             });
 
         // New information for signal meditions
-	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
+        var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
             year: year,
             month: month
         }, function () {
         })
             .done(function (data) {
-	            $("#errorSignal").html("");
+                $("#errorSignal").html("");
                 $("#signal").show();
-	            add = "";
+                add = "";
                 $.each(data, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });
@@ -215,22 +215,22 @@
                 $("#signal").hide();
             });
 
-	    // New information for ammount of signals (2G, 3G, 4G, unknown)
-	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
+        // New information for ammount of signals (2G, 3G, 4G, unknown)
+        var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
             year: year,
             month: month
         }, function () {
         })
             .done(function (data) {
-	            $("#errorNetwork").html("");
+                $("#errorNetwork").html("");
                 $("#network").show();
-	            add = "";
+                add = "";
                 $.each(data, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>";
                     $.each(v, function(k2,v2){
                         add += "<li>" + k2 + " : " + v2 + "</li>"
                     });
-	                add += "</td></tr>";
+                    add += "</td></tr>";
                 });
                 $("#networkCarriers tbody").html(add);
             })
