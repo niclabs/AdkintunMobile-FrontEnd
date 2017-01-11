@@ -142,6 +142,10 @@ def getNetwork():
     return json.dumps(networkFinal)
 
 
+def convertToGB(bytes):
+    return round(bytes / 1073741824, 2)
+
+
 @app.route('/getRanking')
 def getAppRanking():
     from app.models.ranking import Ranking
@@ -151,14 +155,16 @@ def getAppRanking():
     traffic_type = request.args.get('traffic_type')
     transfer_type = request.args.get('transfer_type')
     carrier_id = request.args.get('carrier_id')
-    ranking = Ranking.query.filter_by(year=year, month=month, carrier_id= carrier_id,
+    ranking = Ranking.query.filter_by(year=year,
+                                      month=month,
+                                      carrier_id= carrier_id,
                                       traffic_type=traffic_type,
                                       transfer_type=transfer_type)
 
     wrapper = [{'ranking_number':e.ranking_number,
                 'app_name':e.app_name,
                 'total_bytes':e.total_bytes,
-                'bytes_per_user':e.bytes_per_user,
+                'bytes_per_user':convertToGB(e.bytes_per_user),
                 'total_devices':e.total_devices} for e in ranking]
 
     wrapper = sorted(wrapper, key= lambda x: x['ranking_number'])
@@ -202,13 +208,53 @@ def modelToDict(model):
 
 @app.route('/getGsmCount')
 def getGsmCount():
-    from app.map.mapManagement import build, change
-    newZoom = float(request.args.get('zoom'))
-    lastZoom = request.args.get('lastZoom')
-    newCarrier = int(request.args.get('carrier'))
-    lastCarrier = request.args.get('lastCarrier')
-    bounds = json.loads(request.args.get('mapBounds'))
-    if not lastZoom:
-        return json.dumps(build(newZoom, newCarrier, bounds))
+    #from app.map.mapManagement import build, change
+    from app.models.antenna import Antenna
+    from app.models.carrier import Carrier
+    from app.models.gsm_count import GsmCount
+
+    # newZoom = float(request.args.get('zoom'))
+    # lastZoom = request.args.get('lastZoom')
+
+    # lastCarrier = request.args.get('lastCarrier')
+    # bounds = json.loads(request.args.get('mapBounds'))
+    # if not lastZoom:
+    #     return json.dumps(build(newZoom, newCarrier, bounds))
+    # else:
+    #     return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))
+
+    carrier = request.args.get('carrier')
+
+    if carrier == "0":
+        antennas = Antenna.query.all()
+        gsmCount = GsmCount.query.all()
     else:
-        return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))
+        antennas = Antenna.query.filter_by(carrier_id = carrier)
+        gsmCount = GsmCount.query.filter_by(carrier_id = carrier)
+
+    carriersKnown = Carrier.query.all()
+    carrierIds = [c.id for c in carriersKnown]
+    antennasData = {}
+
+    for antenna in antennas:
+        if antenna.carrier_id in carrierIds:
+            antennasData[antenna.id] = {'lat': antenna.lat,
+                                        'lon': antenna.lon,
+                                        '2G': 0,
+                                        '3G': 0,
+                                        '4G': 0,
+                                        'Otras': 0,
+                                        'Total': 0}
+
+    for gsm in gsmCount:
+        if gsm.antenna_id in antennasData:
+            antennaDict = antennasData[gsm.antenna_id]
+            antennaDict[getNetworkName(gsm.network_type)] += gsm.quantity
+            antennaDict['Total'] += gsm.quantity
+
+    print('Cantidad de antenas:', len(antennasData.keys()))
+
+    antennasInfo = {'antennasData': antennasData,
+                    'totalAntennas': len(antennasData.keys())}
+
+    return json.dumps(antennasInfo)
