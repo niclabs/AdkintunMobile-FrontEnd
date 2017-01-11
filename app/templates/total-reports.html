@@ -71,6 +71,54 @@
   <h3><span class="label label-danger" id="error"></span></h3>
 </div>
 
+<div class="container" id="signal" style="display: none;">
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">Señales promedio por carrier</div>
+		<div class="table-responsive">
+			<table class="table" id="signalCarriers">
+				<thead>
+				<tr>
+					<th>Operador</th>
+					<th>Señal Promedio</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<h3><span class="label label-danger" id="errorSignal"></span></h3>
+</div>
+
+<div class="container" id="network" style="display: none;">
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">Distribución de señales por carrier</div>
+		<div class="table-responsive">
+			<table class="table" id="networkCarriers">
+				<thead>
+				<tr>
+					<th>Operador</th>
+					<th>Cantidad de mediciones por tipo de red</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<h3><span class="label label-danger" id="errorNetwork"></span></h3>
+</div>
+
 
 </body>
 <script type="text/javascript">
@@ -142,22 +190,65 @@
                 $.each(data.total_gsm_carrier, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });
-                add += "<tr><td>Total</td><td>" + data.total_gsm + "</td></tr>";
+                add += "<tr><td>Total</td><td>" + data.total_gsm + "</td></tr>"
                 $("#gsm tbody").html(add);
-
-               //populate sims
+                //populate sims
                 add = "";
-                $.each(data.total_sims_carrier, function( k, v ) {
-                    add += "<tr><td>"+k+"</td><td>"+v+"</td></tr>";
+                $.each(data.total_sims_carrier, function (k, v) {
+                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });
-                add += "<tr><td>Total</td><td>"+data.total_sims+"</td></tr>"
+                add += "<tr><td>Total</td><td>" + data.total_sims + "</td></tr>"
                 $("#sims tbody").html(add);
 
-                })
-                .fail(function() {
-                    $("#error").html("<i>No hay información disponible para esta fecha</i>");
-                    $("#reports").hide();
+            })
+            .fail(function () {
+                $("#error").html("<i>No hay información disponible para esta fecha</i>");
+                $("#reports").hide();
+            });
+
+        // New information for signal meditions
+	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
+            year: year,
+            month: month
+        }, function () {
+        })
+            .done(function (data) {
+	            $("#errorSignal").html("");
+                $("#signal").show();
+	            add = "";
+                $.each(data, function (k, v) {
+                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });
+                $("#signalCarriers tbody").html(add);
+            })
+            .fail(function () {
+                $("#errorSignal").html("<i>No hay información disponible para esta fecha</i>");
+                $("#signal").hide();
+            });
+
+	    // New information for ammount of signals (2G, 3G, 4G, unknown)
+	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
+            year: year,
+            month: month
+        }, function () {
+        })
+            .done(function (data) {
+	            $("#errorNetwork").html("");
+                $("#network").show();
+	            add = "";
+                $.each(data, function (k, v) {
+                    add += "<tr><td>" + k + "</td><td>";
+                    $.each(v, function(k2,v2){
+                        add += "<li>" + k2 + " : " + v2 + "</li>"
+                    });
+	                add += "</td></tr>";
+                });
+                $("#networkCarriers tbody").html(add);
+            })
+            .fail(function () {
+                $("#errorNetwork").html("<i>No hay información disponible para esta fecha</i>");
+                $("#network").hide();
+            });
     });
 
     /*var dataCarrier = [];

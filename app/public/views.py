@@ -27,20 +27,23 @@ def getReports():
     total_device_carrier = {}
     total_gsm_carrier = {}
     total_sims_carrier = {}
+    total_devices = 0
+    total_gsm = 0
+    total_sims = 0
 
     for report in reports:
 
         if report.type == "total_device_carrier":
             total_device_carrier[report.carrier.name] = report.quantity
-        elif report.type == "total_gsm_carrier": # check
+        elif report.type == "total_gsm_carrier":
             total_gsm_carrier[report.carrier.name] = report.quantity
         elif report.type == "total_sims_carrier":
             total_sims_carrier[report.carrier.name] = report.quantity
-        elif report.type == "total_sims": # check
+        elif report.type == "total_sims":
             total_sims = report.quantity
-        elif report.type == "total_gsm": # check
+        elif report.type == "total_gsm":
             total_gsm = report.quantity
-        elif report.type == "total_devices": # check
+        elif report.type == "total_devices":
             total_devices = report.quantity
 
     data = {"total_device_carrier": total_device_carrier,
@@ -49,12 +52,98 @@ def getReports():
             "total_gsm": total_gsm,
             "total_sims_carrier": total_sims_carrier,
             "total_sims": total_sims}
+
     return json.dumps(data)
+
+@app.route('/getGsmSignal')
+def getGsmSignal():
+    from app.models.gsm_signal import GsmSignal
+    from app.models.carrier import Carrier
+
+    year = request.args.get('year')
+    month = request.args.get('month')
+    gsm = GsmSignal.query.filter_by(year=year, month=month).all()
+    carriersKnown = Carrier.query.all()
+    carrierIds = [c.id for c in carriersKnown]
+    carriers = set()
+
+    for e in gsm:
+        # We add just the carriers we know without repetition
+        if e.carrier_id in carrierIds:
+            carriers.add(e.carrier_id)
+
+    signal = {}
+
+    for c in carriers:
+        signal[c] = []
+
+    for e in gsm:
+        # signal < 0 because there are outliers
+        if e.signal and e.signal < 0:
+            signal[e.carrier_id].append(abs(e.signal))
+
+    signalMean = {}
+
+    for k,v in signal.items():
+        carrierName = Carrier.query.filter_by(id=k).first().name
+        signalMean[carrierName] = sum(v) / len(v)
+
+    return json.dumps(signalMean)
+
+def getNetworkName(network_type):
+    networks = ["OTHER", "RTT", "CDMA", "EDGE", "EHRPD", "EVDO_0",
+                "EVDO_A", "EVDO_B", "GPRS", "HSDPA", "HSPA", "HSPAP", "HSUPA", "IDEN", "LTE", "UMTS", "UNKNOWN"];
+    network_name = networks[network_type]
+    if network_name in ["GPRS", "EDGE", "CDMA", "RTT", "IDEN"]:
+        return "2G"
+    elif network_name in ["UMTS", "EVDO_0", "EVDO_A", "HSDPA", "HSUPA", "HSPA", "EVDO_B", "EHRPD", "HSPAP"]:
+        return "3G"
+    elif network_name in ["LTE"]:
+        return "4G"
+    else:
+        return "Otras"
+
+@app.route('/getNetwork')
+def getNetwork():
+    from app.models.gsm_count import GsmCount
+    from app.models.carrier import Carrier
+
+    year = request.args.get('year')
+    month = request.args.get('month')
+    gsm = GsmCount.query.filter_by(year=year, month=month).all()
+    carriersKnown = Carrier.query.all()
+    carrierIds = [c.id for c in carriersKnown]
+    carriers = set()
+
+    for e in gsm:
+        # We add just the carriers we know without repetition
+        if e.carrier_id in carrierIds:
+            carriers.add(e.carrier_id)
+
+    networkInformation = {}
+
+    for c in carriers:
+        networkCount = {'2G':0,
+                        '3G':0,
+                        '4G':0,
+                        'Otras':0}
+        networkInformation[c] = networkCount
+
+    for e in gsm:
+        currentCarrier = e.carrier_id
+        networkInformation[currentCarrier][getNetworkName(e.network_type)] += e.quantity
+
+    networkFinal = {}
+
+    for k,v in networkInformation.items():
+        carrierName = Carrier.query.filter_by(id=k).first().name
+        networkFinal[carrierName] = v
+
+    return json.dumps(networkFinal)
 
 
 @app.route('/getRanking')
 def getAppRanking():
-    import operator
     from app.models.ranking import Ranking
 
     year = request.args.get('year')
@@ -65,6 +154,7 @@ def getAppRanking():
     ranking = Ranking.query.filter_by(year=year, month=month, carrier_id= carrier_id,
                                       traffic_type=traffic_type,
                                       transfer_type=transfer_type)
+
     wrapper = [{'ranking_number':e.ranking_number,
                 'app_name':e.app_name,
                 'total_bytes':e.total_bytes,
