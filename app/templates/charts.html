@@ -69,7 +69,7 @@
 	</div>
 </div>
 <div class="container">
-	<div id="chart" style="display: none;"></div>
+	<div id="chart"></div>
 </div>
 <div class="container">
 	<h3><span class="label label-danger" id="error"></span></h3>
@@ -77,24 +77,6 @@
 </body>
 
 <script>
-    var chart = c3.generate({
-        data: {
-            x: 'x',
-            columns: [],
-            type: 'bar'
-        },
-        bar: {
-            width: {
-                ratio: 0.6
-            }
-        },
-        axis: {
-            x: {
-                type: 'categorized'
-            },
-            rotated: true
-        }
-    });
     //datetimepicker format
     $(function () {
         $('#datetimepicker1').datetimepicker({
@@ -139,24 +121,48 @@
     $("#datetimepicker1").on("dp.change", dataThenCreate);
 
     function createChart(data, transfer_type) {
+
         if (transfer_type == "upload")
             var transfer = "subidos";
         else if (transfer_type == "download")
             var transfer = "bajados";
         else
             var transfer = "totales";
+
+        var chart = c3.generate({
+            bindto : '#chart',
+            data: {
+                x: 'x',
+                columns: [],
+                type: 'bar',
+                labels: true
+            },
+            bar: {
+                width: {
+                    ratio: 0.6
+                }
+            },
+            axis: {
+                x: {
+                    type: 'categorized'
+                },
+                rotated: true
+            }
+        });
+
         var xaxis = $.map(data, function (value, key) {
             return key
         });
         var yaxis = $.map(data, function (value, key) {
             return value
         });
+
         setTimeout(function () {
             chart.unload();
             chart.load({
                 columns: [
                     ['x'].concat(data.xaxis),
-                    ['bytes por usuario ' + transfer].concat(data.yaxis),
+                    ['GB por usuario ' + transfer].concat(data.yaxis),
                 ]
             });
         }, 1);
