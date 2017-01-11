@@ -42,29 +42,43 @@
 </div>
 <div class="container" id="reports" style="display: none;">
   <div class="panel panel-default">
-    <!-- Default panel contents -->
-    <div class="panel-heading">Dispositivos</div>
-    <div id="devicesChart"></div>
+      <!-- Default panel contents -->
+      <div class="panel-heading"><h4>Dispositivos</h4></div>
+      <div id="devicesChart"></div>
+      <div class="table-responsive">
+          <table class="table" id="devices">
+              <tbody>
+              <tr>
+              </tr>
+              </tbody>
+          </table>
+      </div>
   </div>
   <div class="panel panel-default">
     <!-- Default panel contents -->
-    <div class="panel-heading">Mediciones</div>
+      <div class="panel-heading"><h4>Mediciones</h4></div>
     <div id="gsmChart"></div>
+      <div class="table-responsive">
+          <table class="table" id="gsm">
+              <tbody>
+              <tr>
+              </tr>
+              </tbody>
+          </table>
+      </div>
   </div>
   <div class="panel panel-default">
     <!-- Default panel contents -->
-    <div class="panel-heading">Sims</div>
-    <div class="simsChart"></div>
-    <table class="table" id="sims">
-      <thead>
-      <tr>
-        <th>Operador</th>
-        <th>Cantidad</th>
-      </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
+      <div class="panel-heading"><h4>Sims</h4></div>
+    <div id="simsChart"></div>
+      <div class="table-responsive">
+          <table class="table" id="sims">
+              <tbody>
+              <tr>
+              </tr>
+              </tbody>
+          </table>
+      </div>
   </div>
 </div>
 <div class="container">
@@ -74,7 +88,8 @@
 <div class="container" id="signal" style="display: none;">
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
-		<div class="panel-heading">Señales promedio por carrier</div>
+        <div class="panel-heading"><h4>Señales promedio por carrier</h4></div>
+        <div id="signalChart"></div>
 		<div class="table-responsive">
 			<table class="table" id="signalCarriers">
 				<thead>
@@ -98,7 +113,8 @@
 <div class="container" id="network" style="display: none;">
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
-		<div class="panel-heading">Distribución de señales por carrier</div>
+        <div class="panel-heading"><h4>Distribución de señales por carrier</h4></div>
+        <div id="networkChart"></div>
 		<div class="table-responsive">
 			<table class="table" id="networkCarriers">
 				<thead>
@@ -149,19 +165,19 @@
 
 
                 //populate devices
-              /*add = "";
-               $.each(data.total_device_carrier, function (k, v) {
+              add = "";
+               /*$.each(data.total_device_carrier, function (k, v) {
                add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-               });
+               });*/
                add += "<tr><td>Total</td><td>" + data.total_devices + "</td></tr>"
-               $("#devices tbody").html(add);*/
+               $("#devices tbody").html(add);
                //console.log(JSON.stringify(data, null, 4));
                 if (!(Object.keys(data.total_device_carrier).length === 0)) {
+                    $('#devicesChart').show();
                     var chart = c3.generate({
                         bindto: '#devicesChart',
                         data: {
                             json: data.total_device_carrier,
-
 
                             type: 'donut',
                             onclick: function (d, i) {
@@ -174,31 +190,140 @@
                                 console.log("onmouseout", d, i);
                             }
                         },
-                        color: {
+                        /*color: {
                             pattern: ['#5987B2', '#76A3CC', '#334D66', '#395773', '#263A4C', '#9BC3E0']
+                        },*/
+                        color: {
+                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
+                        },
+                        legend: {
+                            item: {
+                                onclick: function() {}
+                            }
                         },
                         donut: {
                             title: "Dispositivos"
+                        },
+                        padding: {
+                            top: 20
+                        },
+                        tooltip: {
+                            format: {
+                                title: function (d) { return d; },
+                                value: function (value, ratio, id) {
+                                    var format = d3.format('');
+                                    return format(value);
+                                }
+                            }
                         }
                     });
+                } else {
+                    $('#devicesChart').hide();
                 }
 
 
                 //populate gsm
 
                 add = "";
-                $.each(data.total_gsm_carrier, function (k, v) {
+                /*$.each(data.total_gsm_carrier, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-                });
+                });*/
                 add += "<tr><td>Total</td><td>" + data.total_gsm + "</td></tr>"
                 $("#gsm tbody").html(add);
+
+                if (!(Object.keys(data.total_gsm_carrier).length === 0)) {
+                    $('#gsmChart').show();
+                    var xaxis = $.map(data.total_gsm_carrier, function(value, key) { return key; });
+                    var yaxis = $.map(data.total_gsm_carrier, function(value, key) { return value; });
+
+                    var chart = c3.generate({
+                        bindto: '#gsmChart',
+                        data: {
+                            x: 'x',
+                            columns: [
+                                    ['x'].concat(xaxis),
+                                    ['value'].concat(yaxis),
+                            ],
+                            type: 'bar',
+                            labels: true
+                        },
+                        legend: {
+                            show: false
+                        },
+                        padding: {
+                            top: 20
+                        },
+                        axis: {
+                            rotated: true,
+                            x: {
+                                type: 'category'
+                            }
+                        },
+                        color: {
+                            pattern: ['#1f77b4']
+                        },
+                        //76A3CC
+                    });
+                } else {
+                    $('#gsmChart').hide();
+                }
+
+
                 //populate sims
                 add = "";
-                $.each(data.total_sims_carrier, function (k, v) {
+                /*$.each(data.total_sims_carrier, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-                });
+                });*/
                 add += "<tr><td>Total</td><td>" + data.total_sims + "</td></tr>"
                 $("#sims tbody").html(add);
+                if (!(Object.keys(data.total_sims_carrier).length === 0)) {
+                    $('#simsChart').show();
+                    var chart = c3.generate({
+                        bindto: '#simsChart',
+                        data: {
+                            json: data.total_sims_carrier,
+
+                            type: 'donut',
+                            onclick: function (d, i) {
+                                console.log("onclick", d, i);
+                            },
+                            onmouseover: function (d, i) {
+                                console.log("onmouseover", d, i);
+                            },
+                            onmouseout: function (d, i) {
+                                console.log("onmouseout", d, i);
+                            }
+                        },
+                        padding: {
+                            top: 20
+                        },
+                        /*color: {
+                            pattern: ['#5987B2', '#76A3CC', '#334D66', '#395773', '#263A4C', '#9BC3E0']
+                        },*/
+                        color: {
+                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
+                        },
+                        donut: {
+                            title: "Sims"
+                        },
+                        legend: {
+                            item: {
+                                onclick: function() {}
+                            }
+                        },
+                        tooltip: {
+                            format: {
+                                title: function (d) { return d; },
+                                value: function (value, ratio, id) {
+                                    var format = d3.format('');
+                                    return format(value);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    $('#simsChart').hide();
+                }
 
             })
             .fail(function () {
@@ -215,16 +340,55 @@
             .done(function (data) {
 	            $("#errorSignal").html("");
                 $("#signal").show();
-	            add = "";
+
+	            /*add = "";
                 $.each(data, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });
-                $("#signalCarriers tbody").html(add);
+                $("#signalCarriers tbody").html(add);*/
+
+                if (!(Object.keys(data).length === 0)) {
+                    $('#signalChart').show();
+                    var xaxis = $.map(data, function(value, key) { return key; });
+                    var yaxis = $.map(data, function(value, key) { return value; });
+
+                    var chart = c3.generate({
+                        bindto: '#signalChart',
+                        data: {
+                            x: 'x',
+                            columns: [
+                                    ['x'].concat(xaxis),
+                                    ['value'].concat(yaxis),
+                            ],
+                            type: 'bar',
+                            labels: true
+                        },
+                        legend: {
+                            show: false
+                        },
+                        padding: {
+                            top: 20
+                        },
+                        axis: {
+                            rotated: true,
+                            x: {
+                                type: 'category'
+                            }
+                        },
+                        color: {
+                            pattern: ['#1f77b4']
+                        },
+                        //76A3CC
+                    });
+                } else {
+                    $('#signalChart').hide();
+                }
             })
             .fail(function () {
                 $("#errorSignal").html("<i>No hay información disponible para esta fecha</i>");
                 $("#signal").hide();
             });
+	        //console.log(JSON.stringify(data, null, 4));
 
 	    // New information for ammount of signals (2G, 3G, 4G, unknown)
 	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
@@ -235,135 +399,78 @@
             .done(function (data) {
 	            $("#errorNetwork").html("");
                 $("#network").show();
-	            add = "";
+
+                /*add = "";
                 $.each(data, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>";
                     $.each(v, function(k2,v2){
                         add += "<li>" + k2 + " : " + v2 + "</li>"
                     });
 	                add += "</td></tr>";
-                });
-                $("#networkCarriers tbody").html(add);
+                });*
+                $("#networkCarriers tbody").html(add);*/
+                //console.log(JSON.stringify(data, null, 4));
+
+                if (!(Object.keys(data).length === 0)) {
+                    $('#networkChart').show();
+                    var yaxis = [];
+                    var x2G = [];
+                    var x3G = [];
+                    var x4G = [];
+                    var xOtras = [];
+                    $.each(data, function(k,v) {
+                        yaxis.push(k)
+                        x2G.push(v['2G'])
+                        x3G.push(v['3G'])
+                        x4G.push(v['4G'])
+                        xOtras.push(v['Otras'])
+                    })
+
+                    var chart = c3.generate({
+                        bindto: '#networkChart',
+                        data: {
+                            x: 'x',
+                            columns: [
+                                ['x'].concat(yaxis),
+                                ['2G'].concat(x2G),
+                                ['3G'].concat(x3G),
+                                ['4G'].concat(x4G),
+                                ['Otras'].concat(xOtras)
+                            ],
+                            labels: false,
+                            type: 'bar',
+                        },
+                        bar: {
+                            width: 15
+                        },
+                        size: {
+                            height: 480
+                        },
+                        padding: {
+                            top: 20
+                        },
+                        axis: {
+                            x: {
+                              type: 'categorized'
+                            }, rotated:true
+                        },
+                        color: {
+                        pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
+                       },
+                       /*color: {
+                        pattern: ['#00293E',
+                            '#003E54', '#006269', '#00918F', '#00BAB5', '#6AD6D5']
+                       },*/
+                    });
+                } else {
+                    $('#networkChart').hide();
+                }
             })
             .fail(function () {
                 $("#errorNetwork").html("<i>No hay información disponible para esta fecha</i>");
                 $("#network").hide();
             });
     });
-
-    /*var dataCarrier = [];
-     var dataCantidad = [];
-     $.each(data.total_gsm_carrier, function (k, v) {
-     dataCarrier.push(k);
-     var x = parseInt(v);
-     dataCantidad.push(x);
-     });
-
-     var i;
-     for (i = 0; i < dataCantidad.length; i++) {
-     console.log(dataCantidad[i]);
-     }
-
-     var div = d3.select("body")
-     .append("div")
-     .attr("class", "toolTip");
-
-     var axisMargin = 20,
-     margin = 60,
-     valueMargin = 4,
-     width = parseInt(d3.select('body').style('width'), 10),
-     height = parseInt(d3.select('body').style('height'), 10),
-     barHeight = (height-axisMargin-margin*2)* 0.4/dataCantidad.length-2,
-     barPadding = (height-axisMargin-margin*2)*0.6/dataCantidad.length,
-     data, bar, svg, scale, xAxis, labelWidth = 0;
-     var chartTop = width - margin*2 - labelWidth;
-
-     var colors = ["#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8"];
-     var colorScale = d3.scaleQuantize()
-     .domain([0,dataCantidad.length])
-     .range(colors);
-
-     max = d3.max(dataCantidad, function(d, i) { return dataCantidad[i]; });
-
-     d3.select('#gsmChart').select("svg").remove();
-
-     svg = d3.select('#gsmChart')
-     .append("svg")
-     .attr('width', width)
-     .attr('height', height);
-
-     bar = svg.selectAll("g")
-     .data(dataCantidad)
-     .enter()
-     .append("g");
-
-     bar.attr("class", "bar")
-     .attr("cx",0)
-     .attr("transform", function(d, i) {
-     return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
-     });
-
-     bar.append("text")
-     .attr("class", "label")
-     .attr("y", barHeight / 2)
-     .attr("dy", ".35em")
-     .text(function(d, i){ return dataCarrier[i];})
-     .each(function() {
-     labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width)) + 1;
-
-     });
-
-     scale = d3.scaleLinear()
-     .domain([0, max])
-     .range([0, width - margin*2 - labelWidth*4.5]);
-
-     xAxis = d3.axisBottom(scale)
-     .tickSize(-height + 1.6*margin + axisMargin)
-     .tickSizeOuter([0]);
-
-     yAxis = d3.axisLeft(scale)
-     .tickFormat('')
-     .tickSize(0);
-
-     bar.append("rect")
-     .attr("transform", "translate("+labelWidth+", 0)")
-     .attr("height", barHeight)
-     //.style('fill',function(d,i){ return colorScale(i); })
-     .attr("width", function(d, i){ return scale(dataCantidad[i]); });
-
-     bar.append("text")
-     .attr("class", "value")
-     .attr("y", barHeight / 2)
-     .attr("dx", -valueMargin + labelWidth)
-     .attr("dy", ".35em")
-     .attr("text-anchor", "end")
-     .text(function(d, i){return dataCantidad[i];})
-     .attr("x", function(d, i){
-     var width = this.getBBox().width;
-     return Math.max(width + valueMargin, scale(dataCantidad[i]));
-     });
-
-     bar.on("mousemove", function(d, i){
-     div.style("left", d3.event.pageX+10+"px");
-     div.style("top", d3.event.pageY-25+"px");
-     div.style("display", "inline-block");
-     div.html((dataCarrier[i])+"<br>"+(dataCantidad[i]));
-     });
-
-     bar.on("mouseout", function(d){
-     div.style("display", "none");
-     });
-
-     svg.insert("g",":first-child")
-     .attr("class", "axisHorizontal")
-     .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
-     .call(xAxis);
-     svg.insert("g",":first-child")
-     .attr("class", "axisVertical")
-     .attr("transform", "translate(" + (margin + labelWidth) + ","+ (-height + 2.4*axisMargin + margin)+")")
-     //.call(yAxis);
-     });
-     });*/
 
 </script>
 </html>
