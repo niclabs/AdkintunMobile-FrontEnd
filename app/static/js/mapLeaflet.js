@@ -35,6 +35,12 @@ function mouseOverEvent(dataAntennas) {
                         console.log("onmouseout", d, i);
                     },
                 },
+                legend: {
+                    item: {
+                        onclick: function () {
+                        }
+                    }
+                },
                 donut: {
                     title: "Distribución de redes"
                 }
@@ -50,6 +56,8 @@ $(document).ready(function initmap() {
 
     // add an OpenStreetMap tile layer
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        noWrap: true,
+        minZoom: 4,
         maxZoom: 16,
         attribution: '&amp;copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -76,6 +84,8 @@ $(document).ready(function initmap() {
             markerCluster.addLayers(markerList);
             map.addLayer(markerCluster);
 
+            var group = L.featureGroup(markerList);
+            map.setMaxBounds(group.getBounds().pad(0.1));
         });
 });
 
