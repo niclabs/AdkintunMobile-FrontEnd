@@ -44,42 +44,63 @@
   <div class="panel panel-default">
       <!-- Default panel contents -->
       <div class="panel-heading"><h4>Dispositivos</h4></div>
-      <div id="devicesChart"></div>
-      <div class="table-responsive">
-          <table class="table" id="devices">
-              <tbody>
-              <tr>
-              </tr>
-              </tbody>
-          </table>
+      <div class="row">
+          <div>
+              <div id="devicesChart"></div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+              <div class="panel panel-default">
+                  <table class="table table-bordered text-center" id="devices">
+                      <thead class="thead-default">
+                          <tr>
+                          </tr>
+                      </thead>
+                  </table>
+              </div>
+          </div>
       </div>
   </div>
   <div class="panel panel-default">
     <!-- Default panel contents -->
       <div class="panel-heading"><h4>Mediciones</h4></div>
-    <div id="gsmChart"></div>
-      <div class="table-responsive">
-          <table class="table" id="gsm">
-              <tbody>
-              <tr>
-              </tr>
-              </tbody>
-          </table>
+      <div class="col-xs-6 col-md-10 col-md-offset-1">
+          <div id="gsmChart"></div>
+      </div>
+      <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+              <div class="panel panel-default">
+                  <table class="table table-bordered text-center" id="gsm">
+                      <thead class="thead-default">
+                          <tr>
+                          </tr>
+                      </thead>
+                  </table>
+              </div>
+          </div>
       </div>
   </div>
   <div class="panel panel-default">
     <!-- Default panel contents -->
-      <div class="panel-heading"><h4>Sims</h4></div>
-    <div id="simsChart"></div>
-      <div class="table-responsive">
-          <table class="table" id="sims">
-              <tbody>
-              <tr>
-              </tr>
-              </tbody>
-          </table>
+      <div class="panel-heading"><h4>SIMS</h4></div>
+      <div class="row">
+          <div class="col-xs-6 col-md-4 col-md-offset-4">
+              <div id="simsChart"></div>
+          </div>
+          <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+              <div class="panel panel-default">
+                  <table class="table table-bordered text-center" id="sims">
+                      <thead class="thead-default">
+                          <tr>
+                          </tr>
+                      </thead>
+                  </table>
+              </div>
+          </div>
       </div>
-  </div>
+      </div>
 </div>
 <div class="container">
   <h3><span class="label label-danger" id="error"></span></h3>
@@ -89,21 +110,11 @@
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
         <div class="panel-heading"><h4>Señales promedio por carrier</h4></div>
-        <div id="signalChart"></div>
-		<div class="table-responsive">
-			<table class="table" id="signalCarriers">
-				<thead>
-				<tr>
-					<th>Operador</th>
-					<th>Señal Promedio</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-				</tr>
-				</tbody>
-			</table>
-		</div>
+        <div class="row">
+            <div class="col-xs-6 col-md-10 col-md-offset-1">
+                <div id="signalChart"></div>
+            </div>
+        </div>
 	</div>
 </div>
 <div class="container">
@@ -113,22 +124,17 @@
 <div class="container" id="network" style="display: none;">
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
-        <div class="panel-heading"><h4>Distribución de señales por carrier</h4></div>
-        <div id="networkChart"></div>
-		<div class="table-responsive">
-			<table class="table" id="networkCarriers">
-				<thead>
-				<tr>
-					<th>Operador</th>
-					<th>Cantidad de mediciones por tipo de red</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-				</tr>
-				</tbody>
-			</table>
-		</div>
+        <div class="panel-heading">
+            <h4>Distribución de señales por carrier</h4>
+            <div id="heading" >
+                <p></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-10 col-md-offset-1">
+                <div id="networkChart"></div>
+            </div>
+        </div>
 	</div>
 </div>
 <div class="container">
@@ -169,8 +175,8 @@
                /*$.each(data.total_device_carrier, function (k, v) {
                add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                });*/
-               add += "<tr><td>Total</td><td>" + data.total_devices + "</td></tr>"
-               $("#devices tbody").html(add);
+               add += "<tr><td class='active'>Total: &emsp;"+ data.total_devices + "</td></tr>"
+               $("#devices thead").html(add);
                //console.log(JSON.stringify(data, null, 4));
                 if (!(Object.keys(data.total_device_carrier).length === 0)) {
                     $('#devicesChart').show();
@@ -191,10 +197,10 @@
                             }
                         },
                         /*color: {
-                            pattern: ['#5987B2', '#76A3CC', '#334D66', '#395773', '#263A4C', '#9BC3E0']
+                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
                         },*/
                         color: {
-                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
+                            pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
                         },
                         legend: {
                             item: {
@@ -228,8 +234,8 @@
                 /*$.each(data.total_gsm_carrier, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });*/
-                add += "<tr><td>Total</td><td>" + data.total_gsm + "</td></tr>"
-                $("#gsm tbody").html(add);
+                add += "<tr><td class='active'>Total: &emsp;"+ data.total_gsm + "</td></tr>"
+                $("#gsm thead").html(add);
 
                 if (!(Object.keys(data.total_gsm_carrier).length === 0)) {
                     $('#gsmChart').show();
@@ -260,10 +266,14 @@
                             }
                         },
                         color: {
-                            pattern: ['#1f77b4']
+                            pattern: ['#4C91C2']
                         },
-                        //76A3CC
+                        //2c717f
                     });
+                    d3.selectAll('.c3-texts text').style('fill', '#000000')
+                                                  .style('font-size', '11px');
+                    d3.selectAll('.c3-axis-x text').style('fill', '#000000')
+                                                   .style('font-size', '11px');
                 } else {
                     $('#gsmChart').hide();
                 }
@@ -274,8 +284,8 @@
                 /*$.each(data.total_sims_carrier, function (k, v) {
                     add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
                 });*/
-                add += "<tr><td>Total</td><td>" + data.total_sims + "</td></tr>"
-                $("#sims tbody").html(add);
+                add += "<tr><td class='active'>Total: &emsp;"+ data.total_sims + "</td></tr>"
+                $("#sims thead").html(add);
                 if (!(Object.keys(data.total_sims_carrier).length === 0)) {
                     $('#simsChart').show();
                     var chart = c3.generate({
@@ -298,13 +308,10 @@
                             top: 20
                         },
                         /*color: {
-                            pattern: ['#5987B2', '#76A3CC', '#334D66', '#395773', '#263A4C', '#9BC3E0']
-                        },*/
-                        color: {
                             pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
-                        },
+                        },*/
                         donut: {
-                            title: "Sims"
+                            title: "SIMS"
                         },
                         legend: {
                             item: {
@@ -361,7 +368,9 @@
                                     ['value'].concat(yaxis),
                             ],
                             type: 'bar',
-                            labels: true
+                            labels: {
+                                    format: d3.format(',.2f')
+                            },
                         },
                         legend: {
                             show: false
@@ -376,17 +385,19 @@
                             }
                         },
                         color: {
-                            pattern: ['#1f77b4']
+                            pattern: ['#4C91C2']
                         },
-                        //76A3CC
                     });
+                    d3.selectAll('.c3-texts text').style('fill', '#000000')
+                                                  .style('font-size', '11px');
+                    d3.selectAll('.c3-axis-x text').style('font-size', '12px');
                 } else {
                     $('#signalChart').hide();
                 }
             })
             .fail(function () {
-                $("#errorSignal").html("<i>No hay información disponible para esta fecha</i>");
                 $("#signal").hide();
+                $("#errorSignal").html("<i>No hay información disponible para esta fecha</i>");
             });
 	        //console.log(JSON.stringify(data, null, 4));
 
@@ -413,17 +424,19 @@
 
                 if (!(Object.keys(data).length === 0)) {
                     $('#networkChart').show();
+                    $('#heading').show();
                     var yaxis = [];
                     var x2G = [];
                     var x3G = [];
                     var x4G = [];
                     var xOtras = [];
+
                     $.each(data, function(k,v) {
                         yaxis.push(k)
-                        x2G.push(v['2G'])
-                        x3G.push(v['3G'])
-                        x4G.push(v['4G'])
-                        xOtras.push(v['Otras'])
+                        x2G.push(v['2G'] == 0? 0 : Math.log(v['2G']) / Math.LN10)
+                        x3G.push(v['3G'] == 0? 0 : Math.log(v['3G']) / Math.LN10)
+                        x4G.push(v['4G'] == 0? 0 : Math.log(v['4G']) / Math.LN10)
+                        xOtras.push(v['Otras']  == 0? 0 : Math.log(v['Otras']) / Math.LN10)
                     })
 
                     var chart = c3.generate({
@@ -439,9 +452,27 @@
                             ],
                             labels: false,
                             type: 'bar',
+                            format: {
+                                value: function (value) {
+                                    if (value == 0) {
+                                        return 1;
+                                    }
+                                }
+                            }
                         },
                         bar: {
-                            width: 15
+                            width: 12
+                        },
+                        tooltip: {
+                            format: {
+                                title: function (d) { return d; },
+                                value: function (value) {
+                                    if (value == 0) {
+                                        return 0;
+                                    }
+                                    return  Math.round(Math.exp(value * Math.LN10));
+                                }
+                            }
                         },
                         size: {
                             height: 480
@@ -462,8 +493,17 @@
                             '#003E54', '#006269', '#00918F', '#00BAB5', '#6AD6D5']
                        },*/
                     });
+                    d3.selectAll('.c3-texts text').style('fill', '#000000')
+                                                  .style('font-size', '11px');
+                    d3.selectAll('.c3-axis-x text').style('font-size', '12px');
+
+                    add = "";
+                    add += "<h4> (Escala logaritmica) </h4>"
+                    $("#heading p").html(add);
+
                 } else {
                     $('#networkChart').hide();
+                    $('#heading').hide();
                 }
             })
             .fail(function () {
