@@ -46,7 +46,9 @@
       <div class="panel-heading"><h4>Dispositivos</h4></div>
       <div class="row">
           <div>
-              <div id="devicesChart"></div>
+              <div class="col-xs-6 col-md-4 col-md-offset-4">
+                <div id="devicesChart"></div>
+              </div>
           </div>
       </div>
       <div class="row">
@@ -158,6 +160,14 @@
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
         var url = $SCRIPT_ROOT + "/getReport"
+
+        $('#devicesChart').hide();
+        $('#gsmChart').hide();
+        $('#simsChart').hide();
+        $('#signalChart').hide();
+        $('#networkChart').hide();
+        $('#heading').hide();
+
         var jqxhr = $.getJSON(url, {
             year: year,
             month: month
@@ -171,13 +181,9 @@
 
 
                 //populate devices
-              add = "";
-               /*$.each(data.total_device_carrier, function (k, v) {
-               add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-               });*/
+               add = "";
                add += "<tr><td class='active'>Total: &emsp;"+ data.total_devices + "</td></tr>"
                $("#devices thead").html(add);
-               //console.log(JSON.stringify(data, null, 4));
                 if (!(Object.keys(data.total_device_carrier).length === 0)) {
                     $('#devicesChart').show();
                     var chart = c3.generate({
@@ -196,9 +202,6 @@
                                 console.log("onmouseout", d, i);
                             }
                         },
-                        /*color: {
-                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
-                        },*/
                         color: {
                             pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
                         },
@@ -223,17 +226,11 @@
                             }
                         }
                     });
-                } else {
-                    $('#devicesChart').hide();
                 }
-
 
                 //populate gsm
 
                 add = "";
-                /*$.each(data.total_gsm_carrier, function (k, v) {
-                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-                });*/
                 add += "<tr><td class='active'>Total: &emsp;"+ data.total_gsm + "</td></tr>"
                 $("#gsm thead").html(add);
 
@@ -268,22 +265,15 @@
                         color: {
                             pattern: ['#4C91C2']
                         },
-                        //2c717f
                     });
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('fill', '#000000')
                                                    .style('font-size', '11px');
-                } else {
-                    $('#gsmChart').hide();
                 }
-
 
                 //populate sims
                 add = "";
-                /*$.each(data.total_sims_carrier, function (k, v) {
-                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-                });*/
                 add += "<tr><td class='active'>Total: &emsp;"+ data.total_sims + "</td></tr>"
                 $("#sims thead").html(add);
                 if (!(Object.keys(data.total_sims_carrier).length === 0)) {
@@ -307,9 +297,9 @@
                         padding: {
                             top: 20
                         },
-                        /*color: {
-                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
-                        },*/
+                        color: {
+                            pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
+                        },
                         donut: {
                             title: "SIMS"
                         },
@@ -328,8 +318,6 @@
                             }
                         }
                     });
-                } else {
-                    $('#simsChart').hide();
                 }
 
             })
@@ -337,6 +325,9 @@
                 $("#error").html("<i>No hay información disponible para esta fecha</i>");
                 $("#reports").hide();
             });
+
+
+        // ---------------------------------------
 
         // New information for signal meditions
 	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
@@ -347,12 +338,6 @@
             .done(function (data) {
 	            $("#errorSignal").html("");
                 $("#signal").show();
-
-	            /*add = "";
-                $.each(data, function (k, v) {
-                    add += "<tr><td>" + k + "</td><td>" + v + "</td></tr>";
-                });
-                $("#signalCarriers tbody").html(add);*/
 
                 if (!(Object.keys(data).length === 0)) {
                     $('#signalChart').show();
@@ -391,15 +376,12 @@
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('font-size', '12px');
-                } else {
-                    $('#signalChart').hide();
                 }
             })
             .fail(function () {
                 $("#signal").hide();
                 $("#errorSignal").html("<i>No hay información disponible para esta fecha</i>");
             });
-	        //console.log(JSON.stringify(data, null, 4));
 
 	    // New information for ammount of signals (2G, 3G, 4G, unknown)
 	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
@@ -410,17 +392,6 @@
             .done(function (data) {
 	            $("#errorNetwork").html("");
                 $("#network").show();
-
-                /*add = "";
-                $.each(data, function (k, v) {
-                    add += "<tr><td>" + k + "</td><td>";
-                    $.each(v, function(k2,v2){
-                        add += "<li>" + k2 + " : " + v2 + "</li>"
-                    });
-	                add += "</td></tr>";
-                });*
-                $("#networkCarriers tbody").html(add);*/
-                //console.log(JSON.stringify(data, null, 4));
 
                 if (!(Object.keys(data).length === 0)) {
                     $('#networkChart').show();
@@ -474,6 +445,11 @@
                                 }
                             }
                         },
+                        legend: {
+                            item: {
+                                onclick: function() {}
+                            }
+                        },
                         size: {
                             height: 480
                         },
@@ -488,10 +464,6 @@
                         color: {
                         pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
                        },
-                       /*color: {
-                        pattern: ['#00293E',
-                            '#003E54', '#006269', '#00918F', '#00BAB5', '#6AD6D5']
-                       },*/
                     });
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
@@ -500,10 +472,6 @@
                     add = "";
                     add += "<h4> (Escala logaritmica) </h4>"
                     $("#heading p").html(add);
-
-                } else {
-                    $('#networkChart').hide();
-                    $('#heading').hide();
                 }
             })
             .fail(function () {
