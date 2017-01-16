@@ -208,7 +208,7 @@
                 console.log(data);
                 var add, mnc;
                 $("#reports").show();
-
+                $("#tabla1").show();
 
                 //populate devices
                add = "";
@@ -269,6 +269,8 @@
 
                 if (!(Object.keys(data.total_gsm_carrier).length === 0)) {
                     $('#gsmChart').show();
+                    $("#tabla2").show();
+
                     var xaxis = $.map(data.total_gsm_carrier, function(value, key) { return key; });
                     var yaxis = $.map(data.total_gsm_carrier, function(value, key) { return value; });
 
@@ -311,6 +313,8 @@
                 $("#sims thead").html(add);
                 if (!(Object.keys(data.total_sims_carrier).length === 0)) {
                     $('#simsChart').show();
+                    $("#tabla3").show();
+
                     var chart = c3.generate({
                         bindto: '#simsChart',
                         data: {
