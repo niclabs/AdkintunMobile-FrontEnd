@@ -148,7 +148,7 @@
     <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading">
-            <h4>Distribución de señales por carrier</h4>
+            <h4>Eventos registrados por carrier</h4>
             <div id="heading">
                 <p></p>
             </div>
@@ -222,6 +222,14 @@
                             json: data.total_device_carrier,
 
                             type: 'donut',
+                            colors: {
+                                'Claro': '#e1051a',
+                                'Entel PCS Telecomunicaciones S.A.': '#1D63B2',
+                                'Movistar': '#6dbf1f',
+                                'VTR Móvil': '#ff7d00',
+                                'Virgin Mobile': '#fa1f70',
+                                'WOM': '#720184'
+                            },
                             onclick: function (d, i) {
                                 console.log("onclick", d, i);
                             },
@@ -232,9 +240,9 @@
                                 console.log("onmouseout", d, i);
                             }
                         },
-                        color: {
+                        /*color: {
                             pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
-                        },
+                        },*/
                         legend: {
                             item: {
                                 onclick: function() {}
@@ -247,13 +255,13 @@
                             top: 20
                         },
                         tooltip: {
-                            format: {
+                            format: true,/*{
                                 title: function (d) { return d; },
                                 value: function (value, ratio, id) {
                                     var format = d3.format('');
                                     return format(value);
                                 }
-                            }
+                            }*/
                         }
                     });
                 } else {
@@ -271,6 +279,22 @@
                     $('#gsmChart').show();
                     $("#tabla2").show();
 
+                    var localeFormatter = d3.locale({
+                        "decimal": ",",
+                        "thousands": ".",
+                        "grouping": [3],
+                        "currency": ["", "€"],
+                        "dateTime": "%a, %e %b %Y, %X",
+                        "date": "%d.%m.%Y",
+                        "time": "%H:%M:%S",
+                        "periods": ["", ""],
+                        "days": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+                        "shortDays": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+                        "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+                        "shortMonths": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+                    });
+                    var numberFormat = localeFormatter.numberFormat(",.f");
+
                     var xaxis = $.map(data.total_gsm_carrier, function(value, key) { return key; });
                     var yaxis = $.map(data.total_gsm_carrier, function(value, key) { return value; });
 
@@ -283,10 +307,21 @@
                                     ['value'].concat(yaxis),
                             ],
                             type: 'bar',
-                            labels: true
+                            labels: {
+                                format: numberFormat,
+                            }
+                        },
+                        tooltip: {
+                            format: {
+                                name: function (name, ratio, id, index) { return name; },
+                                value: function (value, ratio, id) {
+                                    var format = numberFormat;
+                                    return format(value);
+                                }
+                            }
                         },
                         legend: {
-                            show: false
+                            show: false,
                         },
                         padding: {
                             top: 20
@@ -321,6 +356,14 @@
                             json: data.total_sims_carrier,
 
                             type: 'donut',
+                            colors: {
+                                'Claro': '#e1051a',
+                                'Entel PCS Telecomunicaciones S.A.': '#1D63B2',
+                                'Movistar': '#6dbf1f',
+                                'VTR Móvil': '#ff7d00',
+                                'Virgin Mobile': '#fa1f70',
+                                'WOM': '#720184'
+                            },
                             onclick: function (d, i) {
                                 console.log("onclick", d, i);
                             },
@@ -334,9 +377,6 @@
                         padding: {
                             top: 20
                         },
-                        color: {
-                            pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
-                        },
                         donut: {
                             title: "SIMS"
                         },
@@ -346,13 +386,13 @@
                             }
                         },
                         tooltip: {
-                            format: {
+                            format: true,/*{
                                 title: function (d) { return d; },
                                 value: function (value, ratio, id) {
                                     var format = d3.format('');
                                     return format(value);
                                 }
-                            }
+                            }*/
                         }
                     });
                 } else {
@@ -385,10 +425,11 @@
                                     ['x'].concat(xaxis),
                                     ['value'].concat(yaxis),
                             ],
-                            type: 'bar',
+                            type: 'scatter',
                             labels: {
                                     format: d3.format(',.2f')
                             },
+
                         },
                         legend: {
                             show: false
@@ -400,7 +441,13 @@
                             rotated: true,
                             x: {
                                 type: 'category'
-                            }
+                            },
+                            y: {
+                                label: {
+                                    text: 'Potencia de la señal promedio [dBm]',
+                                    position: 'outer-center'
+                                }
+                            },
                         },
                         color: {
                             pattern: ['#4C91C2']
@@ -442,6 +489,7 @@
                         xOtras.push(v['Otras']  == 0? 0 : Math.log(v['Otras']) / Math.LN10)
                     })
 
+
                     var chart = c3.generate({
                         bindto: '#networkChart',
                         data: {
@@ -461,7 +509,7 @@
                         },
                         tooltip: {
                             format: {
-                                title: function (d) { return d; },
+                                name: function (name, ratio, id, index) { return name; },
                                 value: function (value) {
                                     if (value == 0) {
                                         return 0;
@@ -483,8 +531,8 @@
                         },
                         axis: {
                             x: {
-                              type: 'categorized'
-                            }, rotated:true
+                              type: 'categorized',
+                            }, rotated:true,
                         },
                         color: {
                         pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
@@ -493,7 +541,7 @@
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('font-size', '12px');
-
+                    d3.selecAll('.c3-axis-y').scale.log().domain([1,5]).range([0, height]);
                     add = "";
                     add += "<h4> (Escala logarítmica) </h4>"
                     $("#heading p").html(add);
