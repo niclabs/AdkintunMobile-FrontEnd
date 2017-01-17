@@ -147,7 +147,10 @@
                     type: 'categorized'
                 },
                 rotated: true
-            }
+            },
+            color: {
+				pattern: ['#4C91C2']
+			}
         });
 
         var xaxis = $.map(data, function (value, key) {
@@ -165,6 +168,9 @@
                     ['GB por usuario ' + transfer].concat(data.yaxis),
                 ]
             });
+            d3.selectAll('.c3-textstext').style('font-size', '14px')
+				                         .style('fill', '#000000');
+			d3.selectAll('.c3-axis-x text').style('font-size', '11px');
         }, 1);
     }
 </script>

@@ -7,6 +7,7 @@
 
   <title>Adkintun - Reportes</title>
 
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
@@ -33,10 +34,10 @@
   <div class="form-group">
     <label for="datetimepicker1">Seleccione fecha</label>
     <div class='input-group date' id='datetimepicker1'>
-      <input type='text' class="form-control" />
+      <input type='text' class="form-control"/>
       <span class="input-group-addon">
               <span class="glyphicon glyphicon-calendar"></span>
-          </span>
+      </span>
     </div>
   </div>
 </div>
@@ -44,105 +45,128 @@
   <div class="panel panel-default">
       <!-- Default panel contents -->
       <div class="panel-heading"><h4>Dispositivos</h4></div>
-      <div class="row">
-          <div>
-              <div class="col-xs-6 col-md-4 col-md-offset-4">
-                <div id="devicesChart"></div>
+      <div class="panel-body">
+          <div class="row">
+              <div>
+                  <div class="col-xs-6 col-md-4 col-md-offset-4">
+                    <div id="devicesChart"></div>
+                  </div>
               </div>
           </div>
-      </div>
-      <div class="row">
-          <div class="col-md-6 col-md-offset-3">
-              <div class="panel panel-default">
-                  <table class="table table-bordered text-center" id="devices">
-                      <thead class="thead-default">
-                          <tr>
-                          </tr>
-                      </thead>
-                  </table>
+          <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+                  <div class="panel panel-default" id="tabla1">
+                      <table class="table table-bordered text-center" id="devices">
+                          <thead class="thead-default">
+                              <tr>
+                              </tr>
+                          </thead>
+                      </table>
+                  </div>
               </div>
+          </div>
+          <div class="alert alert-danger" id="error1">
+              <span class="glyphicon glyphicon-info-sign"></span>
+              <strong>No hay información disponible para esta fecha</strong>
           </div>
       </div>
   </div>
   <div class="panel panel-default">
     <!-- Default panel contents -->
       <div class="panel-heading"><h4>Mediciones</h4></div>
-      <div class="col-xs-6 col-md-10 col-md-offset-1">
-          <div id="gsmChart"></div>
-      </div>
-      <div class="row">
-          <div class="col-md-6 col-md-offset-3">
-              <div class="panel panel-default">
-                  <table class="table table-bordered text-center" id="gsm">
-                      <thead class="thead-default">
-                          <tr>
-                          </tr>
-                      </thead>
-                  </table>
+      <div class="panel-body">
+          <div class="col-xs-6 col-md-10 col-md-offset-1">
+              <div id="gsmChart"></div>
+          </div>
+          <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+                  <div class="panel panel-default" id="tabla2">
+                      <table class="table table-bordered text-center" id="gsm">
+                          <thead class="thead-default">
+                              <tr>
+                              </tr>
+                          </thead>
+                      </table>
+                  </div>
               </div>
+          </div>
+          <div class="alert alert-danger" id="error2">
+              <span class="glyphicon glyphicon-info-sign"></span>
+              <strong>No hay información disponible para esta fecha</strong>
           </div>
       </div>
   </div>
   <div class="panel panel-default">
     <!-- Default panel contents -->
       <div class="panel-heading"><h4>SIMS</h4></div>
-      <div class="row">
-          <div class="col-xs-6 col-md-4 col-md-offset-4">
-              <div id="simsChart"></div>
-          </div>
+      <div class="panel-body">
           <div class="row">
-          <div class="col-md-6 col-md-offset-3">
-              <div class="panel panel-default">
-                  <table class="table table-bordered text-center" id="sims">
-                      <thead class="thead-default">
-                          <tr>
-                          </tr>
-                      </thead>
-                  </table>
+              <div class="col-xs-6 col-md-4 col-md-offset-4">
+                  <div id="simsChart"></div>
+              </div>
+              <div class="row">
+                  <div class="col-md-6 col-md-offset-3">
+                      <div class="panel panel-default" id="tabla3">
+                          <table class="table table-bordered text-center" id="sims">
+                              <thead class="thead-default">
+                                  <tr>
+                                  </tr>
+                              </thead>
+                          </table>
+                      </div>
+                  </div>
               </div>
           </div>
+          <div class="alert alert-danger" id="error3">
+              <span class="glyphicon glyphicon-info-sign"></span>
+              <strong>No hay información disponible para esta fecha</strong>
+          </div>
       </div>
-      </div>
-</div>
-<div class="container">
-  <h3><span class="label label-danger" id="error"></span></h3>
+  </div>
 </div>
 
 <div class="container" id="signal" style="display: none;">
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
         <div class="panel-heading"><h4>Señales promedio por carrier</h4></div>
-        <div class="row">
-            <div class="col-xs-6 col-md-10 col-md-offset-1">
-                <div id="signalChart"></div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-6 col-md-10 col-md-offset-1">
+                    <div id="signalChart"></div>
+                </div>
+            </div>
+            <div id="loading1"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
+            <div class="alert alert-danger" id="error4">
+                <span class="glyphicon glyphicon-info-sign"></span>
+                <strong>No hay información disponible para esta fecha</strong>
             </div>
         </div>
 	</div>
-</div>
-<div class="container">
-	<h3><span class="label label-danger" id="errorSignal"></span></h3>
 </div>
 
 <div class="container" id="network" style="display: none;">
-	<div class="panel panel-default">
-		<!-- Default panel contents -->
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
         <div class="panel-heading">
-            <h4>Distribución de señales por carrier</h4>
-            <div id="heading" >
+            <h4>Eventos registrados por carrier</h4>
+            <div id="heading">
                 <p></p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-6 col-md-10 col-md-offset-1">
-                <div id="networkChart"></div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-6 col-md-10 col-md-offset-1">
+                    <div id="networkChart"></div>
+                </div>
+            </div>
+            <div id="loading2"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
+            <div class="alert alert-danger" id="error5">
+                <span class="glyphicon glyphicon-info-sign"></span>
+                <strong>No hay información disponible para esta fecha</strong>
             </div>
         </div>
-	</div>
+    </div>
 </div>
-<div class="container">
-	<h3><span class="label label-danger" id="errorNetwork"></span></h3>
-</div>
-
 
 </body>
 <script type="text/javascript">
@@ -167,6 +191,13 @@
         $('#signalChart').hide();
         $('#networkChart').hide();
         $('#heading').hide();
+        $('#error1').hide();
+        $('#error2').hide();
+        $('#error3').hide();
+        $('#error4').hide();
+        $('#error5').hide();
+        $('#loading1').show();
+        $('#loading2').show();
 
         var jqxhr = $.getJSON(url, {
             year: year,
@@ -176,9 +207,8 @@
             .done(function (data) {
                 console.log(data);
                 var add, mnc;
-                $("#error").html("");
                 $("#reports").show();
-
+                $("#tabla1").show();
 
                 //populate devices
                add = "";
@@ -192,6 +222,14 @@
                             json: data.total_device_carrier,
 
                             type: 'donut',
+                            colors: {
+                                'Claro': '#e1051a',
+                                'Entel PCS Telecomunicaciones S.A.': '#1D63B2',
+                                'Movistar': '#6dbf1f',
+                                'VTR Móvil': '#ff7d00',
+                                'Virgin Mobile': '#fa1f70',
+                                'WOM': '#720184'
+                            },
                             onclick: function (d, i) {
                                 console.log("onclick", d, i);
                             },
@@ -202,9 +240,9 @@
                                 console.log("onmouseout", d, i);
                             }
                         },
-                        color: {
+                        /*color: {
                             pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
-                        },
+                        },*/
                         legend: {
                             item: {
                                 onclick: function() {}
@@ -217,15 +255,18 @@
                             top: 20
                         },
                         tooltip: {
-                            format: {
+                            format: true,/*{
                                 title: function (d) { return d; },
                                 value: function (value, ratio, id) {
                                     var format = d3.format('');
                                     return format(value);
                                 }
-                            }
+                            }*/
                         }
                     });
+                } else {
+                    $("#tabla1").hide();
+                    $("#error1").show();
                 }
 
                 //populate gsm
@@ -236,6 +277,24 @@
 
                 if (!(Object.keys(data.total_gsm_carrier).length === 0)) {
                     $('#gsmChart').show();
+                    $("#tabla2").show();
+
+                    var localeFormatter = d3.locale({
+                        "decimal": ",",
+                        "thousands": ".",
+                        "grouping": [3],
+                        "currency": ["", "€"],
+                        "dateTime": "%a, %e %b %Y, %X",
+                        "date": "%d.%m.%Y",
+                        "time": "%H:%M:%S",
+                        "periods": ["", ""],
+                        "days": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+                        "shortDays": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+                        "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+                        "shortMonths": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+                    });
+                    var numberFormat = localeFormatter.numberFormat(",.f");
+
                     var xaxis = $.map(data.total_gsm_carrier, function(value, key) { return key; });
                     var yaxis = $.map(data.total_gsm_carrier, function(value, key) { return value; });
 
@@ -248,10 +307,21 @@
                                     ['value'].concat(yaxis),
                             ],
                             type: 'bar',
-                            labels: true
+                            labels: {
+                                format: numberFormat,
+                            }
+                        },
+                        tooltip: {
+                            format: {
+                                name: function (name, ratio, id, index) { return name; },
+                                value: function (value, ratio, id) {
+                                    var format = numberFormat;
+                                    return format(value);
+                                }
+                            }
                         },
                         legend: {
-                            show: false
+                            show: false,
                         },
                         padding: {
                             top: 20
@@ -266,10 +336,10 @@
                             pattern: ['#4C91C2']
                         },
                     });
-                    d3.selectAll('.c3-texts text').style('fill', '#000000')
-                                                  .style('font-size', '11px');
-                    d3.selectAll('.c3-axis-x text').style('fill', '#000000')
-                                                   .style('font-size', '11px');
+
+                } else {
+                    $("#tabla2").hide();
+                    $("#error2").show();
                 }
 
                 //populate sims
@@ -278,12 +348,22 @@
                 $("#sims thead").html(add);
                 if (!(Object.keys(data.total_sims_carrier).length === 0)) {
                     $('#simsChart').show();
+                    $("#tabla3").show();
+
                     var chart = c3.generate({
                         bindto: '#simsChart',
                         data: {
                             json: data.total_sims_carrier,
 
                             type: 'donut',
+                            colors: {
+                                'Claro': '#e1051a',
+                                'Entel PCS Telecomunicaciones S.A.': '#1D63B2',
+                                'Movistar': '#6dbf1f',
+                                'VTR Móvil': '#ff7d00',
+                                'Virgin Mobile': '#fa1f70',
+                                'WOM': '#720184'
+                            },
                             onclick: function (d, i) {
                                 console.log("onclick", d, i);
                             },
@@ -297,9 +377,6 @@
                         padding: {
                             top: 20
                         },
-                        color: {
-                            pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
-                        },
                         donut: {
                             title: "SIMS"
                         },
@@ -309,25 +386,21 @@
                             }
                         },
                         tooltip: {
-                            format: {
+                            format: true,/*{
                                 title: function (d) { return d; },
                                 value: function (value, ratio, id) {
                                     var format = d3.format('');
                                     return format(value);
                                 }
-                            }
+                            }*/
                         }
                     });
+                } else {
+                    $("#tabla3").hide();
+                    $("#error3").show();
                 }
 
             })
-            .fail(function () {
-                $("#error").html("<i>No hay información disponible para esta fecha</i>");
-                $("#reports").hide();
-            });
-
-
-        // ---------------------------------------
 
         // New information for signal meditions
 	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
@@ -336,10 +409,10 @@
         }, function () {
         })
             .done(function (data) {
-	            $("#errorSignal").html("");
                 $("#signal").show();
 
                 if (!(Object.keys(data).length === 0)) {
+                    $('#loading1').hide();
                     $('#signalChart').show();
                     var xaxis = $.map(data, function(value, key) { return key; });
                     var yaxis = $.map(data, function(value, key) { return value; });
@@ -352,10 +425,11 @@
                                     ['x'].concat(xaxis),
                                     ['value'].concat(yaxis),
                             ],
-                            type: 'bar',
+                            type: 'scatter',
                             labels: {
                                     format: d3.format(',.2f')
                             },
+
                         },
                         legend: {
                             show: false
@@ -367,7 +441,13 @@
                             rotated: true,
                             x: {
                                 type: 'category'
-                            }
+                            },
+                            y: {
+                                label: {
+                                    text: 'Potencia de la señal promedio [dBm]',
+                                    position: 'outer-center'
+                                }
+                            },
                         },
                         color: {
                             pattern: ['#4C91C2']
@@ -376,12 +456,11 @@
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('font-size', '12px');
+                } else {
+                    $('#loading1').hide();
+                    $("#error4").show();
                 }
             })
-            .fail(function () {
-                $("#signal").hide();
-                $("#errorSignal").html("<i>No hay información disponible para esta fecha</i>");
-            });
 
 	    // New information for ammount of signals (2G, 3G, 4G, unknown)
 	    var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
@@ -390,7 +469,7 @@
         }, function () {
         })
             .done(function (data) {
-	            $("#errorNetwork").html("");
+                $('#loading2').hide();
                 $("#network").show();
 
                 if (!(Object.keys(data).length === 0)) {
@@ -410,6 +489,7 @@
                         xOtras.push(v['Otras']  == 0? 0 : Math.log(v['Otras']) / Math.LN10)
                     })
 
+
                     var chart = c3.generate({
                         bindto: '#networkChart',
                         data: {
@@ -423,20 +503,13 @@
                             ],
                             labels: false,
                             type: 'bar',
-                            format: {
-                                value: function (value) {
-                                    if (value == 0) {
-                                        return 1;
-                                    }
-                                }
-                            }
                         },
                         bar: {
                             width: 12
                         },
                         tooltip: {
                             format: {
-                                title: function (d) { return d; },
+                                name: function (name, ratio, id, index) { return name; },
                                 value: function (value) {
                                     if (value == 0) {
                                         return 0;
@@ -458,8 +531,8 @@
                         },
                         axis: {
                             x: {
-                              type: 'categorized'
-                            }, rotated:true
+                              type: 'categorized',
+                            }, rotated:true,
                         },
                         color: {
                         pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
@@ -468,16 +541,15 @@
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('font-size', '12px');
-
+                    d3.selecAll('.c3-axis-y').scale.log().domain([1,5]).range([0, height]);
                     add = "";
-                    add += "<h4> (Escala logaritmica) </h4>"
+                    add += "<h4> (Escala logarítmica) </h4>"
                     $("#heading p").html(add);
+                } else {
+                    $('#loading2').hide();
+                    $('#error5').show();
                 }
             })
-            .fail(function () {
-                $("#errorNetwork").html("<i>No hay información disponible para esta fecha</i>");
-                $("#network").hide();
-            });
     });
 
 </script>
