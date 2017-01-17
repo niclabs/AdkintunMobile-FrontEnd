@@ -431,6 +431,9 @@
                             },
 
                         },
+                        point: {
+                            r: 1
+                        },
                         legend: {
                             show: false
                         },
@@ -449,9 +452,9 @@
                                 }
                             },
                         },
-                        color: {
+                        /*color: {
                             pattern: ['#4C91C2']
-                        },
+                        },*/
                     });
                     d3.selectAll('.c3-texts text').style('fill', '#000000')
                                                   .style('font-size', '11px');
@@ -533,6 +536,12 @@
                             x: {
                               type: 'categorized',
                             }, rotated:true,
+                             y : {
+                                show:true,
+                                tick: {
+                                   format: function (d) { return Math.pow(10,d).toFixed(0); }
+                                }
+                             }
                         },
                         color: {
                         pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
