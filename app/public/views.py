@@ -55,6 +55,13 @@ def getReports():
 
     return json.dumps(data)
 
+def convertToWatt(signal):
+    return 10**((signal - 30)/10)
+
+def convertToDBM(signal):
+    import math
+    return 30 + 10 * math.log10(signal)
+
 @app.route('/getGsmSignal')
 def getGsmSignal():
     from app.models.gsm_signal import GsmSignal
@@ -81,14 +88,13 @@ def getGsmSignal():
     for e in gsm:
         # signal < 0 because there are outliers
         if e.signal and e.signal <= 80:
-            signal[e.carrier_id].append(abs(e.signal))
+            signal[e.carrier_id].append(convertToWatt(e.signal))
 
     signalMean = {}
 
     for k,v in signal.items():
         carrierName = Carrier.query.filter_by(id=k).first().name
-        #signalMean[carrierName] = sum(v) / len(v)
-        signalMean[carrierName] = statistics.median(v)
+        signalMean[carrierName] = convertToDBM(sum(v) / len(v))
 
     return json.dumps(signalMean)
 
