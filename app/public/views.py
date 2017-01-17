@@ -59,6 +59,7 @@ def getReports():
 def getGsmSignal():
     from app.models.gsm_signal import GsmSignal
     from app.models.carrier import Carrier
+    import statistics
 
     year = request.args.get('year')
     month = request.args.get('month')
@@ -79,14 +80,15 @@ def getGsmSignal():
 
     for e in gsm:
         # signal < 0 because there are outliers
-        if e.signal and e.signal < 0:
+        if e.signal and e.signal <= 80:
             signal[e.carrier_id].append(abs(e.signal))
 
     signalMean = {}
 
     for k,v in signal.items():
         carrierName = Carrier.query.filter_by(id=k).first().name
-        signalMean[carrierName] = sum(v) / len(v)
+        #signalMean[carrierName] = sum(v) / len(v)
+        signalMean[carrierName] = statistics.median(v)
 
     return json.dumps(signalMean)
 
