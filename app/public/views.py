@@ -88,7 +88,8 @@ def getGsmSignal():
     for e in gsm:
         # signal < 0 because there are outliers
         if e.signal and e.signal <= 80:
-            signal[e.carrier_id].append(convertToWatt(e.signal))
+            if 0.0001 >= e.signal:
+                signal[e.carrier_id].append(convertToWatt(e.signal))
 
     signalMean = {}
 
