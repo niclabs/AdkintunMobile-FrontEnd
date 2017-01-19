@@ -4,8 +4,6 @@ var markerList;
 
 function mouseOverEvent(dataAntennas) {
     return function (e) {
-        console.log(JSON.stringify(dataAntennas, null, 4));
-        console.log(dataAntennas);
 
         if (dataAntennas.Total === 0) {
             $("#infoGraph").html(
