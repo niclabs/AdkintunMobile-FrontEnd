@@ -128,11 +128,17 @@
 <div class="container" id="signal" style="display: none;">
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
-        <div class="panel-heading"><h4>Señales promedio por carrier</h4></div>
+        <div class="panel-heading">
+            <h4>Intensidad de señal por carrier</h4>
+            <div id="medHeading">
+                <h4> (Mediana) </h4>
+            </div>
+        </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-6 col-md-10 col-md-offset-1">
                     <div id="signalChart"></div>
+                    <div id="signalLegend"></div>
                 </div>
             </div>
             <div id="loading1"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
@@ -149,8 +155,8 @@
         <!-- Default panel contents -->
         <div class="panel-heading">
             <h4>Eventos registrados por carrier</h4>
-            <div id="heading">
-                <p></p>
+            <div id="logHeading">
+                <h4> (Escala logarítmica) </h4>
             </div>
         </div>
         <div class="panel-body">
@@ -170,6 +176,46 @@
 
 </body>
 <script type="text/javascript">
+
+    //SignalChart Legend
+    $("#signal").show();
+    var dataLegend = ["Baja", "Media", "Alta"];
+    var color = ['red', '#F2AC13', 'green'];
+
+    var legendRectSize = 12;
+    var legendSpacing = 22;
+
+    var svg = d3.selectAll('#signalLegend').append('svg')
+        .attr("width", "100%");
+    var legend = svg.selectAll('.legend')
+        .data(dataLegend)
+        .enter()
+        .append('g')
+        .attr('class', 'legend')
+        .attr('transform', function(d, i) {
+            var height = legendRectSize + legendSpacing;
+            var offset =  height * dataLegend.length / 2;
+            var vert = 2 * legendRectSize;
+            var horz = i * 2 * height - offset + $("#signalLegend").width()/2;
+            return 'translate(' + horz + ',' + vert + ')';
+        });
+    console.log($("#signalLegend").width()/2);
+    legend.append('rect')
+        .attr('width', legendRectSize)
+        .attr('height', legendRectSize)
+        .style('fill', function (d, i) { return color[i]; })
+        .style('fill-opacity', 0.26)
+        .style('stroke', function (d, i) { return color[i]; })
+        .style('stroke-opacity', 0.5);
+
+    legend.append('text')
+        .attr('x', legendRectSize + legendSpacing/4)
+        .attr('y', legendRectSize - 1)
+        .text(function(d) { return d; })
+        .attr('font-size', '14px');
+
+    $("#signal").hide();
+
     //datetimepicker format
     $(function () {
         $('#datetimepicker1').datetimepicker({
@@ -190,12 +236,14 @@
         $('#simsChart').hide();
         $('#signalChart').hide();
         $('#networkChart').hide();
-        $('#heading').hide();
+        $('#logHeading').hide();
+        $('#medHeading').hide();
         $('#error1').hide();
         $('#error2').hide();
         $('#error3').hide();
         $('#error4').hide();
         $('#error5').hide();
+        $('#signalLegend').hide();
         $('#loading1').show();
         $('#loading2').show();
 
@@ -223,12 +271,12 @@
 
                             type: 'donut',
                             colors: {
-                                'Claro': '#e1051a',
-                                'Entel PCS Telecomunicaciones S.A.': '#1D63B2',
-                                'Movistar': '#6dbf1f',
-                                'VTR Móvil': '#ff7d00',
-                                'Virgin Mobile': '#fa1f70',
-                                'WOM': '#720184'
+                                'Claro': '#d9051a',
+                                'Entel PCS Telecomunicaciones S.A.': '#1b74cd',
+                                'Movistar': '#67b71e',
+                                'VTR Móvil': '#f77a00',
+                                'Virgin Mobile': '#ef1f6e',
+                                'WOM': '#6b017d'
                             },
                             onclick: function (d, i) {
                                 console.log("onclick", d, i);
@@ -240,9 +288,6 @@
                                 console.log("onmouseout", d, i);
                             }
                         },
-                        /*color: {
-                            pattern: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#d53e8c']
-                        },*/
                         legend: {
                             item: {
                                 onclick: function() {}
@@ -255,13 +300,7 @@
                             top: 20
                         },
                         tooltip: {
-                            format: true,/*{
-                                title: function (d) { return d; },
-                                value: function (value, ratio, id) {
-                                    var format = d3.format('');
-                                    return format(value);
-                                }
-                            }*/
+                            format: true,
                         }
                     });
                 } else {
@@ -333,7 +372,7 @@
                             }
                         },
                         color: {
-                            pattern: ['#4C91C2']
+                            pattern: ['#2c74b9']
                         },
                     });
 
@@ -357,12 +396,12 @@
 
                             type: 'donut',
                             colors: {
-                                'Claro': '#e1051a',
-                                'Entel PCS Telecomunicaciones S.A.': '#1D63B2',
-                                'Movistar': '#6dbf1f',
-                                'VTR Móvil': '#ff7d00',
-                                'Virgin Mobile': '#fa1f70',
-                                'WOM': '#720184'
+                                'Claro': '#d8051a',
+                                'Entel PCS Telecomunicaciones S.A.': '#1a75cd',
+                                'Movistar': '#67b61e',
+                                'VTR Móvil': '#f67800',
+                                'Virgin Mobile': '#ee1e6b',
+                                'WOM': '#6a017b'
                             },
                             onclick: function (d, i) {
                                 console.log("onclick", d, i);
@@ -386,15 +425,13 @@
                             }
                         },
                         tooltip: {
-                            format: true,/*{
-                                title: function (d) { return d; },
-                                value: function (value, ratio, id) {
-                                    var format = d3.format('');
-                                    return format(value);
-                                }
-                            }*/
+                            format: true,
                         }
                     });
+                    d3.selectAll('.c3-texts text').style('fill', 'black')
+                                                  .style('font-size', '11px');
+                    d3.selectAll('.c3-axis-x text').style('font-size', '12px');
+                    d3.selectAll('.c3-arcs').style('opacity', 0.84);
                 } else {
                     $("#tabla3").hide();
                     $("#error3").show();
@@ -410,10 +447,12 @@
         })
             .done(function (data) {
                 $("#signal").show();
+                $('#signalLegend').show();
 
                 if (!(Object.keys(data).length === 0)) {
                     $('#loading1').hide();
                     $('#signalChart').show();
+                    $('#medHeading').show();
                     var xaxis = $.map(data, function(value, key) { return key; });
                     var yaxis = $.map(data, function(value, key) { return value; });
 
@@ -425,17 +464,27 @@
                                     ['x'].concat(xaxis),
                                     ['value'].concat(yaxis),
                             ],
-                            type: 'scatter',
+                            type: 'bar',
                             labels: {
-                                    format: d3.format(',.2f')
+                                    format: function (d) { return d3.round(30 + 10 * Math.log10(d), 2); }
                             },
 
                         },
-                        point: {
-                            r: 1
+                        regions: [
+                            {axis: 'y', start: 5.6234132519e-23, end: 1e-13, opacity: 0.2},//-192.5 to -100 dbm
+                            {axis: 'y', start: 1e-13, end: 3.1622776602e-12, opacity: 0.18},//-100 to -85 dbm
+                            {axis: 'y', start: 3.1622776602e-12, end: 0.00079432823472, opacity: 0.18}//-85 to -1 dbm
+                        ],
+                        grid: {
+                          y: {
+                            lines: [
+                              {value: 1e-13},
+                              {value: 3.1622776602e-12}
+                            ]
+                          }
                         },
                         legend: {
-                            show: false
+                            show: false,
                         },
                         padding: {
                             top: 20
@@ -447,20 +496,33 @@
                             },
                             y: {
                                 label: {
-                                    text: 'Potencia de la señal promedio [dBm]',
+                                    text: 'Intensidad de señal [dBm]',
                                     position: 'outer-center'
+                                },
+                                tick: {
+                                   format: function (d) {
+                                       if (d != 0) {return d3.round(30 + 10 * Math.log10(d), 2);}
+                                   }
                                 }
                             },
                         },
-                        /*color: {
-                            pattern: ['#4C91C2']
-                        },*/
+                        color: {
+                            pattern: ['#2c74b9']
+                        },
                     });
-                    d3.selectAll('.c3-texts text').style('fill', '#000000')
+                    d3.selectAll('.c3-texts text').style('fill', 'black')
                                                   .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('font-size', '12px');
+                    d3.selectAll('.c3-axis-y-label').style('font-size', '12px')
+                                                    .attr('dy', '3.2em');
+                    d3.selectAll('.c3-region-0').style('fill', 'red');
+                    d3.selectAll('.c3-region-1').style('fill', '#F2AC13');
+                    d3.selectAll('.c3-region-2').style('fill', 'green');
+                    d3.selectAll('.c3-grid line').style('stroke', '#545c6e');
+
                 } else {
                     $('#loading1').hide();
+                    $('#signalLegend').hide();
                     $("#error4").show();
                 }
             })
@@ -477,7 +539,7 @@
 
                 if (!(Object.keys(data).length === 0)) {
                     $('#networkChart').show();
-                    $('#heading').show();
+                    $('#logHeading').show();
                     var yaxis = [];
                     var x2G = [];
                     var x3G = [];
@@ -513,15 +575,16 @@
                         tooltip: {
                             format: {
                                 name: function (name, ratio, id, index) { return name; },
-                                value: function (value) {
-                                    if (value == 0) {
+                                value: function (d) {
+                                    if (d == 0) {
                                         return 0;
                                     }
-                                    return  Math.round(Math.exp(value * Math.LN10));
+                                    return Math.pow(10,d).toFixed(0);
                                 }
                             }
                         },
                         legend: {
+                            //position: 'right',
                             item: {
                                 onclick: function() {}
                             }
@@ -547,13 +610,8 @@
                         pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a']
                        },
                     });
-                    d3.selectAll('.c3-texts text').style('fill', '#000000')
-                                                  .style('font-size', '11px');
                     d3.selectAll('.c3-axis-x text').style('font-size', '12px');
-                    d3.selecAll('.c3-axis-y').scale.log().domain([1,5]).range([0, height]);
-                    add = "";
-                    add += "<h4> (Escala logarítmica) </h4>"
-                    $("#heading p").html(add);
+
                 } else {
                     $('#loading2').hide();
                     $('#error5').show();
