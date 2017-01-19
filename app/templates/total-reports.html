@@ -425,7 +425,7 @@
                                     ['x'].concat(xaxis),
                                     ['value'].concat(yaxis),
                             ],
-                            type: 'scatter',
+                            type: 'bar',
                             labels: {
                                     format: d3.format(',.2f')
                             },
@@ -440,6 +440,9 @@
                         padding: {
                             top: 20
                         },
+	                    point: {
+                            r: 5
+	                    },
                         axis: {
                             rotated: true,
                             x: {

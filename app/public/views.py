@@ -94,7 +94,8 @@ def getGsmSignal():
 
     for k,v in signal.items():
         carrierName = Carrier.query.filter_by(id=k).first().name
-        signalMean[carrierName] = convertToDBM(sum(v) / len(v))
+        #signalMean[carrierName] = convertToDBM(sum(v) / len(v))
+        signalMean[carrierName] = statistics.median(sorted(v))
 
     return json.dumps(signalMean)
 
@@ -248,6 +249,7 @@ def getGsmCount():
         if antenna.carrier_id in carrierIds:
             antennasData[antenna.id] = {'lat': antenna.lat,
                                         'lon': antenna.lon,
+                                        'carrier': Carrier.query.filter_by(id=antenna.carrier_id).first().name,
                                         '2G': 0,
                                         '3G': 0,
                                         '4G': 0,
