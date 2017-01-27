@@ -81,6 +81,7 @@ def convertToDBM(signal):
 def getGsmSignal():
     from app.models.gsm_signal import GsmSignal
     from app.models.carrier import Carrier
+    import numpy as np
     import statistics
 
     year = request.args.get('year')
@@ -102,18 +103,44 @@ def getGsmSignal():
 
     for e in gsm:
         # signal < 0 because there are outliers
-        if e.signal and e.signal <= 80:
-            if 0.0001 >= e.signal:
-                signal[e.carrier_id].append(convertToWatt(e.signal))
+        if e.signal != None and e.signal <= 80 and e.quantity > 0:
+            signal[e.carrier_id].append(e.signal)
 
-    signalMean = {}
+    signalFinal = {}
 
     for k,v in signal.items():
         carrierName = Carrier.query.filter_by(id=k).first().name
-        #signalMean[carrierName] = convertToDBM(sum(v) / len(v))
-        signalMean[carrierName] = statistics.median(sorted(v))
+        signalCount = {'mediana': 0,
+                       'min': 0,
+                       'max': 0}
+        signalFinal[carrierName] = signalCount
 
-    return json.dumps(signalMean)
+
+    for k,v in signal.items():
+        carrierName = Carrier.query.filter_by(id=k).first().name
+        signalFinal[carrierName]['mediana'] = statistics.median(sorted(v))
+        signalFinal[carrierName]['min'] = np.percentile(sorted(v), 25)
+        signalFinal[carrierName]['max'] = np.percentile(sorted(v), 75)
+    return json.dumps(signalFinal)
+
+    # signal = {}
+    #
+    # for c in carriers:
+    #     signal[c] = []
+    #
+    # for e in gsm:
+    #     # signal < 0 because there are outliers
+    #     if e.signal != None and e.signal <= 80 and e.quantity > 0:
+    #         #signal[e.carrier_id].append(convertToWatt(e.signal))
+    #         signal[e.carrier_id].append(e.signal)
+    #
+    # signalMean = {}
+    #
+    # for k,v in signal.items():
+    #     carrierName = Carrier.query.filter_by(id=k).first().name
+    #     signalMean[carrierName] = statistics.median(sorted(v))
+    #
+    # return json.dumps(signalMean)
 
 def getNetworkName(network_type):
     networks = ["OTHER", "RTT", "CDMA", "EDGE", "EHRPD", "EVDO_0",
