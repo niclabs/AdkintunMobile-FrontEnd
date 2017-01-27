@@ -26,8 +26,8 @@
 <body>
 <ul class="nav nav-pills">
 	<li role="presentation"><a href="{{ url_for('index') }}">Mapa de antenas</a></li>
-	<li role="presentation" class="active"><a href="#">Gráficos</a></li>
-	<li role="presentation"><a href="{{ url_for('reports') }}">Reportes totales</a></li>
+	<li role="presentation" class="active"><a href="#">Ranking de Aplicaciones</a></li>
+	<li role="presentation"><a href="{{ url_for('reports') }}">Visualización de reportes</a></li>
 </ul>
 <div class="container-fluid" style="height:100%;">
 	<div class="row" style="height:100%;">
@@ -67,13 +67,15 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="container">
+		<div id="chart"></div>
+	</div>
+	<div class="container col-md-offset-4">
+		<h3><span class="label label-danger" id="error"></span></h3>
+	</div>
 </div>
-<div class="container">
-	<div id="chart"></div>
-</div>
-<div class="container">
-	<h3><span class="label label-danger" id="error"></span></h3>
-</div>
+
 </body>
 
 <script>
@@ -106,14 +108,17 @@
                     carrier_id: carrier_id
                 },
                 success: (function (data) {
-                    $("#error").html("");
-                    $("#chart").show();
-                    createChart(data, transfer_type);
+                    console.log(JSON.stringify(data, null, 4));
+                    if (Object.keys(data['xaxis']).length === 0) {
+                        $("#error").html("<i>No hay información disponible para esta fecha</i>");
+                        $("#chart").hide();
+                    }
+                    else {
+                        $("#error").html("");
+                        $("#chart").show();
+                        createChart(data, transfer_type);
+                    }
                 }),
-                error: (function () {
-                    $("#error").html("<i>No hay información disponible para esta fecha</i>");
-                    $("#chart").hide();
-                })
             });
         }
     }
@@ -130,7 +135,7 @@
             var transfer = "totales";
 
         var chart = c3.generate({
-            bindto : '#chart',
+            bindto: '#chart',
             data: {
                 x: 'x',
                 columns: [],
@@ -144,13 +149,17 @@
             },
             axis: {
                 x: {
-                    type: 'categorized'
+                    type: 'categorized',
+                    tick: {
+                        multiline: false,
+                        centered: true
+                    },
                 },
                 rotated: true
             },
             color: {
-				pattern: ['#4C91C2']
-			}
+                pattern: ['#4C91C2']
+            }
         });
 
         var xaxis = $.map(data, function (value, key) {
@@ -169,8 +178,8 @@
                 ]
             });
             d3.selectAll('.c3-textstext').style('font-size', '14px')
-				                         .style('fill', '#000000');
-			d3.selectAll('.c3-axis-x text').style('font-size', '11px');
+                .style('fill', '#000000');
+            d3.selectAll('.c3-axis-x text').style('font-size', '11px');
         }, 1);
     }
 </script>

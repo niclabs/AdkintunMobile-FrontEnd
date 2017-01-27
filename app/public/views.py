@@ -1,15 +1,30 @@
 from app import app
 from flask import render_template, request, json
 
+def getCarriersWithAntennas():
+    from app.models.carrier import Carrier
+    from app.models.antenna import Antenna
+
+    carriers = Carrier.query.with_entities(Carrier.id, Carrier.name).all()
+    carriersList = [{'id': 0,
+                     'name': 'Todos los operadores'}]
+
+    for c in carriers:
+        # Si es que tiene antennas lo agregamos
+        if Antenna.query.filter_by(carrier_id = c.id).first():
+            carriersList.append({'id': c.id,
+                                 'name': c.name})
+
+    return carriersList
 
 @app.route('/')
 def index():
-    return render_template('index.html', carriers=getCarriers())
+    return render_template('index.html', carriers=getCarriersWithAntennas())
 
 
 @app.route('/charts')
 def charts():
-    return render_template('charts.html', carriers=getCarriers())
+    return render_template('charts.html', carriers=getCarriersWithAntennas())
 
 
 @app.route('/reports')
@@ -204,12 +219,6 @@ def getAntennas():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page-not-found.html'), 404
-
-
-def getCarriers():
-    from app.models.carrier import Carrier
-    carriers = Carrier.query.with_entities(Carrier.id, Carrier.name).all()
-    return carriers
 
 
 def modelToDict(model):

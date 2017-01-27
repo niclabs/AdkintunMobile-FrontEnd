@@ -14,7 +14,7 @@ class DefaultConfig(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = "1234"
-    USER = "vale"
+    USER = "cris"
     SQLALCHEMY_DATABASE_URI = "postgresql://" + USER + ":" + SECRET_KEY + "@localhost/visualization"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
@@ -25,8 +25,8 @@ class AppTokens:
 
 
 class AdminUser:
-    first_name = "Valentina"
-    last_name = "Liberona"
-    login = "vale"
-    email = "vale@example.cl"
+    first_name = "Cristian"
+    last_name = "Parra"
+    login = "cris"
+    email = "cris@example.cl"
     password = "1234"

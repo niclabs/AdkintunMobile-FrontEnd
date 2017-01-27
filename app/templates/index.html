@@ -52,9 +52,9 @@
 
 <div class="container">
 	<ul class="nav nav-pills col-md-offset-4">
-		<li role="presentation" class="active"><a href="#">Mapa interactivo</a></li>
-		<li role="presentation"><a href="{{ url_for('charts') }}">Gráficos</a></li>
-		<li role="presentation"><a href="{{ url_for('reports') }}">Reportes totales</a></li>
+		<li role="presentation" class="active"><a href="#">Mapa de antenas</a></li>
+		<li role="presentation"><a href="{{ url_for('charts') }}">Ranking de Aplicaciones</a></li>
+		<li role="presentation"><a href="{{ url_for('reports') }}">Visualización de reportes</a></li>
 	</ul>
 </div>
 
@@ -69,10 +69,18 @@
 		<div class="container col-xs-12 col-sm-6 col-lg-4" id="infoAntenna">
 
 			<div class="selector">
+
+				<div class="bg-info text-center">
+					<strong>Atención!</strong> Si su operador no aparece, es por que no tiene antenas, o bien no lograron ser geolocalizadas.
+				</div>
+
+				<br>
+
 				<label for="sel1">Seleccione operador</label>
 				<select class="form-control" id="sel1">
+
 					{% for carrier in carriers %}
-						<option value={{ carrier.id }}>{{ carrier.name }}</option>
+						<option value={{ carrier['id'] }}>{{ carrier['name'] }}</option>
 					{% endfor %}
 				</select>
 			</div>
