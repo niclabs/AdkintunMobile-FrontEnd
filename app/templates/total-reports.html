@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Adkintun - Reportes</title>
+	<title>Adkintun - Reportes</title>
 
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="{{ url_for('static', filename='js/carriers.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="{{ url_for('static', filename='js/moment.js') }}"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="{{ url_for('static', filename='js/carriers.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
 </head>
 
 <script type=text/javascript>
@@ -26,162 +26,164 @@
 
 <body>
 <ul class="nav nav-pills">
-    <li role="presentation"><a href="{{url_for('index')}}">Mapa de antenas</a></li>
-    <li role="presentation"><a href="{{url_for('charts')}}">Gráficos</a></li>
-    <li role="presentation" class="active"><a href="#">Reportes totales</a></li>
+	<li role="presentation"><a href="{{ url_for('index') }}">Mapa de antenas</a></li>
+	<li role="presentation"><a href="{{ url_for('charts') }}">Ranking de Aplicaciones</a></li>
+	<li role="presentation" class="active"><a href="#">Visualizacion de reportes</a></li>
 </ul>
 <div class="container">
-    <div class="form-group">
-        <label for="datetimepicker1">Seleccione fecha</label>
-        <div class='input-group date' id='datetimepicker1'>
-            <input type='text' class="form-control"/>
-            <span class="input-group-addon">
+	<div class="form-group">
+		<label for="datetimepicker1">Seleccione fecha</label>
+		<div class='input-group date' id='datetimepicker1'>
+			<input type='text' class="form-control" />
+			<span class="input-group-addon">
               <span class="glyphicon glyphicon-calendar"></span>
       </span>
-        </div>
-    </div>
+		</div>
+	</div>
 </div>
 <div class="container" id="reports" style="display: none;">
-    <div class="panel panel-default">
-        <!-- Default panel contents -->
-        <div class="panel-heading"><h4>Dispositivos</h4></div>
-        <div class="panel-body">
-            <div class="row">
-                <div>
-                    <div class="col-xs-6 col-md-4 col-md-offset-4">
-                        <div id="devicesChart"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <div class="panel panel-default" id="tabla1">
-                        <table class="table table-bordered text-center" id="devices">
-                            <thead class="thead-default">
-                            <tr>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-danger" id="error1">
-                <span class="glyphicon glyphicon-info-sign"></span>
-                <strong>No hay información disponible para esta fecha</strong>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <!-- Default panel contents -->
-        <div class="panel-heading"><h4>Mediciones</h4></div>
-        <div class="panel-body">
-            <div class="col-xs-6 col-md-10 col-md-offset-1">
-                <div id="gsmChart"></div>
-            </div>-
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <div class="panel panel-default" id="tabla2">
-                        <table class="table table-bordered text-center" id="gsm">
-                            <thead class="thead-default">
-                            <tr>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-danger" id="error2">
-                <span class="glyphicon glyphicon-info-sign"></span>
-                <strong>No hay información disponible para esta fecha</strong>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <!-- Default panel contents -->
-        <div class="panel-heading"><h4>SIMS</h4></div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-xs-6 col-md-4 col-md-offset-4">
-                    <div id="simsChart"></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 col-md-offset-3">
-                        <div class="panel panel-default" id="tabla3">
-                            <table class="table table-bordered text-center" id="sims">
-                                <thead class="thead-default">
-                                <tr>
-                                </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-danger" id="error3">
-                <span class="glyphicon glyphicon-info-sign"></span>
-                <strong>No hay información disponible para esta fecha</strong>
-            </div>
-        </div>
-    </div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading"><h4>Dispositivos</h4></div>
+		<div class="panel-body">
+			<div class="row">
+				<div>
+					<div class="col-xs-6 col-md-4 col-md-offset-4">
+						<div id="devicesChart"></div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="panel panel-default" id="tabla1">
+						<table class="table table-bordered text-center" id="devices">
+							<thead class="thead-default">
+							<tr>
+							</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="alert alert-danger" id="error1">
+				<span class="glyphicon glyphicon-info-sign"></span>
+				<strong>No hay información disponible para esta fecha</strong>
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading"><h4>Mediciones</h4></div>
+		<div class="panel-body">
+			<div class="col-xs-6 col-md-10 col-md-offset-1">
+				<div id="gsmChart"></div>
+			</div>
+			-
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="panel panel-default" id="tabla2">
+						<table class="table table-bordered text-center" id="gsm">
+							<thead class="thead-default">
+							<tr>
+							</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="alert alert-danger" id="error2">
+				<span class="glyphicon glyphicon-info-sign"></span>
+				<strong>No hay información disponible para esta fecha</strong>
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading"><h4>SIMS</h4></div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-xs-6 col-md-4 col-md-offset-4">
+					<div id="simsChart"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 col-md-offset-3">
+						<div class="panel panel-default" id="tabla3">
+							<table class="table table-bordered text-center" id="sims">
+								<thead class="thead-default">
+								<tr>
+								</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="alert alert-danger" id="error3">
+				<span class="glyphicon glyphicon-info-sign"></span>
+				<strong>No hay información disponible para esta fecha</strong>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="container" id="signal" style="display: none;">
-    <div class="panel panel-default">
-        <!-- Default panel contents -->
-        <div class="panel-heading">
-            <h4>Intensidad de señal por carrier</h4>
-            <div id="medHeading">
-                <!-- <h4> (Mediana) </h4> -->
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-xs-6 col-md-10 col-md-offset-1">
-                    <div class="form-group" id="signalSelect">
-                        <label for="sel1" >Seleccione gráfico</label>
-                        <select class="form-control" id="sel1">
-                            <option value="dBm" selected>dBm</option>
-                            <option value="pW">pW</option>
-                        </select>
-                    </div>
-                    <div id="signalChart"></div>
-                    <div id="signalLegend">
-                        <div id="legend"></div>
-                        <h5>Referencia: <a href="url">http://www.commdevices.com/files/information/cell_signal_101-1431464546.pdf</a></h5>
-                    </div>
-                </div>
-            </div>
-            <div id="loading1"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
-            <div class="alert alert-danger" id="error4">
-                <span class="glyphicon glyphicon-info-sign"></span>
-                <strong>No hay información disponible para esta fecha</strong>
-            </div>
-        </div>
-    </div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">
+			<h4>Intensidad de señal por carrier</h4>
+			<div id="medHeading">
+				<!-- <h4> (Mediana) </h4> -->
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-xs-6 col-md-10 col-md-offset-1">
+					<div class="form-group" id="signalSelect">
+						<label for="sel1">Seleccione gráfico</label>
+						<select class="form-control" id="sel1">
+							<option value="dBm" selected>dBm</option>
+							<option value="pW">pW</option>
+						</select>
+					</div>
+					<div id="signalChart"></div>
+					<div id="signalLegend">
+						<div id="legend"></div>
+						<h5>Referencia: <a href="url">http://www.commdevices.com/files/information/cell_signal_101-1431464546.pdf</a>
+						</h5>
+					</div>
+				</div>
+			</div>
+			<div id="loading1"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
+			<div class="alert alert-danger" id="error4">
+				<span class="glyphicon glyphicon-info-sign"></span>
+				<strong>No hay información disponible para esta fecha</strong>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="container" id="network" style="display: none;">
-    <div class="panel panel-default">
-        <!-- Default panel contents -->
-        <div class="panel-heading">
-            <h4>Eventos registrados por carrier</h4>
-            <div id="logHeading">
-                <h4> (Escala logarítmica) </h4>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-xs-6 col-md-10 col-md-offset-1">
-                    <div id="networkChart"></div>
-                </div>
-            </div>
-            <div id="loading2"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
-            <div class="alert alert-danger" id="error5">
-                <span class="glyphicon glyphicon-info-sign"></span>
-                <strong>No hay información disponible para esta fecha</strong>
-            </div>
-        </div>
-    </div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">
+			<h4>Eventos registrados por carrier</h4>
+			<div id="logHeading">
+				<h4> (Escala logarítmica) </h4>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-xs-6 col-md-10 col-md-offset-1">
+					<div id="networkChart"></div>
+				</div>
+			</div>
+			<div id="loading2"><h4><i class="fa fa-spinner fa-spin"></i> Loading...</h4></div>
+			<div class="alert alert-danger" id="error5">
+				<span class="glyphicon glyphicon-info-sign"></span>
+				<strong>No hay información disponible para esta fecha</strong>
+			</div>
+		</div>
+	</div>
 </div>
 
 </body>
@@ -197,31 +199,37 @@
 
     var svg = d3.selectAll('#legend').append('svg')
         .attr("width", "100%")
-        .attr("height",$("#signalChart").width()/20);
+        .attr("height", $("#signalChart").width() / 20);
     var legend = svg.selectAll('.legend')
         .data(dataLegend)
         .enter()
         .append('g')
         .attr('class', 'legend')
-        .attr('transform', function(d, i) {
+        .attr('transform', function (d, i) {
             var height = legendRectSize + legendSpacing;
-            var offset =  height * dataLegend.length / 2;
+            var offset = height * dataLegend.length / 2;
             var vert = 2 * legendRectSize;
-            var horz = i * 2 * height - offset + $("#signalLegend").width()/2;
+            var horz = i * 2 * height - offset + $("#signalLegend").width() / 2;
             return 'translate(' + horz + ',' + vert + ')';
         });
     legend.append('rect')
         .attr('width', legendRectSize)
         .attr('height', legendRectSize)
-        .style('fill', function (d, i) { return color[i]; })
+        .style('fill', function (d, i) {
+            return color[i];
+        })
         .style('fill-opacity', 0.26)
-        .style('stroke', function (d, i) { return color[i]; })
+        .style('stroke', function (d, i) {
+            return color[i];
+        })
         .style('stroke-opacity', 0.5);
 
     legend.append('text')
-        .attr('x', legendRectSize + legendSpacing/4)
+        .attr('x', legendRectSize + legendSpacing / 4)
         .attr('y', legendRectSize - 1)
-        .text(function(d) { return d; })
+        .text(function (d) {
+            return d;
+        })
         .attr('font-size', '14px');
 
     $("#signal").hide();
@@ -247,7 +255,9 @@
     function tooltip_contents(d, defaultTitleFormat, defaultValueFormat, color) {
         var $$ = this, config = $$.config, CLASS = $$.CLASS,
             titleFormat = config.tooltip_format_title || defaultTitleFormat,
-            nameFormat = config.tooltip_format_name || function (name) { return name; },
+            nameFormat = config.tooltip_format_name || function (name) {
+                    return name;
+                },
             valueFormat = config.tooltip_format_value || defaultValueFormat,
             text, i, title, value, name, bgcolor;
         var format;
@@ -255,12 +265,16 @@
         console.log($$.data.targets);
 
         for (i = 0; i < d.length; i++) {
-            if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
+            if (!(d[i] && (d[i].value || d[i].value === 0))) {
+                continue;
+            }
 
             // ADD
-            if (d[i].name === 'data2') { continue; }
+            if (d[i].name === 'data2') {
+                continue;
+            }
 
-            if (! text) {
+            if (!text) {
                 text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
             }
 
@@ -287,6 +301,360 @@
             useCurrent: false
         });
     });
+
+    function dataThenCreate(month, year) {
+        $('#medHeading').show();
+        $('#signalChart').html("");
+        var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
+            year: year,
+            month: month
+        }, function () {
+        })
+            .done(function (data) {
+                //$("#signal").show();
+                if (!(Object.keys(data).length === 0)) {
+                    console.log(data)
+
+                    //                         $('#loading1').hide();
+                    $('#signalSelect').show();
+                    $('#signalLegend').show();
+//                        $('#medHeading').show();
+//                        $('#signalSelect').show();
+
+                    if ($("#sel1").val() == 'dBm') {
+                        createChart1(data);
+                    } else {
+                        createChart2(data);
+                    }
+
+                    d3.selectAll('.c3-text')//.style('stroke', 'black')
+                    //.style('stroke-width', '0.2')
+                        .style('fill', 'black')
+                        .style('font-size', '11px');
+                    d3.selectAll('.c3-axis-x text').style('font-size', '12px');
+                    d3.selectAll('.c3-axis-y-label').style('font-size', '12px')
+                        .attr('dy', '3.2em');
+                    d3.selectAll('.c3-region-0').style('fill', 'red');
+                    d3.selectAll('.c3-region-1').style('fill', '#F2AC13');
+                    d3.selectAll('.c3-region-2').style('fill', 'green');
+                    d3.selectAll('.c3-grid line').style('stroke', '#545c6e');
+
+                    $('#loading1').hide();
+                    //$('#signalChart').show();
+
+                } else {
+                    $('#loading1').hide();
+                    $('#signalLegend').hide();
+                    $("#error4").show();
+                }
+            })
+    }
+
+    function createChart1(data) {
+        //var xaxis = $.map(data, function(value, key) { return key; });
+        //var yaxis = $.map(data, function(value, key) { return 110 - Math.abs(value);});
+        var yaxis = [];
+        var xmediana = [];
+        //var xmin = [];
+        //var xmax= [];
+        var xrange2 = [];
+        var xrange = [];
+
+        $.each(data, function (k, v) {
+            yaxis.push(k)
+            xmediana.push(110 - Math.abs(v['mediana']))
+            xrange.push([Math.abs(110 - Math.abs(v['min'])), Math.abs(110 - Math.abs(v['max']))])
+            xrange2.push([v['min'], v['max']])
+            //xmin.push(110 - Math.abs(v['min']))
+            //xmax.push(110 - Math.abs(v['max']))
+        })
+
+        console.log(xrange2);
+        console.log(xrange);
+        chart4 = c3.generate({
+            bindto: '#signalChart',
+            data: {
+                x: 'x',
+                columns: [
+                    ['x'].concat(yaxis),
+                    ['Mediana'].concat(xmediana),
+                ],
+                type: 'bar',
+			    /*groups: [
+			     ['mínimo', 'máximo', 'mediana']
+			     ],*/
+                labels: false, /*{
+			     format: function (d) {
+			     //return numberFormat(d3.round(30 + 10 * Math.log10(d), 2));
+			     d = 110 - Math.abs(d);
+			     return -numberFormat(d.toPrecision(2));
+			     }
+			     },*/
+            },
+            regions: [
+                {axis: 'y', start: -82.5, end: 10, opacity: 0.2},//−192.5  to -100 dBm
+                {axis: 'y', start: 10, end: 25, opacity: 0.18},//-100 to -85 dBm
+                {axis: 'y', start: 25, end: 80, opacity: 0.18}//-85 to -30 dBm
+            ],
+            grid: {
+                y: {
+                    lines: [
+                        {value: 10}, //-110 dBm
+                        {value: 25} //-85 dBm
+                    ]
+                }
+            },
+            tooltip: {
+                format: {
+                    name: function (name, ratio, id, index) {
+                        return name;
+                    },
+                    value: function (d) {
+                        d = 110 - Math.abs(d);
+                        return -numberFormat(d.toPrecision(2)) + '[dBm]';
+					    /*return numberFormat(d3.round(30 + 10 * Math.log10(d), 2)) + ' [dBm]';*/
+                    }
+                }
+            },
+            legend: {
+                show: false,
+            },
+            padding: {
+                top: 20
+            },
+            point: {
+                r: 5
+            },
+            axis: {
+                rotated: true,
+                x: {
+                    type: 'category',
+                },
+                y: {
+                    //min: -110, //-110
+                    max: 80, //-70
+                    padding: {top: 0, bottom: 0},
+                    label: {
+                        text: 'Intensidad de señal [dBm]',
+                        position: 'outer-center'
+                    },
+                    tick: {
+                        fit: true,
+                        count: 8,
+                        values: ['0', '10', '20', '30', '40', '50', '60', '70', '80'],
+                        //values: ['1e-14', '1e-13', '3.1622776602e-13', '1e-12', '3.1622776602e-12', '1e-11', '3.1622776602e-11', '1e-10'],
+                        format: function (d) {
+                            //console.log(d3.round(30 + 10 * Math.log10(d), 2));
+						    /*if (d != 0) {
+						     return numberFormat(d3.round(30 + 10 * Math.log10(d), 2));}*/
+                            d = 110 - Math.abs(d);
+                            return -numberFormat(d.toPrecision(2));
+                        }
+                    }
+                },
+            },
+            color: {
+                pattern: ['#2c74b9']
+            },
+            onresized: function () {
+                updateErrorBars();
+            }
+        });
+
+        //var errors = [[-105,-60 ], [-100, -75], [-85,-64], [-80, -73], [-90, -50], [-93,-60]];
+
+        var errorBars = d3.select('#signalChart svg .c3-chart').append('g');
+
+        errorBars.selectAll('circle')
+            .data(xrange)
+            .enter().append('circle')
+            .attr('class', function (d, i) {
+                return 'error-circle-' + i;
+            })
+            .attr('r', 4);
+
+        errorBars.selectAll('path')
+            .data(xrange)
+            .enter().append('path')
+            .attr('class', function (d, i) {
+                return 'error-line-' + i;
+            });
+
+        function updateErrorBars() {
+
+            var width = d3.select('#signalChart').select('.c3-chart').node().getBoundingClientRect().width;
+            var coef = (width - 5) / 80;
+
+            console.log(width)
+
+
+            d3.select('#signalChart').selectAll('.c3-bar').each(function (d, i) {
+                var segList = this.pathSegList,
+                    yPos = (segList.getItem(2).y + segList.getItem(0).y) / 2,
+                    xPos = (segList.getItem(2).x );
+
+                errorBars.select('.error-circle-' + i)
+                    .attr('cx', xPos)
+                    .attr('cy', yPos);
+
+                errorBars.select('.error-line-' + i)
+                    .attr('d', function (d) {
+                        d = $.map(d, function (n) {
+                            return n * coef;
+                        })
+                        return 'M' + (xPos + d[1] / 2) + ',' + yPos + ' ' +
+                            'L' + (xPos - d[0] / 2) + ',' + yPos + ' ' +
+                            'M' + (xPos + d[1] / 2) + ',' + (yPos - 5) + ' ' +
+                            'L' + (xPos + d[1] / 2) + ',' + (yPos + 5) + ' ' +
+                            'M' + (xPos - d[0] / 2) + ',' + (yPos - 5) + ' ' +
+                            'L' + (xPos - d[0] / 2) + ',' + (yPos + 5) + ' ' +
+                            'z';
+                    });
+
+            });
+        };
+
+        setTimeout(updateErrorBars, 500);
+    }
+
+    function createChart2(data) {
+        //var xaxis = $.map(data, function(value, key) { return key; });
+        //var yaxis = $.map(data, function(value, key) { return Math.pow(10,((value - 30)/10));});
+        var yaxis = [];
+        var xmediana = [];
+        var xmin = [];
+        var xmax = [];
+
+        $.each(data, function (k, v) {
+            yaxis.push(k)
+            xmediana.push(Math.pow(10, ((v['mediana'] - 30) / 10)))
+            xmin.push(Math.pow(10, ((v['min'] - 30) / 10)))
+            xmax.push(Math.pow(10, ((v['max'] - 30) / 10)))
+        })
+        chart5 = c3.generate({
+            bindto: '#signalChart',
+            data: {
+                x: 'x',
+                columns: [
+                    ['x'].concat(yaxis),
+                    ['Mediana'].concat(xmediana),
+                ],
+                type: 'bar',
+                labels: false, /*{
+			     format: function (d) {
+			     return numberFormat((d*10e11).toPrecision(2));
+			     }
+			     },*/
+            },
+            regions: [
+                {axis: 'y', start: 5.6234132519e-23, end: 1e-13, opacity: 0.2},//−192.5  to -100 dbm
+                {axis: 'y', start: 1e-13, end: 3.1622776602e-12, opacity: 0.18},//-100 to -85 dbm
+                {axis: 'y', start: 3.1622776602e-12, end: 0.00079432823472, opacity: 0.18}//-85 to -1 dbm
+            ],
+            grid: {
+                y: {
+                    lines: [
+                        {value: 1e-13}, //-100 dBm
+                        {value: 3.1622776602e-12} //-85 dBm
+                    ]
+                }
+            },
+            tooltip: {
+                format: {
+                    name: function (name, ratio, id, index) {
+                        return name;
+                    },
+                    value: function (d) {
+                        return numberFormat((d * 10e11).toPrecision(2)) + '[pW]';
+                    }
+                }
+            },
+            legend: {
+                show: false,
+            },
+            padding: {
+                top: 20
+            },
+            point: {
+                r: 5
+            },
+            axis: {
+                rotated: true,
+                x: {
+                    type: 'category',
+                },
+                y: {
+                    label: {
+                        text: 'Intensidad de señal [pW]',
+                        position: 'outer-center'
+                    },
+                    tick: {
+                        fit: true,
+                        count: 8,
+                        format: function (d) {
+                            return numberFormat((d * 10e11).toPrecision(2));
+                        }
+                    }
+                },
+            },
+            onresized: function () {
+                updateErrorBars();
+            }
+        });
+
+        var errors = [[-105, -60], [-100, -75], [-85, -64], [-80, -73], [-90, -50], [-93, -60]];
+
+        var errorBars = d3.select('#signalChart svg .c3-chart').append('g');
+
+        errorBars.selectAll('circle')
+            .data(errors)
+            .enter().append('circle')
+            .attr('class', function (d, i) {
+                return 'error-circle-' + i;
+            })
+            .attr('r', 5);
+
+        errorBars.selectAll('path')
+            .data(errors)
+            .enter().append('path')
+            .attr('class', function (d, i) {
+                return 'error-line-' + i;
+            });
+
+        function updateErrorBars() {
+
+            var width = d3.select('#signalChart').select('.c3-chart').node().getBoundingClientRect().width;
+            var coef = (width) / 80;
+
+            console.log(width)
+
+
+            d3.select('#signalChart').selectAll('.c3-bar').each(function (d, i) {
+                var segList = this.pathSegList,
+                    yPos = (segList.getItem(2).y + segList.getItem(0).y) / 2,
+                    xPos = (segList.getItem(2).x );
+
+                console.log(segList);
+                errorBars.select('.error-circle-' + i)
+                    .attr('cx', xPos)
+                    .attr('cy', yPos);
+
+                errorBars.select('.error-line-' + i)
+                    .attr('d', function (d) {
+                        return 'M' + (xPos + d[1] / 2) + ',' + yPos + ' ' +
+                            'L' + (xPos - d[0] / 2) + ',' + yPos + ' ' +
+                            'M' + (xPos + d[1] / 2) + ',' + (yPos - 5) + ' ' +
+                            'L' + (xPos + d[1] / 2) + ',' + (yPos + 5) + ' ' +
+                            'M' + (xPos - d[0] / 2) + ',' + (yPos - 5) + ' ' +
+                            'L' + (xPos - d[0] / 2) + ',' + (yPos + 5) + ' ' +
+                            'z';
+                    });
+
+            });
+        };
+
+        setTimeout(updateErrorBars, 500);
+    }
 
     //datetimepicker event
     $("#datetimepicker1").on("dp.change", function (e) {
@@ -325,7 +693,7 @@
 
                 //populate devices
                 add = "";
-                add += "<tr><td class='active'>Total: &emsp;"+ numberFormat(data.total_devices) + "</td></tr>"
+                add += "<tr><td class='active'>Total: &emsp;" + numberFormat(data.total_devices) + "</td></tr>"
                 $("#devices thead").html(add);
 
                 if (!(Object.keys(data.total_device_carrier).length === 0)) {
@@ -356,7 +724,8 @@
                         },
                         legend: {
                             item: {
-                                onclick: function() {}
+                                onclick: function () {
+                                }
                             }
                         },
                         donut: {
@@ -376,7 +745,7 @@
                 //populate gsm
 
                 add = "";
-                add += "<tr><td class='active'>Total: &emsp;"+ numberFormat(data.total_gsm) + "</td></tr>"
+                add += "<tr><td class='active'>Total: &emsp;" + numberFormat(data.total_gsm) + "</td></tr>"
                 $("#gsm thead").html(add);
 
                 if (!(Object.keys(data.total_gsm_carrier).length === 0)) {
@@ -384,8 +753,12 @@
                     $("#tabla2").show();
 
 
-                    var xaxis = $.map(data.total_gsm_carrier, function(value, key) { return key; });
-                    var yaxis = $.map(data.total_gsm_carrier, function(value, key) { return value; });
+                    var xaxis = $.map(data.total_gsm_carrier, function (value, key) {
+                        return key;
+                    });
+                    var yaxis = $.map(data.total_gsm_carrier, function (value, key) {
+                        return value;
+                    });
 
                     var chart2 = c3.generate({
                         bindto: '#gsmChart',
@@ -405,8 +778,12 @@
                         },
                         tooltip: {
                             format: {
-                                name: function (name, ratio, id, index) { return name; },
-                                value: function (value, ratio, id) {return numberFormat(value);}
+                                name: function (name, ratio, id, index) {
+                                    return name;
+                                },
+                                value: function (value, ratio, id) {
+                                    return numberFormat(value);
+                                }
                             }
                         },
                         legend: {
@@ -438,7 +815,7 @@
 
                 //populate sims
                 add = "";
-                add += "<tr><td class='active'>Total: &emsp;"+ numberFormat(data.total_sims) + "</td></tr>"
+                add += "<tr><td class='active'>Total: &emsp;" + numberFormat(data.total_sims) + "</td></tr>"
                 $("#sims thead").html(add);
 
                 if (!(Object.keys(data.total_sims_carrier).length === 0)) {
@@ -477,7 +854,8 @@
                         },
                         legend: {
                             item: {
-                                onclick: function() {}
+                                onclick: function () {
+                                }
                             }
                         },
                         tooltip: {
@@ -502,356 +880,8 @@
         //var chart4;
         //var chart5;
         $("#signal").show();
-        dataThenCreate();
+        dataThenCreate(month, year);
         $('#signalChart').show();
-
-
-        function dataThenCreate() {
-            $('#medHeading').show();
-            $('#signalChart').html("");
-            console.log('holi');
-            var date = $("#datetimepicker1").data("DateTimePicker").date().toDate();
-            var year = date.getFullYear();
-            var month = date.getMonth() + 1;
-            var url = $SCRIPT_ROOT + "/getReport"
-            var jqxhr = $.getJSON($SCRIPT_ROOT + "/getGsmSignal", {
-                year: year,
-                month: month
-            }, function () {
-            })
-                .done(function (data) {
-                    //$("#signal").show();
-                    if (!(Object.keys(data).length === 0)) {
-                        console.log(data)
-
-                        //                         $('#loading1').hide();
-                        $('#signalSelect').show();
-                        $('#signalLegend').show();
-//                        $('#medHeading').show();
-//                        $('#signalSelect').show();
-
-                        if ($("#sel1").val() == 'dBm') {
-                            createChart1(data);
-                        } else {
-                            createChart2(data);
-                        }
-
-                        d3.selectAll('.c3-text')//.style('stroke', 'black')
-                        //.style('stroke-width', '0.2')
-                            .style('fill', 'black')
-                            .style('font-size', '11px');
-                        d3.selectAll('.c3-axis-x text').style('font-size', '12px');
-                        d3.selectAll('.c3-axis-y-label').style('font-size', '12px')
-                            .attr('dy', '3.2em');
-                        d3.selectAll('.c3-region-0').style('fill', 'red');
-                        d3.selectAll('.c3-region-1').style('fill', '#F2AC13');
-                        d3.selectAll('.c3-region-2').style('fill', 'green');
-                        d3.selectAll('.c3-grid line').style('stroke', '#545c6e');
-
-                        $('#loading1').hide();
-                        //$('#signalChart').show();
-
-                    } else {
-                        $('#loading1').hide();
-                        $('#signalLegend').hide();
-                        $("#error4").show();
-                    }
-                })
-        }
-
-        function createChart1(data) {
-            //var xaxis = $.map(data, function(value, key) { return key; });
-            //var yaxis = $.map(data, function(value, key) { return 110 - Math.abs(value);});
-            var yaxis = [];
-            var xmediana = [];
-            //var xmin = [];
-            //var xmax= [];
-            var xrange2 = [];
-            var xrange = [];
-
-            $.each(data, function(k,v) {
-                yaxis.push(k)
-                xmediana.push(110 - Math.abs(v['mediana']))
-                xrange.push([Math.abs(110 - Math.abs(v['min'])), Math.abs(110 - Math.abs(v['max']))])
-                xrange2.push([v['min'], v['max']])
-                //xmin.push(110 - Math.abs(v['min']))
-                //xmax.push(110 - Math.abs(v['max']))
-            })
-
-            console.log(xrange2);
-            console.log(xrange);
-            chart4 = c3.generate({
-                bindto: '#signalChart',
-                data: {
-                    x: 'x',
-                    columns: [
-                        ['x'].concat(yaxis),
-                        ['Mediana'].concat(xmediana),
-                    ],
-                    type: 'bar',
-                    /*groups: [
-                     ['mínimo', 'máximo', 'mediana']
-                     ],*/
-                    labels: false/*{
-                     format: function (d) {
-                     //return numberFormat(d3.round(30 + 10 * Math.log10(d), 2));
-                     d = 110 - Math.abs(d);
-                     return -numberFormat(d.toPrecision(2));
-                     }
-                     },*/
-                },
-                regions: [
-                    {axis: 'y', start: -82.5, end: 10, opacity: 0.2},//−192.5  to -100 dBm
-                    {axis: 'y', start: 10, end: 25, opacity: 0.18},//-100 to -85 dBm
-                    {axis: 'y', start: 25, end: 80, opacity: 0.18}//-85 to -30 dBm
-                ],
-                grid: {
-                    y: {
-                        lines: [
-                            {value: 10}, //-110 dBm
-                            {value: 25} //-85 dBm
-                        ]
-                    }
-                },
-                tooltip: {
-                    format: {
-                        name: function (name, ratio, id, index) { return name; },
-                        value: function (d) {
-                            d = 110 - Math.abs(d);
-                            return -numberFormat(d.toPrecision(2)) + '[dBm]';
-                            /*return numberFormat(d3.round(30 + 10 * Math.log10(d), 2)) + ' [dBm]';*/
-                        }
-                    }
-                },
-                legend: {
-                    show: false,
-                },
-                padding: {
-                    top: 20
-                },
-                point: {
-                    r: 5
-                },
-                axis: {
-                    rotated: true,
-                    x: {
-                        type: 'category',
-                    },
-                    y: {
-                        //min: -110, //-110
-                        max: 80, //-70
-                        padding: {top: 0, bottom: 0},
-                        label: {
-                            text: 'Intensidad de señal [dBm]',
-                            position: 'outer-center'
-                        },
-                        tick: {
-                            fit: true,
-                            count: 8,
-                            values: ['0', '10', '20', '30', '40', '50', '60', '70', '80'],
-                            //values: ['1e-14', '1e-13', '3.1622776602e-13', '1e-12', '3.1622776602e-12', '1e-11', '3.1622776602e-11', '1e-10'],
-                            format: function (d) {
-                                //console.log(d3.round(30 + 10 * Math.log10(d), 2));
-                                /*if (d != 0) {
-                                 return numberFormat(d3.round(30 + 10 * Math.log10(d), 2));}*/
-                                d = 110 - Math.abs(d);
-                                return -numberFormat(d.toPrecision(2));
-                            }
-                        }
-                    }
-                },
-                color: {
-                    pattern: ['#2c74b9']
-                },
-                onresized: function () {
-                    updateErrorBars();
-                }
-            });
-
-            //var errors = [[-105,-60 ], [-100, -75], [-85,-64], [-80, -73], [-90, -50], [-93,-60]];
-
-            var errorBars = d3.select('#signalChart svg .c3-chart').append('g');
-
-            errorBars.selectAll('circle')
-                .data(xrange)
-                .enter().append('circle')
-                .attr('class', function (d, i) { return 'error-circle-' + i; })
-                .attr('r', 4);
-
-            errorBars.selectAll('path')
-                .data(xrange)
-                .enter().append('path')
-                .attr('class', function (d, i) { return 'error-line-' + i; });
-
-            function updateErrorBars() {
-
-                var width = d3.select('#signalChart').select('.c3-chart').node().getBoundingClientRect().width;
-                var coef = (width - 5)/80;
-
-                console.log(width)
-
-
-                d3.select('#signalChart').selectAll('.c3-bar').each(function (d, i) {
-                    var segList = this.pathSegList,
-                        yPos = (segList.getItem(2).y + segList.getItem(0).y)/2,
-                        xPos = (segList.getItem(2).x );
-
-                    errorBars.select('.error-circle-' + i)
-                        .attr('cx', xPos)
-                        .attr('cy', yPos);
-
-                    errorBars.select('.error-line-' + i)
-                        .attr('d', function (d) {
-                            d = $.map(d, function (n) {
-                                return n*coef;
-                            })
-                            return 'M' + (xPos + d[1]/2) + ',' + yPos  + ' ' +
-                                'L' + (xPos - d[0]/2) + ',' + yPos + ' ' +
-                                'M' + (xPos + d[1]/2) + ',' + (yPos - 5) + ' ' +
-                                'L' + (xPos + d[1]/2) + ',' + (yPos + 5) + ' ' +
-                                'M' + (xPos - d[0]/2) + ',' + (yPos - 5) + ' ' +
-                                'L' + (xPos - d[0]/2) + ',' + (yPos + 5) + ' ' +
-                                'z';
-                        });
-
-                });
-            };
-
-            setTimeout(updateErrorBars, 500);
-        }
-
-        function createChart2(data) {
-            //var xaxis = $.map(data, function(value, key) { return key; });
-            //var yaxis = $.map(data, function(value, key) { return Math.pow(10,((value - 30)/10));});
-            var yaxis = [];
-            var xmediana = [];
-            var xmin = [];
-            var xmax= [];
-
-            $.each(data, function(k,v) {
-                yaxis.push(k)
-                xmediana.push(Math.pow(10,((v['mediana']- 30)/10)))
-                xmin.push(Math.pow(10,((v['min']- 30)/10)))
-                xmax.push(Math.pow(10,((v['max']- 30)/10)))
-            })
-            chart5 = c3.generate({
-                bindto: '#signalChart',
-                data: {
-                    x: 'x',
-                    columns: [
-                        ['x'].concat(yaxis),
-                        ['Mediana'].concat(xmediana),
-                    ],
-                    type: 'bar',
-                    labels: false,/*{
-                     format: function (d) {
-                     return numberFormat((d*10e11).toPrecision(2));
-                     }
-                     },*/
-                },
-                regions: [
-                    {axis: 'y', start: 5.6234132519e-23, end: 1e-13, opacity: 0.2},//−192.5  to -100 dbm
-                    {axis: 'y', start: 1e-13, end: 3.1622776602e-12, opacity: 0.18},//-100 to -85 dbm
-                    {axis: 'y', start: 3.1622776602e-12, end: 0.00079432823472, opacity: 0.18}//-85 to -1 dbm
-                ],
-                grid: {
-                    y: {
-                        lines: [
-                            {value: 1e-13}, //-100 dBm
-                            {value: 3.1622776602e-12} //-85 dBm
-                        ]
-                    }
-                },
-                tooltip: {
-                    format: {
-                        name: function (name, ratio, id, index) { return name; },
-                        value: function (d) {
-                            return numberFormat((d*10e11).toPrecision(2)) + '[pW]';
-                        }
-                    }
-                },
-                legend: {
-                    show: false,
-                },
-                padding: {
-                    top: 20
-                },
-                point: {
-                    r: 5
-                },
-                axis: {
-                    rotated: true,
-                    x: {
-                        type: 'category',
-                    },
-                    y: {
-                        label: {
-                            text: 'Intensidad de señal [pW]',
-                            position: 'outer-center'
-                        },
-                        tick: {
-                            fit: true,
-                            count: 8,
-                            format: function (d) {
-                                return numberFormat((d*10e11).toPrecision(2));
-                            }
-                        }
-                    },
-                },
-                onresized: function () {
-                    updateErrorBars();
-                }
-            });
-
-            var errors = [[-105,-60 ], [-100, -75], [-85,-64], [-80, -73], [-90, -50], [-93,-60]];
-
-            var errorBars = d3.select('#signalChart svg .c3-chart').append('g');
-
-            errorBars.selectAll('circle')
-                .data(errors)
-                .enter().append('circle')
-                .attr('class', function (d, i) { return 'error-circle-' + i; })
-                .attr('r', 5);
-
-            errorBars.selectAll('path')
-                .data(errors)
-                .enter().append('path')
-                .attr('class', function (d, i) { return 'error-line-' + i; });
-
-            function updateErrorBars() {
-
-                var width = d3.select('#signalChart').select('.c3-chart').node().getBoundingClientRect().width;
-                var coef = (width)/80;
-
-                console.log(width)
-
-
-                d3.select('#signalChart').selectAll('.c3-bar').each(function (d, i) {
-                    var segList = this.pathSegList,
-                        yPos = (segList.getItem(2).y + segList.getItem(0).y)/2,
-                        xPos = (segList.getItem(2).x );
-
-                    console.log(segList);
-                    errorBars.select('.error-circle-' + i)
-                        .attr('cx', xPos)
-                        .attr('cy', yPos);
-
-                    errorBars.select('.error-line-' + i)
-                        .attr('d', function (d) {
-                            return 'M' + (xPos + d[1]/2) + ',' + yPos  + ' ' +
-                                'L' + (xPos - d[0]/2) + ',' + yPos + ' ' +
-                                'M' + (xPos + d[1]/2) + ',' + (yPos - 5) + ' ' +
-                                'L' + (xPos + d[1]/2) + ',' + (yPos + 5) + ' ' +
-                                'M' + (xPos - d[0]/2) + ',' + (yPos - 5) + ' ' +
-                                'L' + (xPos - d[0]/2) + ',' + (yPos + 5) + ' ' +
-                                'z';
-                        });
-
-                });
-            };
-
-            setTimeout(updateErrorBars, 500);
-        }
 
         // New information for ammount of signals (2G, 3G, 4G, unknown)
         var jqxhr = $.getJSON($SCRIPT_ROOT + "/getNetwork", {
@@ -872,12 +902,12 @@
                     var x4G = [];
                     var xOtras = [];
 
-                    $.each(data, function(k,v) {
+                    $.each(data, function (k, v) {
                         yaxis.push(k)
-                        x2G.push(v['2G'] == 0? 0 : Math.log(v['2G']) / Math.LN10)
-                        x3G.push(v['3G'] == 0? 0 : Math.log(v['3G']) / Math.LN10)
-                        x4G.push(v['4G'] == 0? 0 : Math.log(v['4G']) / Math.LN10)
-                        xOtras.push(v['Otras']  == 0? 0 : Math.log(v['Otras']) / Math.LN10)
+                        x2G.push(v['2G'] == 0 ? 0 : Math.log(v['2G']) / Math.LN10)
+                        x3G.push(v['3G'] == 0 ? 0 : Math.log(v['3G']) / Math.LN10)
+                        x4G.push(v['4G'] == 0 ? 0 : Math.log(v['4G']) / Math.LN10)
+                        xOtras.push(v['Otras'] == 0 ? 0 : Math.log(v['Otras']) / Math.LN10)
                     })
 
 
@@ -900,19 +930,22 @@
                         },
                         tooltip: {
                             format: {
-                                name: function (name, ratio, id, index) { return name; },
+                                name: function (name, ratio, id, index) {
+                                    return name;
+                                },
                                 value: function (d) {
                                     if (d == 0) {
                                         return 0;
                                     }
-                                    return numberFormat(Math.pow(10,d).toFixed(0));
+                                    return numberFormat(Math.pow(10, d).toFixed(0));
                                 }
                             }
                         },
                         legend: {
                             //position: 'right',
                             item: {
-                                onclick: function() {}
+                                onclick: function () {
+                                }
                             }
                         },
                         size: {
@@ -924,15 +957,17 @@
                         axis: {
                             x: {
                                 type: 'categorized',
-                            }, rotated:true,
-                            y : {
+                            }, rotated: true,
+                            y: {
                                 min: 1,
                                 fit: true,
                                 padding: {top: 0, bottom: 0},
                                 tick: {
-                                    format:function (d) {
-                                        var yValue = Math.pow(10,d);
-                                        if(yValue%10 == 0) {return numberFormat(yValue);}
+                                    format: function (d) {
+                                        var yValue = Math.pow(10, d);
+                                        if (yValue % 10 == 0) {
+                                            return numberFormat(yValue);
+                                        }
                                     }
                                 }
                             }
@@ -951,9 +986,15 @@
             })
     });
 
-    $("#sel1").on("change", function (e) {
-            dataThenCreate();
-            $('#signalChart').show();
+    $(document).ready(function () {
+        $("#sel1").on("change", function (e) {
+            var date = $("#datetimepicker1").data("DateTimePicker").date().toDate();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            dataThenCreate(month, year);
+            //$('#signalChart').show();
+        });
     });
+
 </script>
 </html>
