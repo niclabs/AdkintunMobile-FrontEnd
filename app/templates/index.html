@@ -8,25 +8,25 @@
 	<title>Adkintun - Mapa </title>
 
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
+	<link rel="stylesheet" href="static/css/c3.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="http://d3js.org/topojson.v1.min.js"></script>
-	<script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/markerclusterer.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/networkVisualization.js') }}"></script>
-	{#    <script src="{{ url_for('static', filename='js/map.js') }}"></script>#}
+	<script src="static/js/d3.v3.js"></script>
+	<script src="static/js/c3.min.js"></script>
+	<script src="static/js/markerclusterer.js"></script>
+	<script src="static/js/networkVisualization.js"></script>
+	{#    <script src="static/js/map.js"></script>#}
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
 	<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
-	<script src="{{ url_for('static', filename='js/mapLeaflet.js') }}"></script>
+	<script src="static/js/mapLeaflet.js"></script>
 
-	<script src="{{ url_for('static', filename='js/leaflet.markercluster.js') }}"></script>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/MarkerCluster.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/MarkerCluster.Default.css') }}">
-	<script src="{{ url_for('static', filename='js/spin.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/leaflet.spin.min.js') }}"></script>
+	<script src="static/js/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="static/css/MarkerCluster.css">
+	<link rel="stylesheet" href="static/css/MarkerCluster.Default.css">
+	<script src="static/js/spin.min.js"></script>
+	<script src="static/js/leaflet.spin.min.js"></script>
 
 
 	<style>
@@ -68,21 +68,26 @@
 
 		<div class="container col-xs-12 col-sm-6 col-lg-4" id="infoAntenna">
 
-			<div class="selector">
+			<div id="operatorSelector" class="selector">
 
 				<div class="bg-info text-center">
 					<strong>Atención!</strong> Si su operador no aparece, es por que no tiene antenas, o bien no lograron ser geolocalizadas.
 				</div>
-
 				<br>
 
-				<label for="sel1">Seleccione operador</label>
+				<label  for="sel1">Seleccione operador</label>
 				<select class="form-control" id="sel1">
-
-					{% for carrier in carriers %}
-						<option value={{ carrier['id'] }}>{{ carrier['name'] }}</option>
-					{% endfor %}
 				</select>
+				<script>
+
+					$.getJSON("/getCarriersWithAntennas", function(data){
+				var carriers = [];
+				$.each( data, function( key, val ) {
+				var option = "<option value=" + val.id + ">" + val.name + "</option>";
+				$(option).appendTo("#sel1");
+				});
+				});
+				</script>
 			</div>
 
 			<div id="info"></div>

@@ -1,6 +1,7 @@
 from app import app
 from flask import render_template, request, json
 
+@app.route('/getCarriersWithAntennas')
 def getCarriersWithAntennas():
     from app.models.carrier import Carrier
     from app.models.antenna import Antenna
@@ -15,16 +16,16 @@ def getCarriersWithAntennas():
             carriersList.append({'id': c.id,
                                  'name': c.name})
 
-    return carriersList
+    return json.dumps(carriersList)
 
 @app.route('/')
 def index():
-    return render_template('index.html', carriers=getCarriersWithAntennas())
+    return render_template('index.html')
 
 
 @app.route('/charts')
 def charts():
-    return render_template('charts.html', carriers=getCarriersWithAntennas())
+    return render_template('charts.html')
 
 
 @app.route('/reports')

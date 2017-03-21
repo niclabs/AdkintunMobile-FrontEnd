@@ -8,14 +8,14 @@
 	<title> Adkintun - Gráficos </title>
 
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/c3.min.css') }}">
+	<link rel="stylesheet" href="static/css/bootstrap-datetimepicker.min.css') }}">
+	<link rel="stylesheet" href="static/css/c3.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script src="{{ url_for('static', filename='js/moment.js') }}"></script>
+	<script src="static/js/moment.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>
-	<script src="{{ url_for('static', filename='js/d3.v3.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+	<script src="static/js/d3.v3.js"></script>
+	<script src="static/js/c3.min.js"></script>
 
 </head>
 
@@ -41,7 +41,6 @@
 					<option value="mobile all">Tráfico Móvil - Total</option>
 					<option value="mobile upload">Tráfico Móvil - Subida</option>
 					<option value="mobile download">Tráfico Móvil - Bajada</option>
-
 				</select>
 			</div>
 		</div>
@@ -49,10 +48,18 @@
 			<div class="form-group">
 				<label for="sel2">Seleccione operador</label>
 				<select class="form-control" id="sel2" onchange="dataThenCreate()">
-					{% for carrier in carriers %}
-						<option value={{ carrier.id }}>{{ carrier.name }}</option>
-					{% endfor %}
 				</select>
+
+				<script>
+
+					$.getJSON("/getCarriersWithAntennas", function(data){
+				var carriers = [];
+				$.each( data, function( key, val ) {
+				var option = "<option value=" + val.id + ">" + val.name + "</option>";
+				$(option).appendTo("#sel2");
+				});
+				});
+				</script>
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-lg-4">
