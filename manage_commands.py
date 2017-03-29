@@ -2,7 +2,7 @@ import json
 
 from app import db
 from app.data import initial_data_carriers
-from flask_script import Command
+from flask_script import Command, Option
 from sqlalchemy.exc import IntegrityError
 
 
@@ -204,10 +204,14 @@ class ExampleAntennas(Command):
 
 # Import data, asking the user the year and the month (Just for testing)
 class GeneralImport(Command):
-    def run(self):
+    def get_options(self):
+        return [
+            Option('-y', '--year', dest='year', default=0),
+            Option('-m', '--month', dest='month', default=0),
+        ]
+
+    def run(self, year, month):
         from app.importation.general_importation import report_import, gsm_signal_import, gsm_count_import, ranking_import
-        year = int(input('Ingrese el año '))
-        month = int(input('Ingrese el mes '))
         # Reports
         print('Importando reportes del año {} mes {} ... '.format(year,month))
         report_import(year, month)
