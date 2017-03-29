@@ -139,7 +139,7 @@ def gsm_signal_import(year, month):
             if not antenna:
                 try:
                     ans = get_antenna(antenna_id)
-                    if ans == 'Antenna with no lat or lon':
+                    if ans == 'Antenna with no lat or lon' or ans is None:
                         continue
 
                 except DifferentIdException:
@@ -185,7 +185,7 @@ def gsm_count_import(year, month):
             if not antenna:
                 try:
                     ans = get_antenna(antenna_id)
-                    if ans == 'Antenna with no lat or lon':
+                    if ans == 'Antenna with no lat or lon' or ans is None:
                         continue
                 except DifferentIdException:
                     continue
@@ -214,7 +214,7 @@ def get_antenna(id):
     try:
         response = urllib.request.urlopen(request)
         data = json.load(reader(response))
-        print(data)
+#        print(data)
         carrier_id = data["carrier_id"]
         cid = data["cid"]
         lac = data["lac"]
@@ -241,6 +241,8 @@ def get_antenna(id):
 
     except ValueError:
         print("Url is not valid")
+    except URLError:
+        print("Error when accessing ", url)
 
 def antennas_import():
     id = db.session.query(func.max(Antenna.id))[0][0] + 1
