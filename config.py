@@ -17,6 +17,8 @@ class DefaultConfig(object):
     USER = "vale"
     SQLALCHEMY_DATABASE_URI = "postgresql://" + USER + ":" + SECRET_KEY + "@localhost/visualization"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    CORS_DOMAIN = '*'
+
 
 class AppTokens:
     tokens = {

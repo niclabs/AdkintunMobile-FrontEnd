@@ -1,22 +1,22 @@
-from app import app
+from sqlalchemy.orm import Session
+
+from app import app, crossdomain
 from flask import render_template, request, json
 
+from app.models.carrier import Carrier
+from app.models.antenna import Antenna
+from sqlalchemy import distinct
+
+cors_origin = app.config['CORS_DOMAIN']
+
 @app.route('/getCarriersWithAntennas')
+@crossdomain(origin=cors_origin)
 def getCarriersWithAntennas():
-    from app.models.carrier import Carrier
-    from app.models.antenna import Antenna
 
-    carriers = Carrier.query.with_entities(Carrier.id, Carrier.name).all()
-    carriersList = [{'id': 0,
-                     'name': 'Todos los operadores'}]
-
-    for c in carriers:
-        # Si es que tiene antennas lo agregamos
-        if Antenna.query.filter_by(carrier_id = c.id).first():
-            carriersList.append({'id': c.id,
-                                 'name': c.name})
-
-    return json.dumps(carriersList)
+    carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Antenna.carrier_id).\
+        filter_by(id=Antenna.carrier_id).all()
+    carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
+    return json.dumps(carriers_list)
 
 @app.route('/')
 def index():
@@ -34,6 +34,7 @@ def reports():
 
 # View that handles the reports and return them in Json format
 @app.route('/getReport')
+@crossdomain(origin=cors_origin)
 def getReports():
     from app.models.report import Report
 
@@ -79,6 +80,7 @@ def convertToDBM(signal):
     return 30 + 10 * math.log10(signal)
 
 @app.route('/getGsmSignal')
+@crossdomain(origin=cors_origin)
 def getGsmSignal():
     from app.models.gsm_signal import GsmSignal
     from app.models.carrier import Carrier
@@ -157,6 +159,7 @@ def getNetworkName(network_type):
         return "Otras"
 
 @app.route('/getNetwork')
+@crossdomain(origin=cors_origin)
 def getNetwork():
     from app.models.gsm_count import GsmCount
     from app.models.carrier import Carrier
@@ -200,6 +203,7 @@ def convertToGB(bytes):
 
 
 @app.route('/getRanking')
+@crossdomain(origin=cors_origin)
 def getAppRanking():
     from app.models.ranking import Ranking
 
@@ -254,6 +258,7 @@ def modelToDict(model):
 
 
 @app.route('/getGsmCount')
+@crossdomain(origin=cors_origin)
 def getGsmCount():
     #from app.map.mapManagement import build, change
     from app.models.antenna import Antenna
