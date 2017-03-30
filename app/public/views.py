@@ -5,6 +5,7 @@ from flask import render_template, request, json
 
 from app.models.carrier import Carrier
 from app.models.antenna import Antenna
+from app.models.ranking import Ranking
 from sqlalchemy import distinct
 
 cors_origin = app.config['CORS_DOMAIN']
@@ -15,6 +16,15 @@ def getCarriersWithAntennas():
 
     carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Antenna.carrier_id).\
         filter_by(id=Antenna.carrier_id).all()
+    carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
+    return json.dumps(carriers_list)
+
+@app.route('/getCarriersWithRanking')
+@crossdomain(origin=cors_origin)
+def getCarriersWithRanking():
+
+    carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Ranking.carrier_id).\
+        filter_by(id=Ranking.carrier_id).all()
     carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
     return json.dumps(carriers_list)
 
