@@ -10,6 +10,7 @@ from sqlalchemy import distinct
 
 cors_origin = app.config['CORS_DOMAIN']
 
+
 @app.route('/getCarriersWithAntennas')
 @crossdomain(origin=cors_origin)
 def getCarriersWithAntennas():
@@ -18,6 +19,7 @@ def getCarriersWithAntennas():
         filter_by(id=Antenna.carrier_id).all()
     carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
     return json.dumps(carriers_list)
+
 
 @app.route('/getCarriersWithRanking')
 @crossdomain(origin=cors_origin)
@@ -28,19 +30,6 @@ def getCarriersWithRanking():
     carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
     return json.dumps(carriers_list)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-@app.route('/charts')
-def charts():
-    return render_template('charts.html')
-
-
-@app.route('/reports')
-def reports():
-    return render_template('total-reports.html')
 
 # View that handles the reports and return them in Json format
 @app.route('/getReport')
@@ -82,12 +71,15 @@ def getReports():
 
     return json.dumps(data)
 
-def convertToWatt(signal):
+
+def convert_to_watt(signal):
     return 10**((signal - 30)/10)
 
-def convertToDBM(signal):
+
+def convert_to_dbm(signal):
     import math
     return 30 + 10 * math.log10(signal)
+
 
 @app.route('/getGsmSignal')
 @crossdomain(origin=cors_origin)
@@ -144,7 +136,7 @@ def getGsmSignal():
     # for e in gsm:
     #     # signal < 0 because there are outliers
     #     if e.signal != None and e.signal <= 80 and e.quantity > 0:
-    #         #signal[e.carrier_id].append(convertToWatt(e.signal))
+    #         #signal[e.carrier_id].append(convert_to_watt(e.signal))
     #         signal[e.carrier_id].append(e.signal)
     #
     # signalMean = {}
