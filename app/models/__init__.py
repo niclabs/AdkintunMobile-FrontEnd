@@ -6,3 +6,6 @@ from app.models import carrier
 from app.models import user
 from app.models import region
 from app.models import ranking
+from app.models import gsm_count
+from app.models import gsm_signal
+from app.models import network_type
