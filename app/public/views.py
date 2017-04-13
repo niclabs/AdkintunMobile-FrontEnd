@@ -1,12 +1,10 @@
-from sqlalchemy.orm import Session
-
-from app import app, crossdomain
-from flask import render_template, request, json
+from app import app, crossdomain, db
+from flask import render_template, request, json, abort
 
 from app.models.carrier import Carrier
 from app.models.antenna import Antenna
 from app.models.ranking import Ranking
-from sqlalchemy import distinct
+from sqlalchemy import distinct, text
 
 cors_origin = app.config['CORS_DOMAIN']
 
@@ -15,7 +13,7 @@ cors_origin = app.config['CORS_DOMAIN']
 @crossdomain(origin=cors_origin)
 def getCarriersWithAntennas():
 
-    carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Antenna.carrier_id).\
+    carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Antenna.carrier_id). \
         filter_by(id=Antenna.carrier_id).all()
     carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
     return json.dumps(carriers_list)
@@ -25,7 +23,7 @@ def getCarriersWithAntennas():
 @crossdomain(origin=cors_origin)
 def getCarriersWithRanking():
 
-    carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Ranking.carrier_id).\
+    carriers = Carrier.query.with_entities(distinct(Carrier.id), Carrier.name, Ranking.carrier_id). \
         filter_by(id=Ranking.carrier_id).all()
     carriers_list = [{'id': c.carrier_id, 'name': c.name} for c in carriers]
     return json.dumps(carriers_list)
@@ -81,72 +79,6 @@ def convert_to_dbm(signal):
     return 30 + 10 * math.log10(signal)
 
 
-@app.route('/getGsmSignal')
-@crossdomain(origin=cors_origin)
-def getGsmSignal():
-    from app.models.gsm_signal import GsmSignal
-    from app.models.carrier import Carrier
-    import numpy as np
-    import statistics
-
-    year = request.args.get('year')
-    month = request.args.get('month')
-    gsm = GsmSignal.query.filter_by(year=year, month=month).all()
-    carriersKnown = Carrier.query.all()
-    carrierIds = [c.id for c in carriersKnown]
-    carriers = set()
-
-    for e in gsm:
-        # We add just the carriers we know without repetition
-        if e.carrier_id in carrierIds:
-            carriers.add(e.carrier_id)
-
-    signal = {}
-
-    for c in carriers:
-        signal[c] = []
-
-    for e in gsm:
-        # signal < 0 because there are outliers
-        if e.signal != None and e.signal <= 80 and e.quantity > 0:
-            signal[e.carrier_id].append(e.signal)
-
-    signalFinal = {}
-
-    for k,v in signal.items():
-        carrierName = Carrier.query.filter_by(id=k).first().name
-        signalCount = {'mediana': 0,
-                       'min': 0,
-                       'max': 0}
-        signalFinal[carrierName] = signalCount
-
-
-    for k,v in signal.items():
-        carrierName = Carrier.query.filter_by(id=k).first().name
-        signalFinal[carrierName]['mediana'] = statistics.median(sorted(v))
-        signalFinal[carrierName]['min'] = np.percentile(sorted(v), 25)
-        signalFinal[carrierName]['max'] = np.percentile(sorted(v), 75)
-    return json.dumps(signalFinal)
-
-    # signal = {}
-    #
-    # for c in carriers:
-    #     signal[c] = []
-    #
-    # for e in gsm:
-    #     # signal < 0 because there are outliers
-    #     if e.signal != None and e.signal <= 80 and e.quantity > 0:
-    #         #signal[e.carrier_id].append(convert_to_watt(e.signal))
-    #         signal[e.carrier_id].append(e.signal)
-    #
-    # signalMean = {}
-    #
-    # for k,v in signal.items():
-    #     carrierName = Carrier.query.filter_by(id=k).first().name
-    #     signalMean[carrierName] = statistics.median(sorted(v))
-    #
-    # return json.dumps(signalMean)
-
 def getNetworkName(network_type):
     networks = ["OTHER", "RTT", "CDMA", "EDGE", "EHRPD", "EVDO_0",
                 "EVDO_A", "EVDO_B", "GPRS", "HSDPA", "HSPA", "HSPAP", "HSUPA", "IDEN", "LTE", "UMTS", "UNKNOWN"];
@@ -160,44 +92,66 @@ def getNetworkName(network_type):
     else:
         return "Otras"
 
-@app.route('/getNetwork')
-@crossdomain(origin=cors_origin)
-def getNetwork():
-    from app.models.gsm_count import GsmCount
-    from app.models.carrier import Carrier
 
+@app.route('/getGsmSignal')
+@crossdomain(origin=cors_origin)
+def get_gsm_signal():
     year = request.args.get('year')
     month = request.args.get('month')
-    gsm = GsmCount.query.filter_by(year=year, month=month).all()
-    carriersKnown = Carrier.query.all()
-    carrierIds = [c.id for c in carriersKnown]
-    carriers = set()
+    # check parameters
+    try:
+        int(year)
+        if 12 < int(month) or 1 > int(month):
+            return abort(404)
+    except Exception:
+        return abort(404)
+    sql = text("""SELECT carrier_name, p25, p50, p75
+                    FROM gsm_signal_statistic_by_carrier
+                    WHERE year=:year AND month=:month""")
+    signal_report = {}
+    result = db.engine.execute(sql, {'year': year, 'month': month})
+    for row in result:
+        name = row['carrier_name']
+        min = row['p25']
+        med = row['p50']
+        max = row['p75']
+        signal_report[name] = {
+            'min': min,
+            'mediana': med,
+            'max': max}
+    return json.dumps(signal_report)
 
-    for e in gsm:
-        # We add just the carriers we know without repetition
-        if e.carrier_id in carrierIds:
-            carriers.add(e.carrier_id)
 
-    networkInformation = {}
+@app.route('/getNetwork')
+@crossdomain(origin=cors_origin)
+def get_network():
+    year = request.args.get('year')
+    month = request.args.get('month')
+    # check parameters
+    try:
+        int(year)
+        if 12 < int(month) or 1 > int(month):
+            return abort(404)
+    except Exception:
+        return abort(404)
 
-    for c in carriers:
-        networkCount = {'2G':0,
-                        '3G':0,
-                        '4G':0,
-                        'Otras':0}
-        networkInformation[c] = networkCount
-
-    for e in gsm:
-        currentCarrier = e.carrier_id
-        networkInformation[currentCarrier][getNetworkName(e.network_type)] += e.quantity
-
-    networkFinal = {}
-
-    for k,v in networkInformation.items():
-        carrierName = Carrier.query.filter_by(id=k).first().name
-        networkFinal[carrierName] = v
-
-    return json.dumps(networkFinal)
+    sql = text("""SELECT carrier_name, network_type, quantity
+                    FROM gsm_count_by_carrier
+                    WHERE year=:year AND month=:month""")
+    count = {}
+    result = db.engine.execute(sql, {'year': year, 'month': month})
+    for row in result:
+        name = row['carrier_name']
+        network = row['network_type']
+        quantity = row['quantity']
+        if name not in count:
+            count[name] = {
+                '2G': 0,
+                '3G': 0,
+                '4G': 0,
+                'Otras': 0}
+        count[name][network] = quantity
+    return json.dumps(count)
 
 
 def convertToGB(bytes):
@@ -313,3 +267,14 @@ def getGsmCount():
                     'totalAntennas': len(antennasData.keys())}
 
     return json.dumps(antennasInfo)
+
+
+@app.route('/healthCheck', methods=['GET'])
+def health_check():
+    try:
+        # to check database we will execute raw query
+        db.session.execute('SELECT 1')
+    except Exception as e:
+        return 'Database unavailable', 503
+
+    return 'OK'
