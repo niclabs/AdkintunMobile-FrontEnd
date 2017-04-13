@@ -9,7 +9,7 @@ class GsmCount(base_model.BaseModel):
     month = db.Column(db.Integer)
     antenna_id = db.Column(db.Integer, db.ForeignKey('antennas.id'))
     carrier_id = db.Column(db.Integer, db.ForeignKey('carriers.id'))
-    network_type = db.Column(db.Integer)
+    network_type = db.Column(db.Integer, db.ForeignKey('network_type.id'))
     quantity = db.Column(db.Integer)
     __table_args__ = (
         PrimaryKeyConstraint("year", "month", "antenna_id", "network_type", "carrier_id", name="gsm_count_pk"), {})

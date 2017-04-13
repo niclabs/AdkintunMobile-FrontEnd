@@ -79,7 +79,7 @@ initial_network_types = '''
         {
             "id": 15,
             "name": "UMTS",
-            "type": "2G"
+            "type": "3G"
         },
         {
             "id": 16,
