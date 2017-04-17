@@ -215,58 +215,18 @@ def modelToDict(model):
 
 @app.route('/getGsmCount')
 @crossdomain(origin=cors_origin)
-def getGsmCount():
-    #from app.map.mapManagement import build, change
-    from app.models.antenna import Antenna
-    from app.models.carrier import Carrier
-    from app.models.gsm_count import GsmCount
-
-    # newZoom = float(request.args.get('zoom'))
-    # lastZoom = request.args.get('lastZoom')
-
-    # lastCarrier = request.args.get('lastCarrier')
-    # bounds = json.loads(request.args.get('mapBounds'))
-    # if not lastZoom:
-    #     return json.dumps(build(newZoom, newCarrier, bounds))
-    # else:
-    #     return json.dumps(change(int(lastZoom), newZoom, lastCarrier, int(newCarrier), bounds))
-
+def get_gsm_count():
     carrier = request.args.get('carrier')
-
-    if carrier == "0":
-        antennas = Antenna.query.all()
-        gsmCount = GsmCount.query.all()
-    else:
-        antennas = Antenna.query.filter_by(carrier_id = carrier)
-        gsmCount = GsmCount.query.filter_by(carrier_id = carrier)
-
-    carriersKnown = Carrier.query.all()
-    carrierIds = [c.id for c in carriersKnown]
-    antennasData = {}
-
-    for antenna in antennas:
-        if antenna.carrier_id in carrierIds:
-            antennasData[antenna.id] = {'lat': antenna.lat,
-                                        'lon': antenna.lon,
-                                        'carrier': Carrier.query.filter_by(id=antenna.carrier_id).first().name,
-                                        '2G': 0,
-                                        '3G': 0,
-                                        '4G': 0,
-                                        'Otras': 0,
-                                        'Total': 0}
-
-    for gsm in gsmCount:
-        if gsm.antenna_id in antennasData:
-            antennaDict = antennasData[gsm.antenna_id]
-            antennaDict[getNetworkName(gsm.network_type)] += gsm.quantity
-            antennaDict['Total'] += gsm.quantity
-
-    print('Cantidad de antenas:', len(antennasData.keys()))
-
-    antennasInfo = {'antennasData': antennasData,
-                    'totalAntennas': len(antennasData.keys())}
-
-    return json.dumps(antennasInfo)
+    try:
+        int(carrier)
+        if Carrier.query.filter(Carrier.id == int(carrier)).first() is None:
+            return abort(404)
+        data = json.load(
+            open("app/static/json/gsm_count/"+carrier+".json",
+                 "r"))
+        return json.dumps(data)
+    except Exception:
+        return abort(404)
 
 
 @app.route('/healthCheck', methods=['GET'])

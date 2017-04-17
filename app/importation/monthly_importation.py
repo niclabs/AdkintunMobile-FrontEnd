@@ -1,8 +1,8 @@
 from datetime import datetime
-from app.importation.general_importation import report_import, ranking_import, gsm_signal_import, gsm_count_import
+from app.importation.general_importation import import_all
+
 
 def monthly_import():
-
     actual_month = datetime.now().month
     actual_year = datetime.now().year
     month_new_import = actual_month - 1
@@ -14,13 +14,5 @@ def monthly_import():
 
     year = year_new_import
     month = month_new_import
-    # Realizamos una actualizacion de la base de datos
 
-    # Importamos los reportes
-    report_import(year, month)
-    # Importamos los ranking
-    ranking_import(year, month)
-    # Importamos signal import
-    gsm_signal_import(year, month)
-    # Importamos count import
-    gsm_count_import(year, month)
+    import_all(year, month)

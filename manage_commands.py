@@ -202,6 +202,7 @@ class ExampleAntennas(Command):
         except IntegrityError:
             db.session.rollback()
 
+
 # Import data, asking the user the year and the month (Just for testing)
 class GeneralImport(Command):
     def get_options(self):
@@ -211,16 +212,14 @@ class GeneralImport(Command):
         ]
 
     def run(self, year, month):
-        from app.importation.general_importation import report_import, gsm_signal_import, gsm_count_import, ranking_import
+        from app.importation.general_importation import import_all
         # Reports
-        print('Importando reportes del año {} mes {} ... '.format(year,month))
-        report_import(year, month)
-        # Ranking
-        print('Importando ranking del año {} mes {} ... '.format(year,month))
-        ranking_import(year, month)
-        # Gsm signal
-        print('Importando gsm signal del año {} mes {} ... '.format(year,month))
-        gsm_signal_import(year, month)
-        # Gsm count
-        print('Importando gsm count del año {} mes {} ... '.format(year,month))
-        gsm_count_import(year, month)
+        import_all(year, month)
+
+
+# Refresh pre-computed queries, should be run whenever new data is imported
+class RefreshQueries(Command):
+    def run(self):
+        from app.importation.general_importation import refresh_antennas_json, refresh_materialized_views
+        refresh_antennas_json()
+        refresh_materialized_views()

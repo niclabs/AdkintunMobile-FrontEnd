@@ -254,5 +254,67 @@ def antennas_import():
         id += 1
 
 
+def refresh_materialized_views():
+    sql = 'REFRESH MATERIALIZED VIEW gsm_count_by_carrier'
+    db.engine.execute(sql)
+    sql = 'REFRESH MATERIALIZED VIEW gsm_signal_statistic_by_carrier'
+    db.engine.execute(sql)
+
+
+def refresh_antennas_json():
+    from app.models.network_type import NetworkType
+    from app.models.gsm_count import GsmCount
+    from app.models.carrier import Carrier
+    from sqlalchemy import func
+    carriers = Carrier.query.all()
+    carriers = ['0'] + [str(c.id) for c in carriers]
+    for carrier in carriers:
+        if carrier == '0':
+            query = GsmCount.query
+        else:
+            query = GsmCount.query.filter(GsmCount.carrier_id == carrier)
+        result = query.join(NetworkType).join(Antenna).join(Carrier, Carrier.id == Antenna.carrier_id).with_entities(
+            func.sum(GsmCount.quantity).label('c'),
+            GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon
+        ).group_by(GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon).all()
+
+        antennas_data = {}
+        atennas_count = 0
+        for row in result:
+            antenna_id = row.antenna_id
+            quantity = row.c
+            network_type = row.type
+            carrier_name = row.name
+            lat = row.lat
+            lon = row.lon
+            if antenna_id not in antennas_data:
+                antennas_data[antenna_id] = {'lat': lat,
+                                             'lon': lon,
+                                             'carrier': carrier_name,
+                                             '2G': 0,
+                                             '3G': 0,
+                                             '4G': 0,
+                                             'Otras': 0,
+                                             'Total': 0}
+
+                atennas_count += 1
+            antennas_data[antenna_id][network_type] = quantity
+            antennas_data[antenna_id]['Total'] += quantity
+        antennas_info = {'antennasData': antennas_data,
+                        'totalAntennas': atennas_count}
+        with open("app/static/json/gsm_count/"+carrier+".json", "w") as jsonfile:
+                json.dump(antennas_info, jsonfile)
+
+
+def import_all(year, month):
+    report_import(year, month)
+    ranking_import(year, month)
+    gsm_signal_import(year, month)
+    gsm_count_import(year, month)
+
+    refresh_materialized_views()
+    refresh_antennas_json()
+
+
 class DifferentIdException(Exception):
     pass
