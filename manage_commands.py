@@ -217,7 +217,7 @@ class GeneralImport(Command):
         import_all(year, month)
 
 
-# Refresh pre-computed queries, should be run whenever new data is imported
+# Refresh pre-computed queries, it's automatically called by the import commands
 class RefreshQueries(Command):
     def run(self):
         from app.importation.general_importation import refresh_antennas_json, refresh_materialized_views
