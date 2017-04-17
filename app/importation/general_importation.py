@@ -14,6 +14,7 @@ from config import AppTokens
 from config import ServerSettings
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
+from app.importation import reportLogger
 
 urls = ServerSettings.urls
 SERVER_BASE_URL = urls["server_url"]
@@ -28,6 +29,7 @@ header = {"Authorization": "token " + token}
 
 # Handles the general report importation (Named general_report_month_year)
 def report_import(year, month):
+    reportLogger.info("Importing general report for {}/{}".format(month, year))
     url = SERVER_BASE_URL + "/" + REPORT_URL + "/" + str(year) + "/" + str(month) + "/general_report_{}_{}.json".format(month,year)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     carriers = Carrier.query.all()
@@ -60,15 +62,17 @@ def report_import(year, month):
                 carrier_id = 0
                 db.session.add(Report(year, month, report_type, carrier_id, element))
                 db.session.commit()
+        reportLogger.info("Finished general report import for {}/{}".format(month, year))
 
     except URLError:
-        print("Can not access to ", url)
+        reportLogger.error("Couldn't reach url {}".format(url))
 
     except ValueError:
-        print("Url is not valid")
+        reportLogger.error("Couldn't reach url {}".format(url))
 
 # Handles the ranking import reports
 def ranking_import(year, month):
+    reportLogger.info("Importing application ranking report for {}/{}".format(month, year))
     url = SERVER_BASE_URL + "/" + RANKING_URL + "/" + str(year) + "/" + str(month) + "/apps_report_{}_{}.json".format(month, year)
     print(url)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
@@ -107,14 +111,16 @@ def ranking_import(year, month):
                                                total_devices=ranking_info["total_devices"]))
                         db.session.commit()
 
+        reportLogger.error("Finished application ranking report import for {}/{}".format(month, year))
     except URLError:
-        print("Can not access to ", url)
+        reportLogger.error("Couldn't reach url {}".format(url))
 
     except ValueError:
-        print("Url is not valid")
+        reportLogger.error("Couldn't reach url {}".format(url))
 
 # Handles the signal reports (Named signal_report_month_year)
 def gsm_signal_import(year, month):
+    reportLogger.info("Importing signal report for {}/{}".format(month, year))
     url = SERVER_BASE_URL + "/" + SIGNAL_URL + "/" + str(year) + "/" + str(month) + "/signal_report_{}_{}.json".format(month, year)
     print(url)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
@@ -156,15 +162,16 @@ def gsm_signal_import(year, month):
                 signal.quantity = quantity
                 signal.signal = signal_mean
                 db.session.commit()
-
+        reportLogger.info("Finished signal report import for {}/{}".format(month, year))
     except URLError:
-        print("Can not access to ", url)
+        reportLogger.error("Couldn't reach url {}".format(url))
 
     except ValueError:
-        print("Url is not valid")
+        reportLogger.error("Couldn't reach url {}".format(url))
 
 
 def gsm_count_import(year, month):
+    reportLogger.info("Importing network report for {}/{}".format(month, year))
     url = SERVER_BASE_URL + "/" + NETWORK_URL + "/" + str(year) + "/" + str(month) + "/network_report_{}_{}.json".format(month,year)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     carriers = Carrier.query.all()
@@ -201,14 +208,16 @@ def gsm_count_import(year, month):
                 count.quantity = quantity
                 db.session.commit()
 
+        reportLogger.info("Finished network report import for {}/{}".format(month, year))
     except URLError:
-        print("Can not access to ", url)
+        reportLogger.error("Couldn't reach url {}".format(url))
 
     except ValueError:
-        print("Url is not valid")
+        reportLogger.error("Couldn't reach url {}".format(url))
 
 # Gets the antenna if it is not inside our database
 def get_antenna(id):
+    reportLogger.info("Requesting antenna {} from database".format(id))
     url = SERVER_BASE_URL + "/" + ANTENNA_URL + "/" + str(id)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
@@ -240,9 +249,9 @@ def get_antenna(id):
                 raise DifferentIdException()
 
     except ValueError:
-        print("Url is not valid")
+        reportLogger.error("Couldn't reach url {}".format(url))
     except URLError:
-        print("Error when accessing ", url)
+        reportLogger.error("Couldn't reach url {}".format(url))
 
 def antennas_import():
     id = db.session.query(func.max(Antenna.id))[0][0] + 1
@@ -255,55 +264,66 @@ def antennas_import():
 
 
 def refresh_materialized_views():
-    sql = 'REFRESH MATERIALIZED VIEW gsm_count_by_carrier'
-    db.engine.execute(sql)
-    sql = 'REFRESH MATERIALIZED VIEW gsm_signal_statistic_by_carrier'
-    db.engine.execute(sql)
+    reportLogger.info("Refreshing materialized views")
+    try:
+        sql = 'REFRESH MATERIALIZED VIEW gsm_count_by_carrier'
+        db.engine.execute(sql)
+        sql = 'REFRESH MATERIALIZED VIEW gsm_signal_statistic_by_carrier'
+        db.engine.execute(sql)
+    except Exception:
+        reportLogger.error("Couldn't refresh materialized views")
+    reportLogger.info("Finished refreshing materialized views")
 
 
 def refresh_antennas_json():
+    reportLogger.info("Refreshing antennas json")
     from app.models.network_type import NetworkType
     from app.models.gsm_count import GsmCount
     from app.models.carrier import Carrier
     from sqlalchemy import func
-    carriers = Carrier.query.all()
-    carriers = ['0'] + [str(c.id) for c in carriers]
-    for carrier in carriers:
-        if carrier == '0':
-            query = GsmCount.query
-        else:
-            query = GsmCount.query.filter(GsmCount.carrier_id == carrier)
-        result = query.join(NetworkType).join(Antenna).join(Carrier, Carrier.id == Antenna.carrier_id).with_entities(
-            func.sum(GsmCount.quantity).label('c'),
-            GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon
-        ).group_by(GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon).all()
+    try:
+        carriers = Carrier.query.all()
+        carriers = ['0'] + [str(c.id) for c in carriers]
+        for carrier in carriers:
+            reportLogger.info("Refreshing antennas json for carrier {}".format(carrier))
+            if carrier == '0':
+                query = GsmCount.query
+            else:
+                query = GsmCount.query.filter(GsmCount.carrier_id == carrier)
+            result = query.join(NetworkType).join(Antenna).join(Carrier, Carrier.id == Antenna.carrier_id).with_entities(
+                func.sum(GsmCount.quantity).label('c'),
+                GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon
+            ).group_by(GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon).all()
 
-        antennas_data = {}
-        atennas_count = 0
-        for row in result:
-            antenna_id = row.antenna_id
-            quantity = row.c
-            network_type = row.type
-            carrier_name = row.name
-            lat = row.lat
-            lon = row.lon
-            if antenna_id not in antennas_data:
-                antennas_data[antenna_id] = {'lat': lat,
-                                             'lon': lon,
-                                             'carrier': carrier_name,
-                                             '2G': 0,
-                                             '3G': 0,
-                                             '4G': 0,
-                                             'Otras': 0,
-                                             'Total': 0}
+            antennas_data = {}
+            atennas_count = 0
+            for row in result:
+                antenna_id = row.antenna_id
+                quantity = row.c
+                network_type = row.type
+                carrier_name = row.name
+                lat = row.lat
+                lon = row.lon
+                if antenna_id not in antennas_data:
+                    antennas_data[antenna_id] = {'lat': lat,
+                                                 'lon': lon,
+                                                 'carrier': carrier_name,
+                                                 '2G': 0,
+                                                 '3G': 0,
+                                                 '4G': 0,
+                                                 'Otras': 0,
+                                                 'Total': 0}
 
-                atennas_count += 1
-            antennas_data[antenna_id][network_type] = quantity
-            antennas_data[antenna_id]['Total'] += quantity
-        antennas_info = {'antennasData': antennas_data,
-                        'totalAntennas': atennas_count}
-        with open("app/static/json/gsm_count/"+carrier+".json", "w") as jsonfile:
-                json.dump(antennas_info, jsonfile)
+                    atennas_count += 1
+                antennas_data[antenna_id][network_type] = quantity
+                antennas_data[antenna_id]['Total'] += quantity
+            antennas_info = {'antennasData': antennas_data,
+                            'totalAntennas': atennas_count}
+            with open("app/static/json/gsm_count/"+carrier+".json", "w") as jsonfile:
+                    json.dump(antennas_info, jsonfile)
+            reportLogger.info("Finished refreshing antennas json for carrier {}".format(carrier))
+    except Exception:
+        reportLogger.error("Couldn't refresh antennas json")
 
 
 def import_all(year, month):

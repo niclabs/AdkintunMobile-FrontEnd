@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.importation import reportLogger
 from app.importation.general_importation import import_all
 
 
@@ -14,5 +15,5 @@ def monthly_import():
 
     year = year_new_import
     month = month_new_import
-
+    reportLogger.info("Initiating monthly report import for {}/{}".format(month, year))
     import_all(year, month)
