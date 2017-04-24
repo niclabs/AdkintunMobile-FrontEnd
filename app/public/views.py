@@ -221,9 +221,13 @@ def get_gsm_count():
         int(carrier)
         if Carrier.query.filter(Carrier.id == int(carrier)).first() is None:
             return abort(404)
-        data = json.load(
-            open("app/static/json/gsm_count/"+carrier+".json",
-                 "r"))
+        file_path = "app/static/json/gsm_count/"+str(carrier)+".json"
+        import os
+        if not os.path.exists(file_path):
+            # If file doesn't exist generate it
+            from app.importation.general_importation import refresh_antennas_json
+            refresh_antennas_json()
+        data = json.load(open(file_path, "r"))
         return json.dumps(data)
     except Exception:
         return abort(404)
