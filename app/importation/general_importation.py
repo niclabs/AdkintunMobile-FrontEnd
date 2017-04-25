@@ -27,6 +27,7 @@ reader = codecs.getreader("utf-8")
 token = AppTokens.tokens["server"]
 header = {"Authorization": "token " + token}
 
+
 # Handles the general report importation (Named general_report_month_year)
 def report_import(year, month):
     reportLogger.info("Importing general report for {}/{}".format(month, year))
@@ -64,11 +65,11 @@ def report_import(year, month):
                 db.session.commit()
         reportLogger.info("Finished general report import for {}/{}".format(month, year))
 
-    except URLError:
-        reportLogger.error("Couldn't reach url {}".format(url))
+    except URLError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except ValueError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
 
-    except ValueError:
-        reportLogger.error("Couldn't reach url {}".format(url))
 
 # Handles the ranking import reports
 def ranking_import(year, month):
@@ -112,11 +113,11 @@ def ranking_import(year, month):
                         db.session.commit()
 
         reportLogger.error("Finished application ranking report import for {}/{}".format(month, year))
-    except URLError:
-        reportLogger.error("Couldn't reach url {}".format(url))
+    except URLError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except ValueError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
 
-    except ValueError:
-        reportLogger.error("Couldn't reach url {}".format(url))
 
 # Handles the signal reports (Named signal_report_month_year)
 def gsm_signal_import(year, month):
@@ -163,11 +164,10 @@ def gsm_signal_import(year, month):
                 signal.signal = signal_mean
                 db.session.commit()
         reportLogger.info("Finished signal report import for {}/{}".format(month, year))
-    except URLError:
-        reportLogger.error("Couldn't reach url {}".format(url))
-
-    except ValueError:
-        reportLogger.error("Couldn't reach url {}".format(url))
+    except URLError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except ValueError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
 
 
 def gsm_count_import(year, month):
@@ -209,11 +209,11 @@ def gsm_count_import(year, month):
                 db.session.commit()
 
         reportLogger.info("Finished network report import for {}/{}".format(month, year))
-    except URLError:
-        reportLogger.error("Couldn't reach url {}".format(url))
+    except URLError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except ValueError as e:
+        reportLogger.error("Couldn't reach url {}".format(url) + str(e))
 
-    except ValueError:
-        reportLogger.error("Couldn't reach url {}".format(url))
 
 # Gets the antenna if it is not inside our database
 def get_antenna(id):
@@ -248,10 +248,11 @@ def get_antenna(id):
             except:
                 raise DifferentIdException()
 
-    except ValueError:
-        reportLogger.error("Couldn't reach url {}".format(url))
-    except URLError:
-        reportLogger.error("Couldn't reach url {}".format(url))
+    except ValueError as e:
+        reportLogger.error("Couldn't reach url {}:".format(url) + str(e))
+    except URLError as e:
+        reportLogger.error("Couldn't reach url {}:".format(url) + str(e))
+
 
 def antennas_import():
     id = db.session.query(func.max(Antenna.id))[0][0] + 1
@@ -270,8 +271,8 @@ def refresh_materialized_views():
         db.engine.execute(sql)
         sql = 'REFRESH MATERIALIZED VIEW gsm_signal_statistic_by_carrier'
         db.engine.execute(sql)
-    except Exception:
-        reportLogger.error("Couldn't refresh materialized views")
+    except Exception as e:
+        reportLogger.error("Couldn't refresh materialized views: " + str(e))
     reportLogger.info("Finished refreshing materialized views")
 
 
@@ -281,6 +282,7 @@ def refresh_antennas_json():
     from app.models.gsm_count import GsmCount
     from app.models.carrier import Carrier
     from sqlalchemy import func
+    import os
     try:
         carriers = Carrier.query.all()
         carriers = ['0'] + [str(c.id) for c in carriers]
@@ -319,11 +321,14 @@ def refresh_antennas_json():
                 antennas_data[antenna_id]['Total'] += quantity
             antennas_info = {'antennasData': antennas_data,
                             'totalAntennas': atennas_count}
+            antennas_dir = "app/static/json/gsm_count/"
+            if not os.path.exists(antennas_dir):
+                os.makedirs(antennas_dir)
             with open("app/static/json/gsm_count/"+carrier+".json", "w") as jsonfile:
                     json.dump(antennas_info, jsonfile)
             reportLogger.info("Finished refreshing antennas json for carrier {}".format(carrier))
-    except Exception:
-        reportLogger.error("Couldn't refresh antennas json")
+    except Exception as e:
+        reportLogger.error("Couldn't refresh antennas json:" + str(e))
 
 
 def import_all(year, month):
