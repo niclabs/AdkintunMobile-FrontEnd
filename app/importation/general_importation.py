@@ -276,6 +276,66 @@ def refresh_materialized_views():
     reportLogger.info("Finished refreshing materialized views")
 
 
+def refresh_4g_antennas_json():
+    reportLogger.info("Refreshing antennas json")
+    from app.models.network_type import NetworkType
+    from app.models.gsm_count import GsmCount
+    from app.models.carrier import Carrier
+    from sqlalchemy import func
+    import os
+    try:
+        carriers = Carrier.query.all()
+        carriers = ['0'] + [str(c.id) for c in carriers]
+        for carrier in carriers:
+            reportLogger.info("Refreshing antennas json for carrier {}".format(carrier))
+            if carrier == '0':
+                query = GsmCount.query
+            else:
+                query = GsmCount.query.filter(GsmCount.carrier_id == carrier)
+            result = query.join(NetworkType).join(Antenna).join(Carrier, Carrier.id == Antenna.carrier_id).with_entities(
+                func.sum(GsmCount.quantity).label('c'),
+                GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon
+            ).group_by(GsmCount.antenna_id, NetworkType.type, Carrier.name, Antenna.lat, Antenna.lon).all()
+
+            antennas_data = {}
+            atennas_count = 0
+            for row in result:
+                antenna_id = row.antenna_id
+                quantity = row.c
+                network_type = row.type
+                carrier_name = row.name
+                lat = row.lat
+                lon = row.lon
+                if antenna_id not in antennas_data:
+                    antennas_data[antenna_id] = {'lat': lat,
+                                                 'lon': lon,
+                                                 'carrier': carrier_name,
+                                                 '4g_events': 0,
+                                                 'non_4g_events': 0,
+                                                 '2G': 0,
+                                                 '3G': 0,
+                                                 '4G': 0,
+                                                 'Otras': 0,
+                                                 'Total': 0}
+
+                    atennas_count += 1
+                if network_type == '4G':
+                    antennas_data[antenna_id]['4g_events'] = quantity
+                else:
+                    antennas_data[antenna_id]['non_4g_events'] = quantity
+                antennas_data[antenna_id]['Total'] += quantity
+            antennas_info = {'antennasData': antennas_data,
+                            'totalAntennas': atennas_count}
+            antennas_dir = "app/static/json/gsm_count/"
+            if not os.path.exists(antennas_dir):
+                os.makedirs(antennas_dir)
+            with open("app/static/json/4g/"+carrier+".json", "w") as jsonfile:
+                    json.dump(antennas_info, jsonfile)
+            reportLogger.info("Finished refreshing antennas json for carrier {}".format(carrier))
+    except Exception as e:
+        reportLogger.error("Couldn't refresh antennas json:" + str(e))
+
+
 def refresh_antennas_json():
     reportLogger.info("Refreshing antennas json")
     from app.models.network_type import NetworkType
