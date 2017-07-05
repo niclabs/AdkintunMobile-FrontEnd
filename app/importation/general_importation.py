@@ -46,29 +46,39 @@ def report_import(year, month):
             if type(element) == dict:
 
                 for carrier, quantity in element.items():
-
                     if carrier.isdigit():
                         carrier_id = int(carrier)
                     else:
                         continue
-
                     # Ignoring the carriers not listed
                     if carrier_id not in carrierIds:
                         continue
-
-                    db.session.add(Report(year, month, report_type, carrier_id, quantity))
-                    db.session.commit()
-
+                    insert_or_update_report(Report(year, month, report_type, carrier_id, quantity))
             else:
                 carrier_id = 0
-                db.session.add(Report(year, month, report_type, carrier_id, element))
-                db.session.commit()
+                insert_or_update_report(Report(year, month, report_type, carrier_id, element))
         reportLogger.info("Finished general report import for {}/{}".format(month, year))
 
     except URLError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
     except ValueError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except IntegrityError as e:
+        db.session.rollback()
+        reportLogger.error("Couldn't insert report into db." + str(e))
+
+
+def insert_or_update_report(report):
+    try:
+        db.session.add(report)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        db_report = Report.query.filter_by(year=report.year, month=report.month,
+                                           carrier_id=report.carrier_id, type=report.type).first()
+        if db_report is not None:
+            db_report.quantity = report.quantity
+            db.session.commit()
 
 
 # Handles the ranking import reports
@@ -102,21 +112,40 @@ def ranking_import(year, month):
 
                         ranking_info = rank[ranking_number]
 
-                        db.session.add(Ranking(year=year, month=month, carrier_id=carrier_id,
-                                               traffic_type=traffic_type.lower(),
-                                               transfer_type=transfer_type.lower(),
-                                               ranking_number=int(ranking_number),
-                                               app_name=ranking_info["app_name"],
-                                               bytes_per_user=ranking_info["bytes_per_user"],
-                                               total_bytes=ranking_info["total_bytes"],
-                                               total_devices=ranking_info["total_devices"]))
-                        db.session.commit()
+                        insert_or_update_ranking(Ranking(year=year, month=month, carrier_id=carrier_id,
+                                                         traffic_type=traffic_type.lower(),
+                                                         transfer_type=transfer_type.lower(),
+                                                         ranking_number=int(ranking_number),
+                                                         app_name=ranking_info["app_name"],
+                                                         bytes_per_user=ranking_info["bytes_per_user"],
+                                                         total_bytes=ranking_info["total_bytes"],
+                                                         total_devices=ranking_info["total_devices"]))
 
-        reportLogger.error("Finished application ranking report import for {}/{}".format(month, year))
+        reportLogger.info("Finished application ranking report import for {}/{}".format(month, year))
     except URLError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
     except ValueError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except IntegrityError as e:
+        db.session.rollback()
+        reportLogger.error("Couldn't insert ranking into db." + str(e))
+
+
+def insert_or_update_ranking(ranking):
+    db_ranking = Ranking.query.filter_by(year=ranking.year, month=ranking.month,
+                                         ranking_number=ranking.ranking_number,
+                                         carrier_id=ranking.carrier_id,
+                                         traffic_type=ranking.traffic_type,
+                                         transfer_type=ranking.transfer_type).first()
+    if db_ranking is not None:
+        db_ranking.total_bytes = ranking.total_bytes
+        db_ranking.bytes_per_user = ranking.bytes_per_user
+        db_ranking.total_devices = ranking.total_devices
+        db_ranking.app_name = ranking.app_name
+        db.session.commit()
+    else:
+        db.session.add(ranking)
+        db.session.commit()
 
 
 # Handles the signal reports (Named signal_report_month_year)
@@ -152,22 +181,32 @@ def gsm_signal_import(year, month):
                 except DifferentIdException:
                     continue
 
-            db.session.add(GsmSignal(year=year, month=month, antenna_id=antenna_id, carrier_id=carrier_id, signal=signal_mean, quantity=quantity))
+            insert_or_update_signal(GsmSignal(year=year, month=month, antenna_id=antenna_id,
+                                              carrier_id=carrier_id, signal=signal_mean, quantity=quantity))
 
-            try:
-                db.session.commit()
-
-            except IntegrityError:
-                db.session.rollback()
-                signal = GsmSignal.query.filter_by(year=year, month=month, carrier_id=carrier_id, antenna_id=antenna_id).first()
-                signal.quantity = quantity
-                signal.signal = signal_mean
-                db.session.commit()
         reportLogger.info("Finished signal report import for {}/{}".format(month, year))
     except URLError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
     except ValueError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except IntegrityError as e:
+        db.session.rollback()
+        reportLogger.error("Couldn't insert signal into db." + str(e))
+
+
+def insert_or_update_signal(signal):
+    try:
+        db.session.add(signal)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        db_signal = GsmSignal.query.filter_by(year=signal.year, month=signal.month,
+                                              carrier_id=signal.carrier_id,
+                                              antenna_id=signal.antenna_id).first()
+        if db_signal is not None:
+            db_signal.quantity = signal.quantity
+            db_signal.signal = signal.signal
+            db.session.commit()
 
 
 def gsm_count_import(year, month):
@@ -186,7 +225,7 @@ def gsm_count_import(year, month):
             network_type = count["network_type"]
             antenna = Antenna.query.get(count["antenna_id"])
 
-            if not carrier_id in carrierIds: # If carrier not in known carriers, we ignore it
+            if carrier_id not in carrierIds:  # If carrier not in known carriers, we ignore it
                 continue
 
             if not antenna:
@@ -197,27 +236,37 @@ def gsm_count_import(year, month):
                 except DifferentIdException:
                     continue
 
-            db.session.add(GsmCount(year=year, month=month, antenna_id=antenna_id, network_type=network_type,
-                                    carrier_id=carrier_id, quantity=quantity))
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-                count = GsmCount.query.filter_by(year=year, month=month, carrier_id=carrier_id,
-                                                  antenna_id=antenna_id, network_type=network_type).first()
-                count.quantity = quantity
-                db.session.commit()
+            insert_or_update_gsm_count(GsmCount(year=year, month=month, antenna_id=antenna_id,
+                                                network_type=network_type, carrier_id=carrier_id,
+                                                quantity=quantity))
 
         reportLogger.info("Finished network report import for {}/{}".format(month, year))
     except URLError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
     except ValueError as e:
         reportLogger.error("Couldn't reach url {}".format(url) + str(e))
+    except IntegrityError as e:
+        reportLogger.error("Couldn't insert gsm_count into db. " + str(e))
+
+
+def insert_or_update_gsm_count(gsm_count):
+    try:
+        db.session.add(gsm_count)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        db_count = GsmCount.query.filter_by(year=gsm_count.year, month=gsm_count.month,
+                                            carrier_id=gsm_count.carrier_id,
+                                            antenna_id=gsm_count.antenna_id,
+                                            network_type=gsm_count.network_type).first()
+        if db_count is not None:
+            db_count.quantity = gsm_count.quantity
+            db.session.commit()
 
 
 # Gets the antenna if it is not inside our database
 def get_antenna(id):
-    reportLogger.info("Requesting antenna {} from database".format(id))
+    # reportLogger.info("Requesting antenna {} from database".format(id))
     url = SERVER_BASE_URL + "/" + ANTENNA_URL + "/" + str(id)
     request = urllib.request.Request(url, headers={"Authorization": "token " + token})
     try:
@@ -347,7 +396,7 @@ def refresh_antennas_json():
         carriers = Carrier.query.all()
         carriers = ['0'] + [str(c.id) for c in carriers]
         for carrier in carriers:
-            reportLogger.info("Refreshing antennas json for carrier {}".format(carrier))
+#            reportLogger.info("Refreshing antennas json for carrier {}".format(carrier))
             if carrier == '0':
                 query = GsmCount.query
             else:
